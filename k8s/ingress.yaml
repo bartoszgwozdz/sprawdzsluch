@@ -9,7 +9,7 @@ metadata:
     # cert-manager.io/cluster-issuer: "letsencrypt"
 spec:
   rules:
-    - host: yourdomain.com   # <- wpisz swój domenowy adres
+    - host: sprawdzsluch.pl   # <- wpisz swój domenowy adres
       http:
         paths:
           - path: /
