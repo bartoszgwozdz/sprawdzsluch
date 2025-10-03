@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sprawdź słuch - O nas</title>
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <style>
+        /* Dodatkowe style specyficzne dla strony "O nas" */
+        .hero-banner {
+            min-height: 320px;
+            border-radius: 0.5rem;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%), url("/assets/img/trojka_lekarzy.jpg");
+            background-size: cover;
+            background-position: center 25%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 4rem;
+            margin-bottom: 2rem;
+            margin-top: 1rem;
+        }
+
+        .hero-banner h1 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .hero-banner h2 {
+            color: white;
+            font-size: 1rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 2rem 0 1rem 0;
+            color: var(--text-dark);
+        }
+
+        .mission-section {
+            margin: 3rem 0;
+        }
+
+        .mission-section h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+            max-width: 720px;
+        }
+
+        .mission-section p {
+            color: var(--text-dark);
+            margin-bottom: 2rem;
+            max-width: 720px;
+        }
+
+        .team-grid,
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .team-member {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .team-image {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            margin-bottom: 1rem;
+        }
+
+        .team-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .team-title {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .feature-card {
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .feature-card h2 {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .feature-card p {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .feature-icon {
+            background-color: var(--light-blue);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-image {
+            width: 100%;
+            height: 180px;
+            border-radius: 0.5rem;
+            background-size: cover;
+            background-position: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-description {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .cta-section {
+            text-align: center;
+            padding: 4rem 0;
+        }
+
+        .cta-section h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--text-dark);
+        }
+
+        @media (min-width: 768px) {
+            .hero-banner {
+                min-height: 400px;
+            }
+
+            .hero-banner h1 {
+                font-size: 3rem;
+            }
+
+            .hero-banner h2 {
+                font-size: 1.25rem;
+            }
+
+            .team-grid,
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div id="main-header"></div>
+
+        <main>
+            <div class="hero-banner">
+                <h1>O nas</h1>
+                <h2>Poznaj historię i misję Sprawdź Słuch, twojego zaufanego partnera w dbaniu o słuch.</h2>
+                <!-- <button id="start-test-btn-hero" class="btn-primary">Rozpocznij bezpłatny test</button> -->
+            </div>
+
+            <section>
+
+                <div class="mission-section">
+                    <h2 class="section-title">Nasza Misja</h2>
+                    <h1>Dostarczanie dostępnych i dokładnych testów słuchu online</h1>
+                    <p>
+                        W Sprawdź Słuch, naszym celem jest uczynienie testów słuchu bardziej dostępnymi i wygodnymi dla
+                        każdego.
+                        Wierzymy, że regularne badania słuchu są kluczowe dla utrzymania dobrego zdrowia i jakości
+                        życia.
+                        Nasze testy online są zaprojektowane tak, aby były dokładne, łatwe w użyciu i dostępne z
+                        dowolnego miejsca.
+                    </p>
+
+                    <div class="features-grid">
+                        <div class="step-card">
+                            <div class="feature-image" style="background-image: url('/assets/img/krzysztof_badanie.jpg');">
+                            </div>
+                            <h3>Dokładność i wiarygodność</h3>
+                            <p>Nasze testy są opracowane przez specjalistów i oparte na sprawdzonych metodach
+                                audiologicznych, zapewniając wiarygodne wyniki.</p>
+                        </div>
+                        <div class="step-card">
+                            <div class="feature-image"
+                                style="background-image: url('/assets/img/kobieta_ze_sluchawkami.jpg');"></div>
+                            <h3>Wygoda i dostępność</h3>
+                            <p>Przeprowadź test w dowolnym miejscu i czasie, bez konieczności wizyty w gabinecie. Wyniki
+                                otrzymasz natychmiast po zakończeniu.</p>
+                        </div>
+                        <div class="step-card">
+                            <div class="feature-image"
+                                style="background-image: url('/assets/img/pacjent_kciuk.jpg');"></div>
+                            <h3>Przystępność i prostota</h3>
+                            <p>Wyniki są zaprezentowane w przystępny sposób, umożliwiając łatwą interpretację. Dodatkowe wskazówki
+                                pomagają zrozumieć stan słuchu i ewentualne kroki do podjęcia.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- <section>
+                <h2 class="section-title">Nasz Zespół</h2>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <div class="team-image" style="background-image: url('../assets/krzysztof_portret.jpg')"></div>
+                        <p class="team-name">Dr. Krzysztof Bednarczyk</p>
+                        <p class="team-title">Audiolog</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="team-image" style="background-image: url('../assets/anna_portret.jpg');"></div>
+                        <p class="team-name">Dr. Anna Kołaczyńska</p>
+                        <p class="team-title">Audiolog</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="team-image" style="background-image: url('../assets/jan_portret.jpg');"></div>
+                        <p class="team-name">Mgr. Jan Wieteska</p>
+                        <p class="team-title">Technik Audiologiczny</p>
+                    </div>
+                </div>
+            </section> -->
+
+            <section>
+
+                <div class="mission-section">
+                    <h2 class="section-title">Innowacje</h2>
+                    <h1>Wykorzystujemy najnowsze technologie, aby zapewnić najlepsze doświadczenie</h1>
+                    <p>
+                        Stale rozwijamy nasze metody testowania i analizy wyników, aby były jeszcze bardziej precyzyjne
+                        i użyteczne.
+                    </p>
+
+                    <div class="steps-grid">
+                        <div class="step-card">
+                            <div class="step-icon">
+                                <span class="material-icons">mic</span>
+                            </div>
+                            <h2>Zaawansowane algorytmy</h2>
+                            <p class="feature-description">Nasze testy wykorzystują zaawansowane algorytmy przetwarzania
+                                sygnałów, aby zapewnić dokładność wyników.</p>
+                        </div>
+                        <div class="step-card">
+                            <div class="step-icon">
+                                <span class="material-icons">show_chart</span>
+                            </div>
+                            <h2>Personalizowane raporty</h2>
+                            <p class="feature-description">Każdy użytkownik otrzymuje spersonalizowany raport z wynikami
+                                i rekomendacjami.</p>
+                        </div>
+                        <div class="step-card">
+                            <div class="step-icon">
+                                <span class="material-icons">shield</span>
+                            </div>
+                            <h2>Bezpieczeństwo danych</h2>
+                            <p class="feature-description">Dbamy o bezpieczeństwo danych naszych użytkowników, stosując
+                                najnowsze standardy ochrony.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div id="main-footer"></div>
+    </div>
+    <!-- MODALE (pozostają bez zmian) -->
+    <div id="hearing-modal" class="modal">
+        <div class="modal-container">
+            <button id="modal-close" class="modal-close">&times;</button>
+            <div id="modal-content" class="modal-content"></div>
+        </div>
+    </div>
+    <div id="confirm-exit-modal" class="modal exit-modal">
+        <div class="modal-container">
+            <div class="modal-content-wrapper">
+                <h2 class="modal-title">Czy na pewno chcesz przerwać test?</h2>
+                <p class="modal-description">Jeśli wyjdziesz teraz, Twój postęp nie zostanie zapisany.</p>
+                <div class="modal-buttons">
+                    <button id="confirm-exit-yes" class="btn-confirm">Tak, przerwij test</button>
+                    <button id="confirm-exit-no" class="btn-cancel">Nie, wróć do testu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/assets/js/main.js"></script>
+    <script>
+        // Obsługa przycisków rozpoczęcia testu
+        document.addEventListener('DOMContentLoaded', function () {
+            const startButtons = document.querySelectorAll('#start-test-btn-hero, #start-test-btn-footer');
+
+            startButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const hearingModal = document.getElementById('hearing-modal');
+                    const modalContent = document.getElementById('modal-content');
+
+                    fetch('assets/partials/modal-intro.html')
+                        .then(response => response.text())
+                        .then(html => {
+                            modalContent.innerHTML = html;
+                            hearingModal.classList.add('show');
+                        })
+                        .catch(error => console.error('Błąd ładowania modalu:', error));
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><!DOCTYPE html>
+        <html lang="pl">
+        <head>
+        <meta charset="UTF-8">
+        <title>Raport badania słuchu – AudioQuality</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f9fafc; color: #1e293b; margin: 0; padding: 20px; }
+        .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        h1 { font-size: 20px; color: #004AAD; margin-bottom: 8px; }
+        h2 { font-size: 16px; margin-top: 20px; margin-bottom: 10px; }
+        .meta div { margin-bottom: 6px; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #e2e8f0; padding: 8px; font-size: 14px; text-align: left; }
+        th { background: #f1f5f9; }
+        .badge { padding: 2px 6px; border-radius: 8px; font-size: 12px; font-weight: bold; color: #fff; }
+        .ok { background: #16a34a; }
+        .mild { background: #84cc16; color: #1e293b; }
+        .moderate { background: #facc15; color: #1e293b; }
+        .footer { font-size: 12px; color: #64748b; margin-top: 20px; text-align: center; }
+        .logo { font-weight: 700; color: #004AAD; }
+        .accent { color: #00C853; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>Raport badania słuchu</h1>
+    <p>Wygenerowany przez <span class="logo">Audio<span class="accent">Quality</span></span></p>
+    <div class="meta">
+        <div><strong>Imię i nazwisko:</strong> <span th:text="${result.name}">Jan Kowalski</span></div>
+        <div><strong>Data:</strong> <span th:text="${result.date}">2025-09-04</span></div>
+        <div><strong>Metoda:</strong> <span th:text="${result.method}">Test tonalny online</span></div>
+        <div><strong>ID raportu:</strong> <span th:text="${result.reportId}">RPT-8AF39KX</span></div>
+        <div><strong>Wiek:</strong> <span th:text="${result.age}">30 lat</span></div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Tabela wyników</h2>
+    <table>
+        <thead>
+        <tr><th>Częstotliwość</th><th>Lewe ucho</th><th>Prawe ucho</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="row : ${result.rows}">
+            <td th:text="${row.frequency}">500 Hz</td>
+            <td>
+                <span th:text="${row.left}">20 dB</span>
+                <span class="badge" th:classappend="${row.leftLevel}">norma</span>
+            </td>
+            <td>
+                <span th:text="${row.right}">22 dB</span>
+                <span class="badge" th:classappend="${row.rightLevel}">lekki</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h2>Podsumowanie</h2>
+    <p th:text="${result.summaryLeft}">Średni próg słyszenia w lewym uchu: 29 dB (lekki ubytek).</p>
+    <p th:text="${result.summaryRight}">Średni próg w prawym uchu: 30 dB (lekki ubytek).</p>
+    <p th:text="${result.recommendation}">Zalecana profilaktyczna konsultacja z protetykiem słuchu.</p>
+</div>
+
+<div class="footer">
+    © 2025 AudioQuality • Test online ma charakter orientacyjny i nie zastępuje badania klinicznego
+</div>
+</body>
+</html>
+</title>
+</head>
+<body>
+
+</body>
+</html>

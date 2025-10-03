@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: myapp-ingress
+  namespace: myapp
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+    - host: myapp.local     # zmień na swoją domenę
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+          - path: /pdf
+            pathType: Prefix
+            backend:
+              service:
+                name: backend-pdf
+                port:
+                  number: 3000
+          - path: /core
+            pathType: Prefix
+            backend:
+              service:
+                name: backend-core
+                port:
+                  number: 8090
+

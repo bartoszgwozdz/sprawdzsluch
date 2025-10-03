@@ -1,0 +1,1272 @@
+/* Zmienne CSS do łatwej zmiany motywu kolorystycznego */
+:root {
+    --primary-blue: #004AAD;
+    --secondary-blue: #003d91;
+    --light-blue: #E6F0FF;
+    --accent-green: #00C853;
+    --text-dark: #212529;
+    --text-light: #6C757D;
+    --bg-light: #F8F9FA;
+    --gray-500: #6B7280;
+    --gray-600: #4B5563;
+}
+
+/* Resetowanie stylów i podstawowa konfiguracja */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    /*font-family: "DM Serif Display", serif;
+    Chivo, sans-serif;
+    */
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+/* Kontener główny */
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+/* Przyciski */
+.btn-primary {
+    background-color: var(--primary-blue);
+    color: white;
+    padding: 1rem 2.5rem;
+    /* większe wypełnienie */
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 1.07rem;
+    font-family: 'Montserrat', sans-serif;
+    /* większa czcionka */
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* subtelny cień dla lepszego efektu */
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary-blue);
+    /* transform: translateY(-2px); lekkie przesunięcie w górę przy najechaniu */
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+    /* mocniejszy cień przy najechaniu */
+}
+
+.btn-primary:disabled {
+    background-color: #D1D5DB;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--primary-blue);
+    border: 2px solid var(--primary-blue);
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-secondary:hover {
+    background-color: var(--primary-blue);
+    color: white;
+}
+
+.btn-confirm,
+.btn-cancel {
+    flex: 1;
+    border-radius: 9999px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border: 2px solid var(--primary-blue);
+}
+
+.btn-confirm {
+    background-color: transparent;
+    color: var(--primary-blue);
+}
+
+.btn-confirm:hover {
+    background-color: var(--secondary-blue);
+    color: white;
+}
+
+.btn-cancel {
+    background-color: var(--primary-blue);
+    color: white;
+}
+
+.btn-cancel:hover {
+    background-color: var(--secondary-blue);
+}
+
+/* Nagłówek */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #E5E7EB;
+    position: relative;
+    /* Potrzebne do pozycjonowania menu mobilnego */
+}
+
+.logo {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+}
+
+.accent {
+    color: var(--accent-green);
+}
+
+.main-nav {
+    display: none;
+}
+
+.main-nav a {
+    color: var(--gray-600);
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.main-nav a:hover {
+    color: var(--primary-blue);
+}
+
+.header-buttons {
+    display: none;
+}
+
+.mobile-menu-btn {
+    display: block;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1001;
+    /* Aby przycisk był zawsze na wierzchu */
+}
+
+/* --- NOWE STYLE DLA MENU MOBILNEGO --- */
+.mobile-menu {
+    display: none;
+    /* Domyślnie ukryte */
+    position: absolute;
+    top: 100%;
+    /* Pozycjonowanie tuż pod headerem */
+    left: 0;
+    right: 0;
+    background-color: var(--bg-light);
+    border-bottom: 1px solid #E5E7EB;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    padding: 1rem 1.5rem 2rem;
+    z-index: 1000;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.mobile-menu.is-open {
+    display: flex;
+    /* Pokaż menu po dodaniu klasy */
+}
+
+.mobile-menu a {
+    color: var(--text-dark);
+    font-weight: 500;
+    font-size: 1.1rem;
+    text-decoration: none;
+    text-align: center;
+}
+
+.mobile-menu .btn-primary {
+    width: 100%;
+    text-align: center;
+}
+
+/* ------------------------------------ */
+
+
+/* Sekcja Hero */
+.hero {
+    padding: 1rem 0 3rem;
+}
+
+.hero-content {
+    display: grid;
+    gap: 4rem;
+    align-items: center;
+}
+
+.hero-text {
+    text-align: center;
+    justify-self: center;
+    align-self: baseline;
+    margin-top: 5rem;
+}
+
+.hero-text h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-dark);
+}
+
+.hero-text p {
+    margin-top: 1.5rem;
+    color: var(--text-light);
+    font-size: 1.125rem;
+}
+
+.hero-buttons {
+    margin-top: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.hero-image-container {
+    position: relative;
+}
+
+.hero-image-container img {
+    width: 100%;
+    border-radius: 0.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.floating-card {
+    position: absolute;
+    bottom: -2rem;
+    left: -2rem;
+    background-color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-width: 320px;
+}
+
+.card-icon {
+    background-color: var(--light-blue);
+    padding: 0.75rem;
+    border-radius: 9999px;
+    flex-shrink: 0;
+    /* Dodano, aby usunąć styl inline z HTML */
+}
+
+.card-icon .material-icons {
+    color: var(--primary-blue);
+}
+
+.card-title {
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.card-subtitle {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+/* Sekcja kroków */
+.steps-section {
+    padding: 1.6rem 0 5rem;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    margin-top: 3rem
+}
+
+.section-header h2 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.section-header p {
+    margin-top: 1rem;
+    font-size: 1.125rem;
+    color: var(--text-light);
+    max-width: 42rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.steps-grid {
+    display: grid;
+    gap: 3rem;
+}
+
+.step-card {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: box-shadow 0.3s;
+}
+
+.step-card:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.step-icon {
+    background-color: var(--light-blue);
+    padding: 1.25rem;
+    border-radius: 9999px;
+    margin-bottom: 1.5rem;
+}
+
+.step-icon .material-icons {
+    color: var(--primary-blue);
+    font-size: 2.5rem;
+}
+
+.step-card h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.step-card p {
+    color: var(--text-light);
+}
+
+/* Sekcja testimonial */
+.testimonial {
+    padding: 6rem 0;
+    background-color: var(--light-blue);
+    border-radius: 1rem;
+    margin: 2rem 0;
+}
+
+.testimonial-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+    padding: 0 1.5rem;
+}
+
+.testimonial-image img {
+    width: 100%;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    height: auto;
+    object-fit: cover;
+}
+
+.testimonial-text {
+    text-align: center;
+}
+
+.testimonial-text h2 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.testimonial-text p {
+    margin-top: 1.5rem;
+    font-size: 1.125rem;
+    color: var(--text-light);
+}
+
+.author-name {
+    margin-top: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    font-size: 1.125rem;
+}
+
+.author-title {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+/* Stopka */
+footer {
+    padding: 4rem 0 2rem;
+    margin-top: 3rem;
+    border-top: 1px solid #E5E7EB;
+}
+
+.footer-content {
+    display: grid;
+    gap: 2rem;
+}
+
+.footer-brand .logo {
+    margin-bottom: 1rem;
+}
+
+.footer-brand p {
+    font-size: 0.875rem;
+    color: var(--text-light);
+}
+
+.footer-menu,
+.footer-support,
+.footer-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+footer h4 {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+footer a {
+    color: var(--text-light);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+footer a:hover {
+    color: var(--primary-blue);
+}
+
+.footer-contact p {
+    color: var(--text-light);
+}
+
+.copyright {
+    text-align: center;
+    color: var(--gray-500);
+    font-size: 0.875rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #E5E7EB;
+}
+
+/* Style dla modali */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 50;
+    display: none;
+    /* Domyślnie ukryty */
+}
+
+.modal.show {
+    display: flex;
+    /* Pokaż po dodaniu klasy .show */
+}
+
+/* Modal na wierzchu */
+.exit-modal {
+    z-index: 60;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-container {
+    background-color: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 672px;
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+}
+
+.small-modal {
+    max-width: 384px;
+    /* sm w Tailwind */
+    padding: 1.5rem;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-500);
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: var(--gray-700, #374151);
+}
+
+.modal-content {
+    width: 100%;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Nagłówki w modalu */
+.modal-content h3 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.modal-content p {
+    color: var(--gray-600, #4B5563);
+    margin-bottom: 1.5rem;
+}
+
+/* Przyciski w modalu */
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* Style dla kroków testu */
+.modal-step {
+    padding: 2rem;
+}
+
+.modal-step h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.modal-step p {
+    margin-bottom: 1.5rem;
+}
+
+.next-step {
+    float: right;
+}
+
+/* Klasy szerokości dla modalu - wersja responsywna */
+.standard-width {
+    max-width: 90%;
+    /* Domyślnie 90% szerokości ekranu na małych urządzeniach */
+    width: 100%;
+}
+
+.wide-width {
+    max-width: 95%;
+    /* Domyślnie 95% szerokości ekranu na małych urządzeniach */
+    width: 100%;
+}
+
+/* Dostosowanie dla tabletów (min-width: 640px) */
+@media (min-width: 640px) {
+    .standard-width {
+        max-width: 540px;
+    }
+
+    .wide-width {
+        max-width: 600px;
+    }
+}
+
+/* Dostosowanie dla większych tabletów (min-width: 768px) */
+@media (min-width: 768px) {
+    .standard-width {
+        max-width: 672px;
+        /* Odpowiednik max-w-2xl z Tailwind */
+    }
+
+    .wide-width {
+        max-width: 768px;
+    }
+}
+
+/* Dostosowanie dla desktopów (min-width: 1024px) */
+@media (min-width: 1024px) {
+    .standard-width {
+        max-width: 672px;
+        /* Wartość nie zmienia się */
+    }
+
+    .wide-width {
+        max-width: 896px;
+        /* Odpowiednik max-w-4xl z Tailwind */
+    }
+}
+
+@media (min-width: 640px) {
+    .hero-buttons {
+        flex-direction: row;
+    }
+}
+
+@media (min-width: 768px) {
+    .main-nav {
+        display: flex;
+        gap: 2rem;
+    }
+
+    .header-buttons {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .mobile-menu-btn {
+        display: none;
+    }
+
+    /* Upewnij się, że menu mobilne jest ukryte na dużych ekranach */
+    .mobile-menu {
+        display: none !important;
+    }
+
+    .hero-text {
+        text-align: left;
+    }
+
+    .hero-text h1 {
+        font-size: 3rem;
+    }
+
+    .hero-buttons {
+        justify-content: flex-start;
+    }
+
+    .testimonial-content {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .testimonial-image {
+        flex: 1;
+    }
+
+    .testimonial-text {
+        flex: 1;
+        text-align: left;
+    }
+
+    .footer-content {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .hero-content {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .steps-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.docs-container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.docs-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    max-width: 960px;
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+    flex: 1;
+    margin: 0 auto;
+    text-align: justify;
+}
+
+.docs-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--text-dark);
+}
+
+.docs-section {
+    margin: 0 1rem;
+    text-align: justify;
+}
+
+.docs-subtitle {
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin: 1.5rem 0 0.5rem 0;
+    color: var(--text-dark);
+}
+
+.docs-description {
+    font-size: 1rem;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+    text-align: justify;
+}
+
+.modal-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 512px;
+    max-width: 512px;
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+    flex: 1;
+}
+
+.modal-title {
+    color: #121615;
+    letter-spacing: normal;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    padding: 0 1rem;
+    /* px-4 */
+    text-align: center;
+    padding-bottom: 0.75rem;
+    /* pb-3 */
+    padding-top: 1.25rem;
+    /* pt-5 */
+}
+
+.modal-button-container {
+    display: flex;
+    padding: 0 1rem;
+    /* px-4 */
+    padding-top: 0.75rem;
+    /* py-3 */
+    padding-bottom: 0.75rem;
+    justify-content: center;
+}
+
+.modal-button {
+    display: flex;
+    min-width: 84px;
+    max-width: 480px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 9999px;
+    /* rounded-full */
+    height: 2.5rem;
+    /* h-10 */
+    padding: 0 1rem;
+    /* px-4 */
+    background-color: #b2e5d1;
+    color: #121615;
+    font-size: 0.875rem;
+    /* text-sm */
+    font-weight: 700;
+    line-height: normal;
+    letter-spacing: 0.015em;
+    border: none;
+    /* Usunięcie domyślnej ramki przycisku */
+    transition: background-color 0.2s ease;
+    /* Dodanie płynnej animacji przy hover */
+}
+
+.modal-button:hover {
+    background-color: #a3d6c2;
+    /* Ciemniejszy odcień na hover */
+}
+
+.button-text {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    /* truncate */
+}
+
+/* Dodanie responsywności */
+@media (max-width: 640px) {
+    .modal-container {
+        padding: 0 1rem;
+    }
+
+    .modal-content-wrapper {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .modal-title {
+        font-size: 24px;
+    }
+}
+
+.checkbox-label {
+    margin-left: 0.5rem;
+    display: block;
+    font-size: 0.875rem;
+    color: #111827;
+}
+
+.start-test-button {
+    width: 100%;
+    border-radius: 9999px;
+    background-color: #b2e5d1;
+    padding: 0.75rem 1.5rem;
+    font-weight: 700;
+    color: #121615;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.start-test-button:hover:not(:disabled) {
+    background-color: #a3d6c2;
+}
+
+.start-test-button:disabled {
+    background-color: #D1D5DB;
+    cursor: not-allowed;
+}
+
+
+/* Style dla modali - dopasowane do ogólnej stylistyki */
+.modal-container {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.modal-content-wrapper {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.modal-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #121615;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.modal-description {
+    font-size: 1rem;
+    color: #121615;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.modal-button-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.modal-button,
+.start-test-button {
+    padding: 0.75rem 2rem;
+    background-color: #b2e5d1;
+    /* Ten sam kolor co btn-primary */
+    color: #121615;
+    border: none;
+    border-radius: 2rem;
+    /* Zaokrąglone narożniki podobne do btn-primary */
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    min-width: 200px;
+}
+
+.modal-button:hover,
+.start-test-button:hover:not(:disabled) {
+    background-color: #a3d6c2;
+    /* Przyciemniony kolor przy hover, podobnie jak btn-primary */
+}
+
+.start-test-button:disabled {
+    background-color: #d1d5db;
+    cursor: not-allowed;
+}
+
+.button-text {
+    display: inline-block;
+}
+
+/* Stylizacja checkboxa */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    padding: 1rem 1rem 0 1rem;
+}
+
+.custom-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--primary-blue);
+    border-radius: 4px;
+    margin-right: 0.75rem;
+    position: relative;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.custom-checkbox:checked {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+}
+
+.custom-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 3px;
+    width: 5px;
+    height: 10px;
+    border: 0px solid white;
+    /* Zmiana z #121615 na white */
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    color: #121615;
+    cursor: pointer;
+}
+
+/* Responsywność */
+@media (max-width: 768px) {
+
+    /* Zmniejszenie bazowego rozmiaru czcionki dla całej strony */
+    html {
+        font-size: 12px;
+        /* Domyślnie jest to 16px, zmniejszenie wpłynie na jednostki rem */
+    }
+
+    /* Zmniejszenie głównego nagłówka */
+    .hero-text h1 {
+        font-size: 2.2rem;
+        /* Zmniejszenie rozmiaru H1 */
+    }
+
+    /* Zmiana układu sekcji hero na kolumnowy */
+    .hero-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .hero-image-container {
+        max-width: 70%; /* Zmniejsza maksymalną szerokość kontenera obrazu */
+        margin: 0 auto; /* Wyśrodkowuje kontener obrazu */
+    }
+
+    /* Zmniejszenie paddingów w sekcjach */
+    section {
+        padding: 30px 15px;
+    }
+
+    /* Zmniejszenie nagłówków sekcji */
+    .section-header h2 {
+        font-size: 1.8rem;
+    }
+
+    .modal-container {
+        padding: 1.5rem;
+    }
+
+    .modal-title {
+        font-size: 1.5rem;
+    }
+
+    .modal-button,
+    .start-test-button {
+        width: 100%;
+        padding: 0.75rem 1rem;
+    }
+
+    .frequency-display {
+        font-size: 1.1rem;
+        padding: 0.75rem 1rem;
+        max-width: 100%;
+    }
+}
+
+.frequency-display {
+    background-color: var(--light-blue);
+    border-radius: 1rem;
+    padding: 1rem 1.5rem;
+    margin: 1.5rem 0;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-blue);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    transition: all 0.3s ease;
+}
+
+.frequency-display.active {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+
+/* --- Kontakt --- */
+.contact-wrapper {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+    padding: 2rem 2rem 2.5rem 2rem;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    background: #f8f9fa;
+    color: var(--text-dark);
+    transition: border-color 0.2s;
+    margin-top: 0.5rem;
+    box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    border-color: var(--primary-blue);
+    outline: none;
+}
+
+.form-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.contact-methods {
+    max-width: 400px;
+    margin: 2rem auto 0 auto;
+}
+
+.contact-method {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.contact-icon {
+    background: var(--light-blue);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.contact-info-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--primary-blue);
+}
+
+.contact-info-text {
+    font-size: 0.95rem;
+    color: var(--text-dark);
+    margin-bottom: 0;
+}
+
+@media (max-width: 700px) {
+    .contact-wrapper {
+        padding: 1rem;
+    }
+
+    .contact-methods {
+        max-width: 100%;
+    }
+}
+
+/* --- NOWE STYLE DLA STRONY INFO I PŁATNOŚCI --- */
+
+.result-card {
+    background: #fff;
+    border-radius: 1rem;
+    /* Dopasowanie do .step-card */
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 600px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    /* Dopasowanie do .step-card */
+    border: 1px solid #E5E7EB;
+    /* Subtelna ramka */
+}
+
+.payment-methods {
+    margin: 1.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.payment-methods label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 500;
+}
+
+#paymentForm input[type="radio"] {
+    accent-color: var(--primary-blue);
+    width: 18px;
+    height: 18px;
+}
+
+#paymentForm .form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    background: #f8f9fa;
+    transition: border-color 0.2s;
+}
+
+#paymentForm .form-input:focus {
+    border-color: var(--primary-blue);
+    outline: none;
+}
+
+#paymentForm .form-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.features {
+    /* Poprawiono: dodano kropkę */
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    text-align: left;
+}
+
+.feature {
+    /* Poprawiono: dodano kropkę */
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 0.5rem 0;
+}
+
+.feature p {
+    /* Poprawiono: dodano kropkę */
+
+    margin-top: 0;
+}
+
+/* --- STARE STYLE (DO USUNIĘCIA LUB ZASTĄPIENIA) --- */
+/* Poniższe style są już zdefiniowane w innych miejscach lub zostały zastąpione.
+   Można je usunąć, aby uniknąć duplikacji.
+*/
+/*
+.result-card, .upgrade-card { ... }
+.muted { ... }
+#paymentForm input[type="email"] { ... }
+#paymentForm button { ... }
+#paymentForm button:hover { ... }
+#paymentForm button:disabled { ... }
+*/
+
+/* Styl dla linku "skip to content" */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--primary-blue);
+    color: white;
+    padding: 8px;
+    z-index: 100;
+    transition: top 0.3s;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* Wyraźniejszy wskaźnik fokusu dla wszystkich interaktywnych elementów */
+:focus-visible {
+    outline: 3px solid var(--accent-green);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 5px rgba(0, 200, 83, 0.3);
+}
+
+/* Poprawka dla przycisków, aby outline był widoczny */
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.modal-close:focus-visible {
+    outline: 3px solid var(--accent-green);
+    outline-offset: 2px;
+}

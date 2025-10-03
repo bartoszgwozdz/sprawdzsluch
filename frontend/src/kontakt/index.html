@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Kontakt - SłuchTest</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/assets/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="container" style="min-height: 100vh; display: flex; flex-direction: column;">
+    <div id="main-header"></div>
+    <main style="flex: 1;">
+      <section class="section-header">
+        <h2>Skontaktuj się z nami</h2>
+      </section>
+      <div class="contact-wrapper">
+        <p class="modal-description">
+          Masz pytania lub potrzebujesz pomocy? Skontaktuj się z nami, a my z przyjemnością Ci pomożemy.
+        </p>
+        <form class="contact-form">
+          <label class="form-label">
+            Imię i nazwisko
+            <input type="text" placeholder="Wpisz swoje imię i nazwisko" class="form-input" />
+          </label>
+          <label class="form-label">
+            Adres e-mail
+            <input type="email" placeholder="Wpisz swój adres e-mail" class="form-input" />
+          </label>
+          <label class="form-label">
+            Temat
+            <input type="text" placeholder="Wybierz temat" class="form-input" />
+          </label>
+          <label class="form-label">
+            Wiadomość
+            <textarea placeholder="Wpisz swoją wiadomość" class="form-textarea"></textarea>
+          </label>
+          <div class="modal-button-container" style="justify-content: flex-start;">
+            <button type="submit" class="btn-primary">
+              <span class="button-text">Wyślij</span>
+            </button>
+          </div>
+        </form>
+        <h3 class="modal-title" style="font-size:1.25rem; margin-top:2rem;">Inne sposoby kontaktu</h3>
+        <p class="modal-description">
+          Możesz również skontaktować się z nami bezpośrednio przez e-mail lub telefon.
+        </p>
+        <div class="contact-methods">
+          <div class="contact-method">
+            <div class="contact-icon">
+              <!-- Ikona e-mail -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor"
+                viewBox="0 0 256 256">
+                <path
+                  d="M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48Zm-96,85.15L52.57,64H203.43ZM98.71,128,40,181.81V74.19Zm11.84,10.85,12,11.05a8,8,0,0,0,10.82,0l12-11.05,58,53.15H52.57ZM157.29,128,216,74.18V181.82Z">
+                </path>
+              </svg>
+            </div>
+            <div>
+              <p class="contact-info-title">E-mail</p>
+              <p class="contact-info-text">kontakt@sluchtest.pl</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <div id="main-footer"></div>
+  </div>
+
+
+  <!-- MODALE (pozostają bez zmian) -->
+  <div id="hearing-modal" class="modal">
+    <div class="modal-container">
+      <button id="modal-close" class="modal-close">&times;</button>
+      <div id="modal-content" class="modal-content"></div>
+    </div>
+  </div>
+  <div id="confirm-exit-modal" class="modal exit-modal">
+    <div class="modal-container">
+      <div class="modal-content-wrapper">
+        <h2 class="modal-title">Czy na pewno chcesz przerwać test?</h2>
+        <p class="modal-description">Jeśli wyjdziesz teraz, Twój postęp nie zostanie zapisany.</p>
+        <div class="modal-buttons">
+          <button id="confirm-exit-yes" class="btn-confirm">Tak, przerwij test</button>
+          <button id="confirm-exit-no" class="btn-cancel">Nie, wróć do testu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/assets/js/main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-core
+  namespace: sprawdzsluch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-core
+  template:
+    metadata:
+      labels:
+        app: backend-core
+    spec:
+      containers:
+        - name: backend-core
+          image: DOCKERHUB_USER/backend-core:latest
+          ports:
+            - containerPort: 8090
+          env:
+            - name: MONGO_URL
+              value: mongodb://$(MONGO_USER):$(MONGO_PASSWORD)@mongodb-0.mongodb.myapp.svc.cluster.local:27017/mydb?authSource=admin
+            - name: MONGO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: mongo-root-username
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: mongo-root-password

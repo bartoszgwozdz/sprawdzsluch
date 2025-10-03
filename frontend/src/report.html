@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Raport badania słuchu – AudioQuality</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root{
+      --primary-blue: #004AAD;
+      --light-blue: #E6F0FF;
+      --accent-green: #00C853;
+      --bg:#f9fafc;
+      --card:#ffffff;
+      --ink:#1e293b;
+      --muted:#475569;
+      --accent:#1d4ed8;
+      --accent-hover:#1e40af;
+      --ok:#16a34a;
+      --mild:#84cc16;
+      --moderate:#facc15;
+      --mod-sev:#fb923c;
+      --severe:#f87171;
+      --profound:#dc2626;
+      --border:#e2e8f0;
+    }
+    body{background:var(--bg);color:var(--ink);font:16px/1.5 "Inter",system-ui,sans-serif;margin:0}
+    .wrap{max-width:960px;margin:40px auto;padding:2rem 4rem;background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+    h1{font-size:2rem;font-weight:700;margin-bottom:8px}
+    h2{font-size:1.25rem;font-weight:600;margin-bottom:8px;color:var(--ink)}
+    .muted{color:var(--muted)}
+    .header-grid{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:24px}
+    .header-grid img{width:100%;border-radius:12px}
+    .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}
+    .meta div{background:#f1f5f9;border-radius:12px;padding:12px;font-size:.9rem}
+    button{background:var(--accent);color:white;border:none;padding:12px 20px;border-radius:9999px;font-weight:600;cursor:pointer;transition:.2s}
+    button:hover{background:var(--accent-hover)}
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    thead th{font-size:.9rem;color:var(--muted);text-align:left;padding:8px 12px}
+    tbody td{padding:12px;background:#f8fafc;border-radius:12px}
+    .badge{padding:4px 10px;border-radius:999px;font-weight:600;color:white;font-size:.8rem}
+    .ok{background:var(--ok)}
+    .mild{background:var(--mild);color:#1e293b}
+    .moderate{background:var(--moderate);color:#1e293b}
+    .mod-sev{background:var(--mod-sev)}
+    .severe{background:var(--severe)}
+    .profound{background:var(--profound)}
+    .legend{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+    .legend span{font-size:.85rem;color:var(--muted);background:#f1f5f9;padding:6px 12px;border-radius:8px}
+    canvas{background:white;border:1px solid var(--border);border-radius:12px;padding:10px}
+    .footer{font-size:.85rem;color:var(--muted);margin-top:20px;text-align:center}
+    .logo {font-size: 1.875rem;font-weight: 700;color: var(--primary-blue);}
+    .accent {color: var(--accent-green);}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card header-grid">
+      <div>
+        <h1>Raport badania słuchu</h1>
+        <p class="muted">Wygenerowany przez <span class="logo">
+        Audio<span class="accent">Quality</span>
+        </span></p>
+        <div class="meta">
+          <div><strong>Imię i nazwisko:</strong> Jan Kowalski</div>
+          <div><strong>Data:</strong> 2025-09-04</div>
+          <div><strong>Metoda:</strong> Test tonalny online</div>
+          <div><strong>ID raportu:</strong> RPT-8AF39KX</div>
+          <div><strong>Wiek:</strong> 30 lat</div>
+        </div>
+        <button>Zapisz jako PDF</button>
+      </div>
+      <div>
+        <img src="assets/sinus.jpg" alt="Osoba w słuchawkach podczas testu słuchu">
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Zakres słyszalności</h2>
+      <p class="muted">
+        Na wykresie przedstawiono pełny zakres słyszalnych częstotliwości (20 Hz – 20 kHz).
+        Zielonym gradientem zaznaczono indywidualnie wykryty zakres słyszalności użytkownika.
+      </p>
+      <canvas id="hearingRange" height="40"></canvas>
+      <div class="legend">
+        <span style="background:linear-gradient(90deg,#22c55e,#bbf7d0);color:#1e293b">
+          Twój zakres: 100 Hz – 13 kHz
+        </span>
+      </div>
+    </div>
+
+
+    <div class="card">
+      <h2>Tabela wyników</h2>
+      <table>
+        <thead>
+          <tr><th>Częstotliwość</th><th>Lewe ucho</th><th>Prawe ucho</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>500 Hz</td><td>20 dB <span class="badge ok">norma</span></td><td>22 dB <span class="badge mild">lekki</span></td></tr>
+          <tr><td>1000 Hz</td><td>25 dB <span class="badge mild">lekki</span></td><td>30 dB <span class="badge mild">lekki</span></td></tr>
+          <tr><td>4000 Hz</td><td>42 dB <span class="badge moderate">umiarkowany</span></td><td>38 dB <span class="badge mild">lekki</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Audiogram</h2>
+      <canvas id="audiogram" height="220"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>Podsumowanie</h2>
+      <p>Średni próg słyszenia w lewym uchu: 29 dB (lekki ubytek).  
+         Średni próg w prawym uchu: 30 dB (lekki ubytek).</p>
+      <p>Zalecana profilaktyczna konsultacja z protetykiem słuchu.</p>
+    </div>
+
+    <div class="footer">
+      © 2025 AudioQuality • Test online ma charakter orientacyjny i nie zastępuje badania klinicznego
+    </div>
+  </div>
+
+
+   <!-- MODAL - uniwersalny, ładuje kroki z osobnych plików -->
+  <div id="hearing-modal" class="modal">
+    <div class="modal-container">
+      <button id="modal-close" class="modal-close">&times;</button>
+      <div id="modal-content" class="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- POP-UP POTWIERDZAJĄCY PRZERWANIE TESTU -->
+  <div id="confirm-exit-modal" class="modal exit-modal">
+    <div class="modal-container">
+      <div class="modal-content-wrapper">
+        <h2 class="modal-title">Czy na pewno chcesz przerwać test?</h3>
+        <p class="modal-description">Jeśli wyjdziesz teraz, Twój postęp nie zostanie zapisany.</p>
+        <div class="modal-buttons">
+          <button id="confirm-exit-yes" class="btn-confirm">Tak, przerwij test</button>
+          <button id="confirm-exit-no" class="btn-cancel">Nie, wróć do testu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ctx=document.getElementById('audiogram');
+    new Chart(ctx,{
+      type:'line',
+      data:{
+        labels:["250 Hz","500 Hz","1000 Hz","2000 Hz","4000 Hz","8000 Hz"],
+        datasets:[
+          {label:"Lewe ucho",data:[18,20,25,28,42,38],borderColor:"#1d4ed8",backgroundColor:"#1d4ed8",tension:.3},
+          {label:"Prawe ucho",data:[15,22,30,26,38,35],borderColor:"#16a34a",backgroundColor:"#16a34a",tension:.3},
+          {label:"Norma (0 dB)",data:[0,0,0,0,0,0],borderColor:"#94a3b8",borderDash:[6,6],pointRadius:0}
+        ]
+      },
+      options:{
+        responsive:true,
+        scales:{y:{reverse:true,min:-10,max:60,ticks:{stepSize:10}}},
+        plugins:{legend:{position:"bottom"}}
+      }
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1"></script>
+<script>
+  const ctx2 = document.getElementById('hearingRange');
+  new Chart(ctx2, {
+    type: 'line',
+    data: {
+      labels: [20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000],
+      datasets: [{
+        label: 'Baseline',
+        data: new Array(10).fill(0),
+        borderColor: 'transparent',
+        pointRadius: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          type: 'logarithmic',
+          min: 3000,
+          max: 20000,
+          ticks: {
+            callback: (val) => val >= 1000 ? val/1000 + " kHz" : val + " Hz"
+          }
+        },
+        y: {
+          display: false,
+          min: 0,
+          max: 1
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        annotation: {
+          annotations: {
+            hearingRange: {
+              type: 'box',
+              xMin: 100,
+              xMax: 13000,
+              yMin: 0,
+              yMax: 1,
+              backgroundColor: 'rgba(34,197,94,0.25)',
+              borderWidth: 0
+            },
+            maxLine: {
+              type: 'line',
+              xMin: 13000,
+              xMax: 13000,
+              borderColor: '#22c55e',
+              borderWidth: 2,
+              borderDash: [4, 4],
+              label: {
+                display: true,
+                content: 'Twój maksymalny zakres słyszalny',
+                position: 'start',
+                yAdjust: -20,
+                backgroundColor: 'rgba(34,197,94,0.9)',
+                color: '#fff',
+                font: {
+                  size: 12,
+                  weight: '600'
+                },
+                padding: 6,
+                borderRadius: 6
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+</script>
+
+
+</body>
+</html>

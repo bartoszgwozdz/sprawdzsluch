@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Raport badania słuchu – AudioQuality</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1"></script>
+    <style>
+        :root{
+       --primary-blue: #004AAD;
+       --light-blue: #E6F0FF;
+       --accent-green: #00C853;
+       --bg:#f9fafc;
+       --card:#ffffff;
+       --ink:#1e293b;
+       --muted:#475569;
+       --accent:#1d4ed8;
+       --accent-hover:#1e40af;
+       --ok:#16a34a;
+       --mild:#84cc16;
+       --moderate:#facc15;
+       --mod-sev:#fb923c;
+       --severe:#f87171;
+       --profound:#dc2626;
+       --border:#e2e8f0;
+     }
+     body{background:var(--bg);color:var(--ink);font:16px/1.5 "Instrument Sans",system-ui,sans-serif;margin:0}
+     .wrap{max-width:960px;margin:40px auto;padding:0 20px}
+     .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+     h1{font-size:2rem;font-weight:700;margin-bottom:8px}
+     h2{font-size:1.25rem;font-weight:600;margin-bottom:8px;color:var(--ink)}
+     .muted{color:var(--muted)}
+     .header-grid{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:24px}
+     .header-grid img{width:100%;border-radius:12px}
+     .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}
+     .meta div{background:#f1f5f9;border-radius:12px;padding:12px;font-size:.9rem}
+     button{background:var(--accent);color:white;border:none;padding:12px 20px;border-radius:9999px;font-weight:600;cursor:pointer;transition:.2s}
+     button:hover{background:var(--accent-hover)}
+     table{width:100%;border-collapse:separate;border-spacing:0 8px}
+     thead th{font-size:.9rem;color:var(--muted);text-align:left;padding:8px 12px}
+     tbody td{padding:12px;background:#f8fafc;border-radius:12px}
+     .badge{padding:4px 10px;border-radius:999px;font-weight:600;color:white;font-size:.8rem}
+     .ok{background:var(--ok)}
+     .mild{background:var(--mild);color:#1e293b}
+     .moderate{background:var(--moderate);color:#1e293b}
+     .mod-sev{background:var(--mod-sev)}
+     .severe{background:var(--severe)}
+     .profound{background:var(--profound)}
+     .legend{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin:12px 0}
+     .legend span{font-size:.85rem;padding:6px 12px;border-radius:8px}
+     canvas{background:white;border:1px solid var(--border);border-radius:12px;padding:10px}
+     .footer{font-size:.85rem;color:var(--muted);margin-top:20px;text-align:center}
+     .logo {font-size: 1.875rem;font-weight: 700;color: var(--primary-blue);}
+     .accent {color: var(--accent-green);}
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="card header-grid">
+        <div>
+            <h1>Raport badania słuchu</h1>
+            <p class="muted">Wygenerowany przez <span class="logo">
+        Audio<span class="accent">Quality</span>
+      </span></p>
+            <div class="meta">
+                <div><strong>Imię i nazwisko:</strong> <span th:text="${user.fullName}">Jan Kowalski</span></div>
+                <div><strong>Data:</strong> <span th:text="${report.date}">2025-09-04</span></div>
+                <div><strong>Metoda:</strong> <span th:text="${report.method}">Test tonalny online</span></div>
+                <div><strong>ID raportu:</strong> <span th:text="${report.id}">RPT-8AF39KX</span></div>
+                <div><strong>Wiek:</strong> <span th:text="${user.age}">30 lat</span></div>
+            </div>
+            <button onclick="window.print()">Zapisz jako PDF</button>
+        </div>
+        <div>
+            <img th:src="@{resources/static/wyniki.png}" alt="Osoba w słuchawkach podczas testu słuchu"></img>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Zakres słyszalności</h2>
+        <p class="muted">
+            Na wykresie przedstawiono pełny zakres słyszalnych częstotliwości (20 Hz – 20 kHz).
+            Zielonym gradientem zaznaczono indywidualnie wykryty zakres słyszalności użytkownika.
+        </p>
+        <canvas id="hearingRange" height="40"></canvas>
+        <div class="legend">
+      <span style="background:linear-gradient(90deg,#22c55e,#bbf7d0);color:#1e293b">
+        Twój zakres: <span th:text="${report.minFreq}">100 Hz</span> – <span th:text="${report.maxFreq}">13 kHz</span>
+      </span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Tabela wyników</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Częstotliwość</th>
+                <th>Lewe ucho</th>
+                <th>Prawe ucho</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="row : ${results}">
+                <td th:text="${row.frequency}">500 Hz</td>
+                <td>
+                    <span th:text="${row.leftEarDb}">20 dB</span>
+                    <span class="badge" th:classappend="${row.leftEarBadgeClass}"
+                          th:text="${row.leftEarStatus}">norma</span>
+                </td>
+                <td>
+                    <span th:text="${row.rightEarDb}">22 dB</span>
+                    <span class="badge" th:classappend="${row.rightEarBadgeClass}"
+                          th:text="${row.rightEarStatus}">lekki</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Audiogram</h2>
+        <canvas id="audiogram" height="220"></canvas>
+    </div>
+
+    <div class="card">
+        <h2>Podsumowanie</h2>
+        <p>
+            Średni próg słyszenia w lewym uchu:
+            <span th:text="${report.avgLeft}">29 dB</span>
+            (<span th:text="${report.leftSummary}">lekki ubytek</span>).
+        </p>
+        <p>
+            Średni próg w prawym uchu:
+            <span th:text="${report.avgRight}">30 dB</span>
+            (<span th:text="${report.rightSummary}">lekki ubytek</span>).
+        </p>
+        <p th:text="${report.recommendation}">Zalecana profilaktyczna konsultacja z protetykiem słuchu.</p>
+    </div>
+
+    <div class="footer">
+        © 2025 AudioQuality • Test online ma charakter orientacyjny i nie zastępuje badania klinicznego
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const audiogramCtx = document.getElementById('audiogram');
+
+    // Pobierz dane z modelu
+    const frequencies = /*[[${frequencies}]]*/ ["250 Hz", "500 Hz", "1000 Hz", "2000 Hz", "4000 Hz", "8000 Hz"];
+    const leftEarData = /*[[${leftEarData}]]*/ [18, 20, 25, 28, 42, 38];
+    const rightEarData = /*[[${rightEarData}]]*/ [15, 22, 30, 26, 38, 35];
+
+    new Chart(audiogramCtx, {
+      type: 'line',
+      data: {
+        labels: frequencies,
+        datasets: [
+          {label: "Lewe ucho", data: leftEarData, borderColor: "#1d4ed8", backgroundColor: "#1d4ed8", tension: 0.3},
+          {label: "Prawe ucho", data: rightEarData, borderColor: "#16a34a", backgroundColor: "#16a34a", tension: 0.3},
+          {label: "Norma (0 dB)", data: new Array(frequencies.length).fill(0), borderColor: "#94a3b8", borderDash: [6, 6], pointRadius: 0}
+        ]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            reverse: true,
+            min: -10,
+            max: 60,
+            ticks: {stepSize: 10}
+          }
+        },
+        plugins: {
+          legend: {position: "bottom"}
+        }
+      }
+    });
+
+    const ctx2 = document.getElementById('hearingRange');
+    new Chart(ctx2, {
+      type: 'line',
+      data: {
+        labels: [20,50,100,200,500,1000,2000,5000,10000,20000],
+        datasets: [{label:'Baseline',data:new Array(10).fill(0),borderColor:'transparent',pointRadius:0}]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: {type:'logarithmic',min:3000,max:20000,ticks:{callback:(val)=> val>=1000? val/1000+' kHz':val+' Hz'}},
+          y: {display:false,min:0,max:1}
+        },
+        plugins: {
+          legend: { display: false },
+          annotation: {
+            annotations: {
+              hearingRange: {
+                type:'box',
+                xMin:[[${report.minFreq}]],
+                xMax:[[${report.maxFreq}]],
+                yMin:0,yMax:1,
+                backgroundColor:'rgba(34,197,94,0.25)',borderWidth:0
+              },
+              maxLine: {
+                type: 'line',
+                xMin: [[${report.maxFreq}]],
+                xMax: [[${report.maxFreq}]],
+                borderColor: '#22c55e',
+                borderWidth: 2,
+                borderDash: [4, 4],
+                label: {
+                  display: true,
+                  content: 'Twój maksymalny zakres słyszalny',
+                  position: 'start',
+                  yAdjust: -20,
+                  backgroundColor: 'rgba(34,197,94,0.9)',
+                  color: '#fff',
+                  font: {
+                    size: 12,
+                    weight: '600'
+                  },
+                  padding: 6,
+                  borderRadius: 6
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

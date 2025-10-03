@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta property="og:title" content="Sprawdź słuch" />
+    <meta property="og:description" content="Twój test słuchu - online" />
+    <meta property="og:image" content="https://sprawdzsluch.pl/thumbnail.jpg" />
+    <meta property="og:url" content="https://sprawdzsluch.pl/" />
+    <meta name="twitter:card" content="summary" />
+
+    <title>Sprawdź słuch</title>
+    <link href="/assets/styles.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet" /> -->
+</head>
+
+<body>
+    <!-- Dodajemy etykiety "skip to content" dla użytkowników klawiatury -->
+    <a href="#main-content" class="skip-link">Przejdź do głównej treści</a>
+
+    <div class="container">
+        <!-- Zakładając, że JS wstawia tu <header>, to jest OK. Jeśli nie, powinien to być tag <header> -->
+        <div id="main-header"></div>
+        
+        <!-- Dodajemy tag <main> i ID dla linku "skip" -->
+        <main id="main-content">
+            <section class="hero" aria-labelledby="hero-heading">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <!-- Dodajemy ID dla aria-labelledby -->
+                        <h1 id="hero-heading">Zbadaj swój słuch online w kilka minut</h1>
+                        <p>Szybko i wygodnie – sprawdź, jak słyszysz w domowym zaciszu. 
+                           Nasz test został opracowany przez specjalistów.</p>
+                        <div class="hero-buttons">
+                            <button id="start-test-btn" class="btn-primary">Rozpocznij test</button>
+                        </div>
+                    </div>
+                    <div class="hero-image-container">
+                        <img alt="Kobieta w słuchawkach robiąca test słuchu" 
+                             src="/assets/img/kobieta_ze_sluchawkami2.jpg" />
+                        <div class="floating-card">
+                            <div class="card-icon">
+                                <!-- Ukrywamy ikonę przed czytnikami ekranu, bo tekst jest wystarczający -->
+                                <span class="material-icons" aria-hidden="true">hearing</span>
+                            </div>
+                            <div class="card-text">
+                                <p class="card-title">Wynik testu</p>
+                                <p class="card-subtitle">Dostępny od razu</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="steps-section" aria-labelledby="steps-heading">
+                <div class="section-header">
+                    <h2 id="steps-heading">Jak to działa?</h2>
+                    <p>Trzy proste kroki dzielą Cię od poznania kondycji Twojego słuchu.</p>
+                </div>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-icon">
+                            <span class="material-icons" aria-hidden="true">headphones</span>
+                        </div>
+                        <h3>1. Załóż słuchawki</h3>
+                        <p>Znajdź ciche miejsce i przygotuj dowolne słuchawki.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-icon">
+                            <span class="material-icons" aria-hidden="true">play_arrow</span>
+                        </div>
+                        <h3>2. Rozpocznij test</h3>
+                        <p>Postępuj zgodnie z instrukcjami wyświetlanymi na ekranie.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-icon">
+                            <span class="material-icons" aria-hidden="true">assignment_turned_in</span>
+                        </div>
+                        <h3>3. Otrzymaj wynik</h3>
+                        <p>Zapoznaj się z wynikiem i rekomendacjami.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="testimonial" aria-labelledby="testimonial-heading">
+                <div class="testimonial-content">
+                    <div class="testimonial-image">
+                        <img alt="Portret Dr. Katarzyny Lichwy-Maciąg" src="/assets/img/lekarka.jpg" />
+                    </div>
+                    <div class="testimonial-text">
+                        <h2 id="testimonial-heading">Test oparty o uznane standardy medyczne</h2>
+                        <p>Nasz test słuchu został opracowany przez zespół doświadczonych audiologów i inżynierów dźwięku, 
+                           aby zapewnić wiarygodne i dokładne wyniki. Korzystamy z technologii cyfrowej, która pozwala 
+                           na precyzyjną ocenę zdolności słyszenia na różnych częstotliwościach.</p>
+                        <p class="author-name">Dr. Katarzyna Lichwa - Maciąg</p>
+                        <p class="author-title">Specjalista audiolog</p>
+                    </div>
+                </div>
+            </section>
+        </main> <!-- Koniec main -->
+        
+        <!-- Zakładając, że JS wstawia tu <footer>, to jest OK. Jeśli nie, powinien to być tag <footer> -->
+        <div id="main-footer"></div>
+    </div>
+    
+
+    <!-- MODAL - dodajemy atrybuty ARIA -->
+    <div id="hearing-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-container">
+            <!-- Dodajemy etykietę dla przycisku zamknięcia -->
+            <button id="modal-close" class="modal-close" aria-label="Zamknij okno">&times;</button>
+            <div id="modal-content" class="modal-content"></div>
+        </div>
+    </div>
+
+    <!-- POP-UP POTWIERDZAJĄCY - dodajemy atrybuty ARIA -->
+    <div id="confirm-exit-modal" class="modal exit-modal" role="alertdialog" aria-modal="true" aria-labelledby="confirm-exit-title">
+        <div class="modal-container">
+            <div class="modal-content-wrapper">
+                <h2 id="confirm-exit-title" class="modal-title">Czy na pewno chcesz przerwać test?</h2>
+                <p class="modal-description">Jeśli wyjdziesz teraz, Twój postęp nie zostanie zapisany.</p>
+                <div class="modal-buttons">
+                    <button id="confirm-exit-yes" class="btn-confirm">Tak, przerwij test</button>
+                    <button id="confirm-exit-no" class="btn-cancel">Nie, wróć do testu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <script src="/assets/js/main.js"></script>
+</body>
+
+</html>

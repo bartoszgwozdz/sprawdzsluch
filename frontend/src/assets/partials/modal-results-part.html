@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wyniki testu — Sprawdź Słuch</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+
+  <style>
+    .mdl-body {
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      margin: 0;
+      padding: 0;
+    }
+
+    .mdl-main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .mdl-section {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .mdl-h2, .mdl-h3 {
+      margin-top: 0;
+      font-weight: 700;
+    }
+
+    .mdl-h2 {
+      font-size: 1.6rem;
+    }
+    .mdl-h3 {
+      font-size: 1.3rem;
+    }
+
+    .mdl-p {
+      margin: 0.5rem 0 1rem 0;
+      color: #475569;
+    }
+
+    /* sekcja raportu z miniaturą */
+    .mdl-report-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    @media (max-width: 700px) {
+      .mdl-report-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .mdl-preview-mock {
+      width: 13rem;
+      background: #f1f5f9;
+      border-radius: 10px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .mdl-preview-mock img {
+      max-width: 100%;
+      max-height: 100%; 
+      object-fit: scale-down;
+      padding: 0.5rem;
+    }
+
+    ul.mdl-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1rem 0;
+    }
+    ul.mdl-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      color: #1e293b;
+    }
+    ul.mdl-features li span {
+      color: #16a34a;
+      font-weight: bold;
+    }
+
+    /* formularz */
+    .mdl-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .mdl-input-email {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    .mdl-input-radio {
+      accent-color: #16a34a;
+    }
+    .mdl-radio-group {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+    .mdl-radio-group label {
+      font-weight: normal;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .mdl-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      background: #16a34a;
+      color: #fff;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.9rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .mdl-btn:hover {
+      background: #15803d;
+    }
+    .mdl-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .mdl-price-tag {
+      background: #dcfce7;
+      color: #166534;
+      font-weight: 600;
+      display: inline-block;
+      padding: 0.2rem 0.8rem;
+      border-radius: 9999px;
+      font-size: 0.9rem;
+    }
+
+    .mdl-status {
+      margin-top: 0.8rem;
+      font-size: 0.85rem;
+      color: #475569;
+    }
+    .mdl-status.mdl-error {
+      color: #dc2626;
+    }
+  </style>
+</head>
+<body class="mdl-body">
+  <main class="mdl-main">
+    <!-- Wstępny wynik -->
+    <section class="mdl-section">
+      <h2 class="mdl-h2">Twój wstępny wynik</h2>
+      <p class="mdl-p">Poniżej prezentujemy Twój wykryty zakres słyszalności — bezpłatny podgląd.</p>
+      <div style="border:1px solid #e2e8f0;border-radius:12px;padding:1rem;">
+        <canvas id="hearingRange" style="width:100%;height:150px;"></canvas>
+      </div>
+      <p id="rangeLabel" class="mdl-p" style="margin-top:0.6rem;font-size:0.85rem;">Twój maksymalny zakres słyszalny: <span>—</span></p>
+    </section>
+
+    <!-- Miniatura raportu + korzyści -->
+    <section class="mdl-section mdl-report-grid">
+      <div class="mdl-preview-mock">
+        <img src="assets/report-preview.jpg" alt="Podgląd raportu">
+      </div>
+      <div>
+        <h3 class="mdl-h3">Pełny raport z badania</h3>
+        <p class="mdl-p">Za jedyne <span class="mdl-price-tag">24,99 zł</span> otrzymasz kompletny raport PDF na podany e-mail.</p>
+
+        <ul class="mdl-features">
+          <li><span>✓</span> Szczegółowy audiogram dla obu uszu</li>
+          <li><span>✓</span> Tabela wyników w dB i interpretacja</li>
+          <li><span>✓</span> Rekomendacje i dalsze kroki</li>
+        </ul>
+
+        <p class="mdl-p" style="font-size:0.85rem;">PDF będzie wyglądał profesjonalnie — z logo, wykresami i pełnym opisem. W przypadku pytań odpowiemy pod adresem <a href="mailto:kontakt@sprawdzsluch.pl">kontakt@sprawdzsluch.pl</a>.</p>
+      </div>
+    </section>
+
+    <!-- Formularz płatności -->
+    <section class="mdl-section">
+      <h3 class="mdl-h3">Dane do płatności</h3>
+      <form id="paymentForm">
+        <div>
+          <label class="mdl-label" for="email">Twój e-mail</label>
+          <input id="email" name="email" type="email" class="mdl-input-email" placeholder="np. jan.kowalski@email.com" required>
+          <p id="emailError" class="mdl-status mdl-error" style="display:none;">Wprowadź poprawny adres e-mail.</p>
+        </div>
+
+        <div style="margin-top:1rem;">
+          <label class="mdl-label">Sposób płatności</label>
+          <div class="mdl-radio-group">
+            <label><input type="radio" class="mdl-input-radio" name="method" value="card" checked>Karta płatnicza</label>
+            <label><input type="radio" class="mdl-input-radio" name="method" value="blik">BLIK</label>
+            <label><input type="radio" class="mdl-input-radio" name="method" value="transfer">Szybki przelew</label>
+          </div>
+        </div>
+
+        <div style="margin-top:1.5rem;">
+          <button id="buyBtn" type="submit" class="mdl-btn">
+            Kup raport PDF za 24,99 zł
+          </button>
+        </div>
+        <p id="statusMessage" class="mdl-status" style="display:none;"></p>
+      </form>
+    </section>
+  </main>
+
+<script>
+    document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const method = document.querySelector('input[name="method"]:checked').value;
+
+      const response = await fetch('/api/payments/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userEmail: email,
+          testId: "TEST-12345", // identyfikator badania (np. generowany na froncie)
+          paymentMethod: method
+        })
+      });
+
+      const payment = await response.json();
+
+      // redirect do Paynow z ID płatności
+      window.location.href = payment.redirectUrl;
+    });
+  </script>
+  <script>
+    const ctx2 = document.getElementById('hearingRange');
+    new Chart(ctx2, {
+      type: 'line',
+      data: {
+        labels: [20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000],
+        datasets: [{
+          label: 'Baseline',
+          data: new Array(10).fill(0),
+          borderColor: 'transparent',
+          pointRadius: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: {
+            type: 'logarithmic',
+            min: 3000,
+            max: 20000,
+            ticks: {
+              callback: (val) => val >= 1000 ? val / 1000 + " kHz" : val + " Hz"
+            }
+          },
+          y: {
+            display: false,
+            min: 0,
+            max: 1
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          annotation: {
+            annotations: {
+              hearingRange: {
+                type: 'box',
+                xMin: 100,
+                xMax: 13000,
+                yMin: 0,
+                yMax: 1,
+                backgroundColor: 'rgba(34,197,94,0.25)',
+                borderWidth: 0
+              },
+              maxLine: {
+                type: 'line',
+                xMin: 13000,
+                xMax: 13000,
+                borderColor: '#22c55e',
+                borderWidth: 2,
+                borderDash: [4, 4],
+                label: {
+                  display: true,
+                  content: 'Twój maksymalny zakres słyszalny',
+                  position: 'start',
+                  yAdjust: -20,
+                  backgroundColor: 'rgba(34,197,94,0.9)',
+                  color: '#fff',
+                  font: {
+                    size: 12,
+                    weight: '600'
+                  },
+                  padding: 6,
+                  borderRadius: 6
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

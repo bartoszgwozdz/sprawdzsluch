@@ -1,0 +1,14 @@
+# Node / Java / Python / etc
+node_modules/
+target/
+*.log
+*.jar
+*.class
+
+# Docker
+*.tar
+
+# IDE
+.vscode/
+.idea/
+*.iml

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Sprawdź Słuch - Regulamin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/assets/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  
+</head>
+
+<body>
+  <div class="container" style="min-height: 100vh; display: flex; flex-direction: column;">
+    <div id="main-header"></div>
+
+    <main style="flex: 1;">
+      <div class="step-card" style="max-width: 960px; margin: 2rem auto; padding: 2rem;">
+        <div class="docs-content-wrapper">
+          <h1 class="docs-title">Regulamin korzystania</h1>
+
+          <div class="docs-section">
+            <h2 class="docs-subtitle">1. Akceptacja regulaminu</h2>
+            <p class="docs-description">
+              Korzystając z testu słuchu online sprawdzsluch.pl, akceptujesz niniejszy regulamin. Jeśli nie zgadzasz się z jego
+              postanowieniami, prosimy o niekorzystanie z usługi.
+            </p>
+          </div>
+
+          <div class="docs-section">
+            <h2 class="docs-subtitle">2. Opis usługi</h2>
+            <p class="docs-description">
+              Sprawdzsluch.pl oferuje test słuchu online, który umożliwia użytkownikom samodzielną ocenę słuchu. Usługa ma
+              charakter wyłącznie informacyjny i nie stanowi diagnozy medycznej ani porady specjalistycznej.
+            </p>
+          </div>
+
+          <div class="docs-section">
+            <h2 class="docs-subtitle">3. Obowiązki użytkownika</h2>
+            <p class="docs-description">
+              Użytkownik zobowiązuje się do korzystania z usługi zgodnie z obowiązującym prawem. Zabronione jest celowe
+              zakłócanie działania usługi lub jej nadużywanie.
+            </p>
+          </div>
+
+          <div class="docs-section">
+            <h2 class="docs-subtitle">4. Prywatność</h2>
+            <p class="docs-description">
+              Twoja prywatność jest dla nas ważna. Prosimy o zapoznanie się z naszą Polityką prywatności, aby dowiedzieć
+              się, jak zbieramy, wykorzystujemy i chronimy Twoje dane osobowe.
+            </p>
+          </div>
+
+          <div class="docs-section">
+            <h2 class="docs-subtitle">5. Zastrzeżenia</h2>
+            <p class="docs-description">
+              Usługa jest świadczona „tak jak jest", bez jakichkolwiek gwarancji – wyraźnych lub dorozumianych. Sprawdzsluch.pl
+              nie ponosi odpowiedzialności za dokładność, niezawodność ani dostępność testu.
+            </p>
+          </div>
+
+          <div class="docs-section">
+            <h2 class="docs-subtitle">6. Ograniczenie odpowiedzialności</h2>
+            <p class="docs-description">
+              Sprawdzsluch.pl nie ponosi odpowiedzialności za jakiekolwiek szkody bezpośrednie, pośrednie, przypadkowe,
+              szczególne ani wtórne wynikające z korzystania z testu.
+            </p>
+          </div>
+
+          <div class="docs-section">
+            <h2 class="docs-subtitle">7. Zmiany regulaminu</h2>
+            <p class="docs-description">
+              Sprawdzsluch.pl zastrzega sobie prawo do wprowadzania zmian w niniejszym regulaminie w dowolnym momencie. Dalsze
+              korzystanie z usługi po wprowadzeniu zmian oznacza ich akceptację.
+            </p>
+          </div>
+
+          <div class="docs-section">
+            <h2 class="docs-subtitle">8. Prawo właściwe</h2>
+            <p class="docs-description">
+              Regulamin podlega prawu obowiązującemu w Polsce.
+            </p>
+          </div>
+
+          <div class="docs-section">
+            <h2 class="docs-subtitle">9. Kontakt</h2>
+            <p class="docs-description">
+              W przypadku pytań dotyczących regulaminu, skontaktuj się z nami pod adresem: kontakt@sprawdzsluch.pl
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="main-footer"></div>
+  </div>
+  <!-- MODALE (pozostają bez zmian) -->
+  <div id="hearing-modal" class="modal">
+    <div class="modal-container">
+      <button id="modal-close" class="modal-close">&times;</button>
+      <div id="modal-content" class="modal-content"></div>
+    </div>
+  </div>
+  <div id="confirm-exit-modal" class="modal exit-modal">
+    <div class="modal-container">
+      <div class="modal-content-wrapper">
+        <h2 class="modal-title">Czy na pewno chcesz przerwać test?</h2>
+        <p class="modal-description">Jeśli wyjdziesz teraz, Twój postęp nie zostanie zapisany.</p>
+        <div class="modal-buttons">
+          <button id="confirm-exit-yes" class="btn-confirm">Tak, przerwij test</button>
+          <button id="confirm-exit-no" class="btn-cancel">Nie, wróć do testu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/assets/js/main.js"></script>
+</body>
+
+</html>

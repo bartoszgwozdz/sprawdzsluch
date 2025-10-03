@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sprawdź Słuch - Polityka Prywatności</title>
+  <link rel="stylesheet" href="/assets/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="container" style="min-height: 100vh; display: flex; flex-direction: column;">
+    <div id="main-header"></div>
+
+    <main style="flex: 1;">
+      <div class="step-card" style="max-width: 960px; margin: 2rem auto; padding: 2rem;">
+        <div class="docs-content-wrapper">
+          <h1 class="docs-title">Polityka prywatności</h1>
+
+          <div class="docs-section">
+            <p class="docs-description">
+              Niniejsza Polityka prywatności opisuje, w jaki sposób sprawdzsluch.pl gromadzi, wykorzystuje i chroni Twoje dane
+              osobowe podczas korzystania z naszych usług. Dbamy o Twoją prywatność i dokładamy wszelkich starań, aby
+              Twoje dane były bezpieczne.
+            </p>
+          </div>
+
+          <div class="docs-section">
+            <h2 class="docs-subtitle">Jakie dane zbieramy</h2>
+            <p class="docs-description">
+              Zbieramy dane, które przekazujesz nam bezpośrednio, np. podczas wykonywania testu słuchu
+              lub kontaktu z naszym zespołem. Mogą to być: imię, adres e-mail, wyniki testu.
+              Automatycznie zbieramy też dane techniczne, takie jak adres IP i informacje o korzystaniu z naszej strony
+              –
+              w celu ulepszania naszych usług.
+            </p>
+          </div>
+
+          <div class="docs-section">
+            <h2 class="docs-subtitle">W jaki sposób wykorzystujemy Twoje dane</h2>
+            <p class="docs-description">
+              Wykorzystujemy Twoje dane, aby świadczyć i ulepszać nasze usługi, personalizować Twoje doświadczenia,
+              komunikować się z Tobą oraz prowadzić działania badawczo-rozwojowe. Możemy również przetwarzać dane w celu
+              spełnienia obowiązków prawnych i ochrony naszych praw.
+            </p>
+          </div>
+
+          <div class="docs-section">
+            <h2 class="docs-subtitle">Udostępnianie danych</h2>
+            <p class="docs-description">
+              Nie sprzedajemy Twoich danych osobowych. Możemy je udostępniać zaufanym partnerom technologicznym, którzy
+              wspierają nas w świadczeniu usług – pod warunkiem zachowania poufności.
+              Dane mogą być również ujawnione, jeśli będzie to wymagane przepisami prawa lub w celu ochrony naszych praw
+              i bezpieczeństwa.
+            </p>
+          </div>
+
+          <div class="docs-section">
+            <h2 class="docs-subtitle">Bezpieczeństwo danych</h2>
+            <p class="docs-description">
+              Stosujemy odpowiednie środki techniczne i organizacyjne, aby chronić Twoje dane osobowe przed
+              nieuprawnionym
+              dostępem, użyciem lub ujawnieniem.
+              Pamiętaj jednak, że żadna metoda przesyłania danych przez Internet ani sposób ich przechowywania nie
+              gwarantuje pełnego bezpieczeństwa.
+            </p>
+          </div>
+
+          <div class="docs-section">
+            <h2 class="docs-subtitle">Twoje prawa</h2>
+            <p class="docs-description">
+              Masz prawo dostępu do swoich danych osobowych, ich poprawiania, usunięcia oraz – w niektórych przypadkach
+              –
+              ograniczenia przetwarzania. Możesz również sprzeciwić się przetwarzaniu danych.
+              Aby skorzystać z tych praw, skontaktuj się z nami pod adresem podanym poniżej.
+            </p>
+          </div>
+
+          <div class="docs-section">
+            <h2 class="docs-subtitle">Administrator danych</h2>
+            <p class="docs-description">
+              Administratorem Twoich danych osobowych jest Sprawdzsluch.pl.
+              Kontakt: AQ Bartosz Gwóźdź ul. Graniczna 21, 32-040 Świątniki Górne, NIP: 6792880349, REGON: 122809833
+            </p>
+          </div>
+
+          <div class="docs-section">
+            <h2 class="docs-subtitle">Zmiany w polityce</h2>
+            <p class="docs-description">
+              Zastrzegamy sobie prawo do aktualizacji tej Polityki prywatności. O istotnych zmianach poinformujemy na
+              naszej stronie internetowej lub w inny sposób.
+              Dalsze korzystanie z naszych usług po dacie wejścia w życie zmian oznacza ich akceptację.
+            </p>
+          </div>
+
+          <div class="docs-section">
+            <h2 class="docs-subtitle">Kontakt</h2>
+            <p class="docs-description">
+              Jeśli masz pytania lub wątpliwości dotyczące tej Polityki prywatności, skontaktuj się z nami:
+              kontakt@sprawdzsluch.pl
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="main-footer"></div>
+  </div>
+  <!-- MODALE (pozostają bez zmian) -->
+  <div id="hearing-modal" class="modal">
+    <div class="modal-container">
+      <button id="modal-close" class="modal-close">&times;</button>
+      <div id="modal-content" class="modal-content"></div>
+    </div>
+  </div>
+  <div id="confirm-exit-modal" class="modal exit-modal">
+    <div class="modal-container">
+      <div class="modal-content-wrapper">
+        <h2 class="modal-title">Czy na pewno chcesz przerwać test?</h2>
+        <p class="modal-description">Jeśli wyjdziesz teraz, Twój postęp nie zostanie zapisany.</p>
+        <div class="modal-buttons">
+          <button id="confirm-exit-yes" class="btn-confirm">Tak, przerwij test</button>
+          <button id="confirm-exit-no" class="btn-cancel">Nie, wróć do testu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/assets/js/main.js"></script>
+</body>
+
+</html>

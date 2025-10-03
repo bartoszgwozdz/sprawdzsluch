@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-pdf
+  namespace: service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-pdf
+  template:
+    metadata:
+      labels:
+        app: backend-pdf
+    spec:
+      containers:
+        - name: backend-pdf
+          image: DOCKERHUB_USER/backend-pdf:latest
+          ports:
+            - containerPort: 3000
+

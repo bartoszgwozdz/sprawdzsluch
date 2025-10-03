@@ -1,0 +1,13 @@
+{
+  "name": "pdf-service",
+  "version": "1.0.0",
+  "description": "Mikroserwis do generowania plików PDF",
+  "main": "pdf-service.js",
+  "scripts": {
+    "start": "node pdf-service.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "puppeteer": "^24.20.0"
+  }
+}

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Test słuchu — Pełny raport</title>
+  <link href="/assets/styles.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <div id="main-header"></div>
+    <div class="section-header" style="margin-bottom: 2rem;">
+        <h2>Test słuchu online</h2>
+        <p style="max-width: fit-content;">Bezpośrednio po teście zobaczysz skrócony wynik. Pełny, szczegółowy raport otrzymasz w formacie PDF po dokonaniu płatności.</p>
+          
+      </div>
+    <section class="hero">
+      
+
+      <div class="hero-content" style="max-width:800px; justify-self: center;">
+        <!-- Lewa strona: Podgląd raportu -->
+        <div class="hero-image-container">
+          <img src="/assets/img/report_preview.jpg" alt="Miniatura raportu PDF" style="padding:0.5rem;" />
+        </div>
+
+        <!-- Prawa strona: Cechy raportu -->
+        <div class="hero-text" style="text-align: left; ">
+          <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 2.5rem;">Co zawiera pełny raport?</h3>
+
+          <div class="features">
+            <div class="feature">
+              <div class="card-icon"><span class="material-icons">graphic_eq</span></div>
+              <div>
+                <strong class="card-title">Szczegółowy audiogram</strong>
+                <p class="card-subtitle">Graficzna prezentacja progu słyszenia.</p>
+              </div>
+            </div>
+            <div class="feature">
+              <div class="card-icon"><span class="material-icons">summarize</span></div>
+              <div>
+                <strong class="card-title">Tabela wyników w dB</strong>
+                <p class="card-subtitle">Dokładne wartości dla kluczowych częstotliwości.</p>
+              </div>
+            </div>
+            <div class="feature">
+              <div class="card-icon"><span class="material-icons">medical_information</span></div>
+              <div>
+                <strong class="card-title">Podsumowanie i interpretacja</strong>
+                <p class="card-subtitle">Wytłumaczenie wyników prostym językiem.</p>
+              </div>
+            </div>
+            <div class="feature">
+              <div class="card-icon"><span class="material-icons">recommend</span></div>
+              <div>
+                <strong class="card-title">Indywidualne zalecenia</strong>
+                <p class="card-subtitle">Sugestie dotyczące dalszych kroków.</p>
+              </div>
+            </div>
+          </div>
+          <p class="badge-price" style="font-size: 1.2rem;display: inline-block; background: var(--light-blue); color: var(--primary-blue); border-radius: 9999px; padding: 0.5rem 1rem; margin: 3rem 0;">
+            Jednorazowa opłata: <del style="color: var(--text-light); margin-right: 0.5rem;">49,99 zł</del> <strong>24,99 zł</strong>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sekcja kroków -->
+    <section class="steps-section">
+      <div class="section-header">
+        <h2>Jak otrzymać raport?</h2>
+        <p>Proces jest prosty i w pełni zautomatyzowany.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-icon"><span class="material-icons">play_arrow</span></div>
+          <h3>1. Zrób test</h3>
+          <p>W kilka minut, wygodnie online, postępując zgodnie z instrukcjami.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon"><span class="material-icons">email</span></div>
+          <h3>2. Podaj e-mail i opłać</h3>
+          <p>Wybierz metodę płatności (BLIK, karta, przelew) i podaj adres do wysyłki.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon"><span class="material-icons">picture_as_pdf</span></div>
+          <h3>3. Odbierz raport PDF</h3>
+          <p>Gotowy raport zostanie automatycznie wysłany na Twój adres e-mail.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sekcja płatności -->
+    <!-- <section id="payment-section" class="section-header">
+        <h2>Kup pełny raport</h2>
+        <p>Wypełnij poniższe pola, aby otrzymać swój szczegółowy raport w formacie PDF.</p>
+        <div class="result-card" style="max-width: 600px; text-align: left;">
+            <form id="paymentForm">
+                <label for="email" class="form-label">Twój e-mail</label>
+                <input id="email" name="email" type="email" required placeholder="np. jan.kowalski@email.com" class="form-input">
+
+                <div style="margin-top: 1.5rem;">
+                    <label class="form-label">Sposób płatności</label>
+                    <div class="payment-methods">
+                        <label><input type="radio" name="method" value="card" checked> Karta płatnicza</label>
+                        <label><input type="radio" name="method" value="blik"> BLIK</label>
+                        <label><input type="radio" name="method" value="transfer"> Szybki przelew</label>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <button type="submit" class="btn-primary" id="buyBtnSmall" style="width: 100%;">Kup i otrzymaj raport za 24,99 zł</button>
+                </div>
+                <p id="payStatus" class="muted" style="margin-top:1rem; text-align: center; display:none;"></p>
+            </form>
+        </div>
+    </section> -->
+
+    <div id="main-footer"></div>
+  </div>
+
+  <!-- MODALE (pozostają bez zmian) -->
+  <div id="hearing-modal" class="modal">
+    <div class="modal-container">
+      <button id="modal-close" class="modal-close">&times;</button>
+      <div id="modal-content" class="modal-content"></div>
+    </div>
+  </div>
+  <div id="confirm-exit-modal" class="modal exit-modal">
+    <div class="modal-container">
+      <div class="modal-content-wrapper">
+        <h2 class="modal-title">Czy na pewno chcesz przerwać test?</h2>
+        <p class="modal-description">Jeśli wyjdziesz teraz, Twój postęp nie zostanie zapisany.</p>
+        <div class="modal-buttons">
+          <button id="confirm-exit-yes" class="btn-confirm">Tak, przerwij test</button>
+          <button id="confirm-exit-no" class="btn-cancel">Nie, wróć do testu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/js/main.js"></script>
+  <!-- <script>
+    // Skrypt do obsługi formularza płatności
+    const paymentForm = document.getElementById('paymentForm');
+    paymentForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const payStatus = document.getElementById('payStatus');
+
+      if (!/\S+@\S+\.\S+/.test(email)) {
+        payStatus.style.display = 'block';
+        payStatus.textContent = 'Wprowadź poprawny adres e-mail.';
+        payStatus.style.color = 'red';
+        return;
+      }
+
+      const body = {
+        userEmail: email,
+        testId: 'test-' + Math.random().toString(36).slice(2, 9),
+        amountCents: 2499,
+        currency: 'PLN',
+        paymentMethod: document.querySelector('input[name="method"]:checked').value
+      };
+
+      const btn = document.getElementById('buyBtnSmall');
+      btn.disabled = true;
+      btn.textContent = 'Przekierowuję do płatności...';
+      payStatus.style.display = 'none';
+
+      try {
+        const resp = await fetch('/api/payments/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        if (!resp.ok) throw new Error('Błąd serwera');
+        const json = await resp.json();
+        const redirect = json.redirectUrl || json.paymentUrl;
+        if (redirect) {
+          window.location.href = redirect;
+        } else {
+          throw new Error('Brak adresu URL do przekierowania');
+        }
+      } catch (err) {
+        payStatus.style.display = 'block';
+        payStatus.textContent = 'Wystąpił błąd podczas inicjalizacji płatności. Spróbuj ponownie.';
+        payStatus.style.color = 'red';
+        btn.disabled = false;
+        btn.textContent = 'Kup i otrzymaj raport za 24,99 zł';
+        console.error(err);
+      }
+    });
+  </script> -->
+</body>
+
+</html>

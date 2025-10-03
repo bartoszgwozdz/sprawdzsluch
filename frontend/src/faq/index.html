@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sprawdź Słuch - FAQ</title>
+  <link rel="stylesheet" href="/assets/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <style>
+    /* Dodatkowe style do FAQ */
+    .faq-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1rem 2rem 0rem;
+    }
+
+    .faq-item {
+      margin-bottom: 1rem;
+      border: 1px solid #dbe1e6;
+      border-radius: 0.5rem;
+      background-color: white;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+      overflow: hidden;
+    }
+
+    .faq-question {
+      cursor: pointer;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 500;
+      color: var(--text-dark);
+    }
+
+    .faq-answer {
+      padding: 0 1.6rem 1.6rem 1.6rem;
+      color: var(--text-light);
+      text-align: justify;
+      display: none;
+    }
+
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+
+    .faq-item.open .faq-icon {
+      transform: rotate(180deg);
+    }
+
+    .faq-icon {
+      transition: transform 0.3s ease;
+    }
+
+    .cta-container {
+      /* margin: 2rem 0; */
+      text-align: center;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container" style="min-height: 100vh; display: flex; flex-direction: column;">
+    <div id="main-header"></div>
+
+    <main style="flex: 1;">
+      <section class="section-header">
+        <h2>Często zadawane pytania</h2>
+      </section>
+
+      <div class="faq-container">
+        <div class="faq-item open">
+          <div class="faq-question">
+            Jak dokładny jest ten test słuchu?
+            <span class="faq-icon material-icons">expand_more</span>
+          </div>
+          <div class="faq-answer">
+            Nasz test słuchu online jest zaprojektowany, aby zapewnić wstępną ocenę Twojego słuchu. Chociaż nie
+            zastępuje on pełnego badania audiologicznego przeprowadzonego przez specjalistę, jest on dokładny w
+            identyfikowaniu potencjalnych problemów ze słuchem. Wyniki testu mogą pomóc Ci zdecydować, czy potrzebujesz
+            dalszej oceny przez audiologa.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            Czy moje dane są bezpieczne?
+            <span class="faq-icon material-icons">expand_more</span>
+          </div>
+          <div class="faq-answer">
+            Tak, bezpieczeństwo Twoich danych jest dla nas priorytetem. Wszystkie informacje przekazywane podczas testu
+            są szyfrowane i przechowywane zgodnie z najwyższymi standardami bezpieczeństwa. Nie udostępniamy Twoich
+            danych osobom trzecim bez Twojej wyraźnej zgody.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            Jak długo trwa test?
+            <span class="faq-icon material-icons">expand_more</span>
+          </div>
+          <div class="faq-answer">
+            Nasz test słuchu zwykle trwa około 5 minut. Jest to znacznie szybsze niż tradycyjne badanie audiologiczne,
+            które może zająć nawet godzinę. Mimo krótkiego czasu trwania, test dostarcza wartościowych informacji o
+            kondycji Twojego słuchu.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            Czy potrzebuję specjalnego sprzętu?
+            <span class="faq-icon material-icons">expand_more</span>
+          </div>
+          <div class="faq-answer">
+            Do wykonania testu wystarczą słuchawki i urządzenie z dostępem do internetu (komputer, tablet lub smartfon).
+            Dla uzyskania najbardziej precyzyjnych wyników, zalecamy korzystanie ze słuchawek dobrej jakości i
+            przeprowadzenie testu w cichym otoczeniu.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            Co się stanie po zakończeniu testu?
+            <span class="faq-icon material-icons">expand_more</span>
+          </div>
+          <div class="faq-answer">
+            Po zakończeniu testu otrzymasz natychmiastowe wyniki pokazujące, jak dobrze słyszysz na różnych
+            częstotliwościach. Wyniki będą zawierały interpretację i zalecenia dotyczące dalszych kroków, jeśli będą one
+            konieczne. Możesz zapisać lub wydrukować swoje wyniki, aby omówić je ze specjalistą.
+          </div>
+        </div>
+
+        <div class="cta-container">
+          <button id="start-test-btn-faq" class="btn-primary">Rozpocznij test</button>
+        </div>
+      </div>
+    </main>
+
+    <div id="main-footer"></div>
+  </div>
+
+  <!-- MODALE (pozostają bez zmian) -->
+  <div id="hearing-modal" class="modal">
+    <div class="modal-container">
+      <button id="modal-close" class="modal-close">&times;</button>
+      <div id="modal-content" class="modal-content"></div>
+    </div>
+  </div>
+  <div id="confirm-exit-modal" class="modal exit-modal">
+    <div class="modal-container">
+      <div class="modal-content-wrapper">
+        <h2 class="modal-title">Czy na pewno chcesz przerwać test?</h2>
+        <p class="modal-description">Jeśli wyjdziesz teraz, Twój postęp nie zostanie zapisany.</p>
+        <div class="modal-buttons">
+          <button id="confirm-exit-yes" class="btn-confirm">Tak, przerwij test</button>
+          <button id="confirm-exit-no" class="btn-cancel">Nie, wróć do testu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/assets/js/main.js"></script>
+  <script>
+    // Obsługa akordeonu FAQ
+    document.addEventListener('DOMContentLoaded', function () {
+      const faqItems = document.querySelectorAll('.faq-item');
+
+      faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+
+        question.addEventListener('click', () => {
+          const isOpen = item.classList.contains('open');
+
+          // Zamknij wszystkie inne elementy
+          faqItems.forEach(otherItem => {
+            otherItem.classList.remove('open');
+          });
+
+          // Przełącz stan bieżącego elementu
+          if (!isOpen) {
+            item.classList.add('open');
+          }
+        });
+      });
+
+      // Podłącz przycisk do rozpoczęcia testu
+      const startTestBtn = document.getElementById('start-test-btn-faq');
+      if (startTestBtn) {
+        startTestBtn.addEventListener('click', function () {
+          const hearingModal = document.getElementById('hearing-modal');
+          const modalContent = document.getElementById('modal-content');
+
+          // Tutaj można dodać kod do uruchomienia testu słuchu
+          // Podobnie jak w index.html
+          if (hearingModal && modalContent) {
+            fetch('/assets/partials/modal-intro.html')
+              .then(response => response.text())
+              .then(html => {
+                modalContent.innerHTML = html;
+                hearingModal.classList.add('show');
+                // Tutaj można wywołać inicjalizację testu
+              })
+              .catch(error => console.error('Błąd ładowania modalu:', error));
+          }
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>

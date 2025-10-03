@@ -1,0 +1,138 @@
+<body>
+  <script>
+    document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const method = document.querySelector('input[name="method"]:checked').value;
+
+      const response = await fetch('/api/payments/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userEmail: email,
+          testId: "TEST-12345", // identyfikator badania (np. generowany na froncie)
+          paymentMethod: method
+        })
+      });
+
+      const payment = await response.json();
+
+      // redirect do Paynow z ID płatności
+      window.location.href = payment.redirectUrl;
+    });
+  </script>
+  <script>
+    const ctx2 = document.getElementById('hearingRange');
+    new Chart(ctx2, {
+      type: 'line',
+      data: {
+        labels: [20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000],
+        datasets: [{
+          label: 'Baseline',
+          data: new Array(10).fill(0),
+          borderColor: 'transparent',
+          pointRadius: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: {
+            type: 'logarithmic',
+            min: 3000,
+            max: 20000,
+            ticks: {
+              callback: (val) => val >= 1000 ? val / 1000 + " kHz" : val + " Hz"
+            }
+          },
+          y: {
+            display: false,
+            min: 0,
+            max: 1
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          annotation: {
+            annotations: {
+              hearingRange: {
+                type: 'box',
+                xMin: 100,
+                xMax: 13000,
+                yMin: 0,
+                yMax: 1,
+                backgroundColor: 'rgba(34,197,94,0.25)',
+                borderWidth: 0
+              },
+              maxLine: {
+                type: 'line',
+                xMin: 13000,
+                xMax: 13000,
+                borderColor: '#22c55e',
+                borderWidth: 2,
+                borderDash: [4, 4],
+                label: {
+                  display: true,
+                  content: 'Twój maksymalny zakres słyszalny',
+                  position: 'start',
+                  yAdjust: -20,
+                  backgroundColor: 'rgba(34,197,94,0.9)',
+                  color: '#fff',
+                  font: {
+                    size: 12,
+                    weight: '600'
+                  },
+                  padding: 6,
+                  borderRadius: 6
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  </script>
+
+  <div class="result-card">
+    <h2>Twój wstępny wynik</h2>
+    <p class="muted">
+      Poniżej prezentujemy Twój wykryty zakres słyszalności (bezpłatnie).
+    </p>
+    <canvas id="hearingRange" height="60"></canvas>
+  </div>
+
+  <div class="upgrade-card">
+    <h2>Pełny raport z badania</h2>
+    <p>
+      Za jedyne <strong>24,99 zł</strong> otrzymasz pełny raport PDF na e-mail, zawierający:
+    </p>
+    <ul>
+      <li>Szczegółowy audiogram dla obu uszu</li>
+      <li>Tabela wyników w dB</li>
+      <li>Interpretację wyników i rekomendacje</li>
+    </ul>
+
+    <form id="paymentForm">
+      <label for="email">Twój e-mail:</label>
+      <input type="email" id="email" name="email" required placeholder="np. jan.kowalski@email.com" />
+
+      <div class="payment-methods">
+        <label>
+          <input type="radio" name="method" value="card" checked />
+          Karta płatnicza
+        </label>
+        <label>
+          <input type="radio" name="method" value="blik" />
+          BLIK
+        </label>
+        <label>
+          <input type="radio" name="method" value="transfer" />
+          Szybki przelew
+        </label>
+      </div>
+
+      <button type="submit">Kup raport za 24,99 zł</button>
+    </form>
+  </div>
+</body>
