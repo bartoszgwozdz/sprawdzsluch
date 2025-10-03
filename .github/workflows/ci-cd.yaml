@@ -22,7 +22,18 @@ jobs:
       # 2️⃣ Uruchom lokalny rejestr Docker
       - name: Start local registry
         run: |
-          docker run -d -p 5000:5000 --name registry registry:2
+          # Zatrzymaj kontener jeśli istnieje
+          docker stop registry || true
+          # Usuń kontener jeśli istnieje
+          docker rm registry || true
+          # Usuń powiązane wolumeny
+          docker volume rm $(docker volume ls -q -f dangling=true) || true
+          # Uruchom nowy kontener rejestru z nazwanymi wolumenami
+          docker run -d \
+            -p 5000:5000 \
+            --name registry \
+            -v registry-data:/var/lib/registry \
+            registry:2
 
       # 3️⃣ Build & push frontend locally
       - name: Build & push frontend locally
@@ -71,3 +82,12 @@ jobs:
           kubectl rollout status deployment/frontend -n $K8S_NAMESPACE
           kubectl rollout status deployment/backend-pdf -n $K8S_NAMESPACE
           kubectl rollout status deployment/backend-core -n $K8S_NAMESPACE
+
+      # 🧹 Cleanup
+      - name: Cleanup
+        if: always()
+        run: |
+          docker stop registry || true
+          docker rm registry || true
+          docker volume rm registry-data || true
+          docker system prune -f --volumes
