@@ -16,16 +16,19 @@ jobs:
 
     steps:
       # 1️⃣ Checkout repo
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       # 2️⃣ Zaloguj do DockerHub
-      - uses: docker/login-action@v2
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # 3️⃣ Build & push frontend (amd64)
-      - uses: docker/build-push-action@v4
+      - name: Build & push frontend (amd64)
+        uses: docker/build-push-action@v4
         with:
           context: ./frontend
           platforms: linux/amd64
@@ -35,7 +38,8 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/frontend:${{ github.sha }}
 
       # 4️⃣ Build & push backend-pdf (amd64)
-      - uses: docker/build-push-action@v4
+      - name: Build & push backend-pdf (amd64)
+        uses: docker/build-push-action@v4
         with:
           context: ./backend-pdf
           platforms: linux/amd64
@@ -45,7 +49,8 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/backend-pdf:${{ github.sha }}
 
       # 5️⃣ Build & push backend-core (amd64)
-      - uses: docker/build-push-action@v4
+      - name: Build & push backend-core (amd64)
+        uses: docker/build-push-action@v4
         with:
           context: ./backend-core
           platforms: linux/amd64
@@ -55,25 +60,29 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/backend-core:${{ github.sha }}
 
       # 6️⃣ Setup kubectl
-      - uses: azure/setup-kubectl@v3
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
         with:
           version: "v1.30.0"
 
       # 7️⃣ Configure kubeconfig do VPS
-      - run: |
+      - name: Configure kubeconfig
+        run: |
           mkdir -p ~/.kube
           echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
           chmod 600 ~/.kube/config
 
       # 8️⃣ Utwórz Secret dla MongoDB
-      - run: |
+      - name: Create MongoDB Secret
+        run: |
           kubectl -n $K8S_NAMESPACE create secret generic mongo-secret \
             --from-literal=mongo-root-username=${{ secrets.MONGO_ROOT_USERNAME }} \
             --from-literal=mongo-root-password=${{ secrets.MONGO_ROOT_PASSWORD }} \
             --dry-run=client -o yaml | kubectl apply -f -
 
       # 9️⃣ Deploy wszystkie manifesty
-      - run: |
+      - name: Deploy all manifests
+        run: |
           kubectl apply -f k8s/
           kubectl rollout status statefulset/mongodb -n $K8S_NAMESPACE
           kubectl rollout status deployment/frontend -n $K8S_NAMESPACE
