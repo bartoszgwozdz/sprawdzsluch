@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend-pdf
-  namespace: service
+  namespace: sprawdzsluch
 spec:
   replicas: 1
   selector:

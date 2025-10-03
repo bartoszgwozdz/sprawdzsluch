@@ -1,13 +1,15 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: myapp-ingress
-  namespace: myapp
+  name: sprawdzsluch-ingress
+  namespace: sprawdzsluch
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web
+    kubernetes.io/ingress.class: "traefik"
+    # Uncomment if you want automatic HTTPS via Let's Encrypt
+    # cert-manager.io/cluster-issuer: "letsencrypt"
 spec:
   rules:
-    - host: myapp.local     # zmień na swoją domenę
+    - host: yourdomain.com   # <- wpisz swój domenowy adres
       http:
         paths:
           - path: /
@@ -31,4 +33,10 @@ spec:
                 name: backend-core
                 port:
                   number: 8090
-
+          - path: /mongo-express
+            pathType: Prefix
+            backend:
+              service:
+                name: mongo-express
+                port:
+                  number: 8081
