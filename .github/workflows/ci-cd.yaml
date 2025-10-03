@@ -97,6 +97,11 @@ jobs:
 
           # Na samym końcu ingress
           # kubectl apply -f k8s/ingress.yaml # <- tymczasowo zakomentowane, jeśli nie używasz domeny
+
+          kubectl rollout restart deployment/frontend -n $K8S_NAMESPACE
+          kubectl rollout restart deployment/backend-pdf -n $K8S_NAMESPACE
+          kubectl rollout restart deployment/backend-core -n $K8S_NAMESPACE
+
           kubectl rollout status statefulset/mongodb -n $K8S_NAMESPACE
           kubectl rollout status deployment/frontend -n $K8S_NAMESPACE
           kubectl rollout status deployment/backend-pdf -n $K8S_NAMESPACE
