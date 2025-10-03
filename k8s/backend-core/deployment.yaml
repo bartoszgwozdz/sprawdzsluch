@@ -31,3 +31,5 @@ spec:
                 secretKeyRef:
                   name: mongo-secret
                   key: mongo-root-password
+      imagePullSecrets:
+        - name: regcred
