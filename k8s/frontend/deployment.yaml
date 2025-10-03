@@ -17,5 +17,23 @@ spec:
         - name: frontend
           image: bartoszgwozdz/frontend:latest
           ports:
-            - containerPort: 80
-
+            - containerPort: 80   # 🔹 musi się zgadzać z tym co masz w Dockerfile
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          readinessProbe:        # 🔹 sprawdzanie zdrowia
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:         # 🔹 sprawdzanie czy nginx żyje
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 20
