@@ -2,7 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main ]  # uruchomienie na push do main
+  repository_dispatch:
+    types: [deploy]            # wywołanie z API
 
 jobs:
   build-and-deploy:
