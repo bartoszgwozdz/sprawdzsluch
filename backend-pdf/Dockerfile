@@ -1,54 +1,46 @@
-# filepath: /Users/bgwozdz/IdeaProjects/pdf-service/Dockerfile
-# Bardziej stabilne podejście z chromium-browser
-FROM node:24.8-slim
+# Stage 1: Build stage
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
-# Instalacja Chromium i zależności
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    chromium \
-    fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf \
-    ca-certificates \
-    fonts-liberation \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libcups2 \
-    libdrm2 \
-    libgbm1 \
-    libgtk-3-0 \
-    libnspr4 \
-    libnss3 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxkbcommon0 \
-    libxrandr2 \
-    xdg-utils \
-    libasound2 && \
-    rm -rf /var/lib/apt/lists/*
-
-# Kopiowanie plików projektu
+# Copy package files
 COPY package*.json ./
 
-# Instalacja zależności
+# Install dependencies
 RUN npm install --omit=dev
 
-# Kopiowanie kodu aplikacji
+
+# Stage 2: Production stage
+FROM node:24-alpine
+
+WORKDIR /app
+
+# Install Chromium and dependencies for Alpine
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    fontconfig
+
+# Copy dependencies from the builder stage
+COPY --from=builder /app/node_modules ./node_modules
+
+# Copy application code
 COPY pdf-service.js ./
 
-# Utworzenie katalogu na logi
-RUN mkdir -p /app/logs && chmod 777 /app/logs
-
-# Konfiguracja Puppeteer do używania zainstalowanego Chromium
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
-
-# Użytkownik bez uprawnień roota
-RUN groupadd -r pdfuser && useradd -r -g pdfuser -s /bin/false pdfuser \
+# Create a non-root user
+RUN addgroup -S pdfuser && adduser -S -G pdfuser pdfuser \
     && chown -R pdfuser:pdfuser /app
+
+# Set Puppeteer environment variables
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
 USER pdfuser
 
-# Ustawienie portu
 EXPOSE 3000
 
-# Uruchomienie aplikacji
 CMD ["node", "pdf-service.js"]
