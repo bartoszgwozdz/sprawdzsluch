@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend-pdf
-          image: DOCKERHUB_USER/backend-pdf:latest
+          image: bartoszgwozdz/backend-pdf:latest
           ports:
             - containerPort: 3000
 
