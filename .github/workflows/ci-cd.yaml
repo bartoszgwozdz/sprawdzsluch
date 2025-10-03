@@ -79,10 +79,14 @@ jobs:
         run: |
           kubectl apply -R -f k8s/
 
-          kubectl rollout restart deployment --all -n $K8S_NAMESPACE
-          
-          kubectl rollout status deployment --all -n $K8S_NAMESPACE
-          kubectl rollout status statefulset --all -n $K8S_NAMESPACE
+          kubectl rollout restart deployment/frontend -n $K8S_NAMESPACE
+          kubectl rollout restart deployment/backend-pdf -n $K8S_NAMESPACE
+          kubectl rollout restart deployment/backend-core -n $K8S_NAMESPACE
+
+          kubectl rollout status statefulset/mongodb -n $K8S_NAMESPACE
+          kubectl rollout status deployment/frontend -n $K8S_NAMESPACE
+          kubectl rollout status deployment/backend-pdf -n $K8S_NAMESPACE
+          kubectl rollout status deployment/backend-core -n $K8S_NAMESPACE
 
       # 🧹 Cleanup
       - name: Cleanup
