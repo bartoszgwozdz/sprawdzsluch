@@ -77,7 +77,26 @@ jobs:
       # 9️⃣ Deploy all manifests
       - name: Deploy all manifests
         run: |
-          kubectl apply -f k8s/
+          # Najpierw namespace
+          kubectl apply -f k8s/namespace.yaml
+
+          # Następnie secrets i configmapy (jeśli istnieją)
+          kubectl apply -f k8s/mongodb/secret.yaml
+
+          # Potem deployment MongoDB
+          kubectl apply -f k8s/mongodb/statefulset.yaml
+          kubectl apply -f k8s/mongodb/service.yaml
+
+          # Na końcu aplikacje
+          kubectl apply -f k8s/frontend/deployment.yaml
+          kubectl apply -f k8s/frontend/service.yaml
+          kubectl apply -f k8s/backend-core/deployment.yaml
+          kubectl apply -f k8s/backend-core/service.yaml
+          kubectl apply -f k8s/backend-pdf/deployment.yaml
+          kubectl apply -f k8s/backend-pdf/service.yaml
+
+          # Na samym końcu ingress
+          kubectl apply -f k8s/ingress.yaml
           kubectl rollout status statefulset/mongodb -n $K8S_NAMESPACE
           kubectl rollout status deployment/frontend -n $K8S_NAMESPACE
           kubectl rollout status deployment/backend-pdf -n $K8S_NAMESPACE
