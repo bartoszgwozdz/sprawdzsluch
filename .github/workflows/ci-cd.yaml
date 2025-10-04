@@ -87,6 +87,9 @@ jobs:
           kubectl apply -f k8s/mongodb/statefulset.yaml
           kubectl apply -f k8s/mongodb/service.yaml
 
+          kubectl apply -f k8s/mongo-express/service.yaml
+          kubectl apply -f k8s/mongo-express/deployment.yaml
+
           # Na końcu aplikacje
           kubectl apply -f k8s/frontend/deployment.yaml
           kubectl apply -f k8s/frontend/service.yaml
