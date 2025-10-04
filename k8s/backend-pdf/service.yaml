@@ -1,21 +1,13 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Service
 metadata:
-  name: backend-pdf
+  name: backend-core
   namespace: sprawdzsluch
 spec:
-  replicas: 1
   selector:
-    matchLabels:
-      app: backend-pdf
-  template:
-    metadata:
-      labels:
-        app: backend-pdf
-    spec:
-      containers:
-        - name: backend-pdf
-          image: bartoszgwozdz/backend-pdf:latest
-          ports:
-            - containerPort: 3000
+    app: backend-pdf
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: ClusterIP
 
