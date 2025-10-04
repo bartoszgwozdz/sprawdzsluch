@@ -9,7 +9,7 @@ metadata:
     # cert-manager.io/cluster-issuer: "letsencrypt"
 spec:
   rules:
-    - host: sprawdzsluch.pl   # <- wpisz swój domenowy adres
+    - host: ""
       http:
         paths:
           - path: /
@@ -19,20 +19,6 @@ spec:
                 name: frontend
                 port:
                   number: 80
-          - path: /pdf
-            pathType: Prefix
-            backend:
-              service:
-                name: backend-pdf
-                port:
-                  number: 3000
-          - path: /core
-            pathType: Prefix
-            backend:
-              service:
-                name: backend-core
-                port:
-                  number: 8090
           - path: /mongo-express
             pathType: Prefix
             backend:
@@ -40,3 +26,10 @@ spec:
                 name: mongo-express
                 port:
                   number: 8081
+          - path: /grafana
+            pathType: Prefix
+            backend:
+              service:
+                name: kube-prometheus-stack-grafana
+                port:
+                  number: 80

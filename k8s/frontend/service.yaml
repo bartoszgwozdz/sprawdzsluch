@@ -4,11 +4,10 @@ metadata:
   name: frontend
   namespace: sprawdzsluch
 spec:
-  type: NodePort 
+  type: ClusterIP 
   selector:
     app: frontend
   ports:
     - protocol: TCP
       port: 80
       targetPort: 80
-      nodePort: 30080  # 🔹 port na którym wystawiamy usługę na zewnątrz
