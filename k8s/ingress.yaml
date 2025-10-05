@@ -1,16 +1,15 @@
-apiVersion: traefik.io/v1alpha1                                                                                       
-kind: Middleware                                                                                                      
-metadata:                                                                                                             
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
   name: strip-prefixes
-  namespace: sprawdzsluch                                                                                             
-spec:                                                                                                                 
-  stripPrefix:                                                                                                        
-  prefixes:                                                                                                         
-    - /api                                                                                                          
-    - /pdf                                                                                                          
-    - /mongo-express                                                                                                
-    - /grafana
----  
+  namespace: sprawdzsluch
+spec:
+  stripPrefix:
+    prefixes:
+      - /grafana
+      - /mongo-express
+
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -18,19 +17,23 @@ metadata:
   namespace: sprawdzsluch
   annotations:
     kubernetes.io/ingress.class: "traefik"
-    # Uncomment if you want automatic HTTPS via Let's Encrypt
-    # cert-manager.io/cluster-issuer: "letsencrypt"
-    traefik.ingress.kubernetes.io/router.middlewares: sprawdzsluch-strip-prefixes@kubernetescrd 
+    traefik.ingress.kubernetes.io/router.middlewares: sprawdzsluch-strip-prefixes@kubernetescrd
 spec:
   rules:
-    - host: ""
-      http:
+    - http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
                 name: frontend
+                port:
+                  number: 80
+          - path: /grafana
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana-external
                 port:
                   number: 80
           - path: /mongo-express
@@ -40,10 +43,3 @@ spec:
                 name: mongo-express
                 port:
                   number: 8081
-          - path: /grafana
-            pathType: Prefix
-            backend:
-              service:
-                name: kube-prometheus-stack-grafana
-                port:
-                  number: 80
