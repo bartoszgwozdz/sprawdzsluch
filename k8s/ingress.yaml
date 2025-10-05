@@ -28,7 +28,7 @@ metadata:
     traefik.ingress.kubernetes.io/router.tls: "true"
 spec:
   rules:
-    - host: "sprawdzsluch.pl"  # Dodaj właściwą domenę
+    - host: ""  # Dodaj właściwą domenę
       http:
         paths:
           # Frontend paths
