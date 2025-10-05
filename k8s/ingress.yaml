@@ -1,3 +1,16 @@
+apiVersion: traefik.io/v1alpha1                                                                                       
+kind: Middleware                                                                                                      
+metadata:                                                                                                             
+  name: strip-prefixes
+  namespace: sprawdzsluch                                                                                             
+spec:                                                                                                                 
+  stripPrefix:                                                                                                        
+  prefixes:                                                                                                         
+    - /api                                                                                                          
+    - /pdf                                                                                                          
+    - /mongo-express                                                                                                
+    - /grafana
+---  
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -7,6 +20,7 @@ metadata:
     kubernetes.io/ingress.class: "traefik"
     # Uncomment if you want automatic HTTPS via Let's Encrypt
     # cert-manager.io/cluster-issuer: "letsencrypt"
+    traefik.ingress.kubernetes.io/router.middlewares: sprawdzsluch-strip-prefixes@kubernetescrd 
 spec:
   rules:
     - host: ""
