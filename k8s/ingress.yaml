@@ -21,14 +21,17 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: sprawdzsluch-ingress-frontend
+  name: sprawdzsluch-ingress
   namespace: sprawdzsluch
   annotations:
     kubernetes.io/ingress.class: "traefik"
+    traefik.ingress.kubernetes.io/router.tls: "true"
 spec:
   rules:
-    - http:
+    - host: "sprawdzsluch.pl"  # Dodaj właściwą domenę
+      http:
         paths:
+          # Frontend paths
           - path: /
             pathType: Prefix
             backend:
@@ -85,43 +88,20 @@ spec:
                 name: frontend
                 port:
                   number: 80
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: sprawdzsluch-ingress-grafana
-  namespace: sprawdzsluch
-  annotations:
-    kubernetes.io/ingress.class: "traefik"
-    traefik.ingress.kubernetes.io/router.middlewares: sprawdzsluch-strip-grafana-prefix@kubernetescrd
-spec:
-  rules:
-    - http:
-        paths:
-          - path: /grafana
-            pathType: Prefix
-            backend:
-              service:
-                name: grafana-external
-                port:
-                  number: 80
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: sprawdzsluch-ingress-mongo-express
-  namespace: sprawdzsluch
-  annotations:
-    kubernetes.io/ingress.class: "traefik"
-    traefik.ingress.kubernetes.io/router.middlewares: sprawdzsluch-strip-mongo-express-prefix@kubernetescrd
-spec:
-  rules:
-    - http:
-        paths:
-          - path: /mongo-express(/|$)(.*)
+          # Mongo Express
+          - path: /mongo-express
             pathType: Prefix
             backend:
               service:
                 name: mongo-express
                 port:
                   number: 8081
+
+          # Grafana (reference to external service)
+          - path: /grafana
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana-external
+                port:
+                  number: 3000
