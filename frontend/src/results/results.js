@@ -1,5 +1,22 @@
 // Skrypt do obsługi strony wyników
 
+// Funkcja do generowania hash z daty
+function generateTestId() {
+    const now = new Date();
+    const dateString = now.toISOString();
+    
+    // Prosta funkcja hash
+    let hash = 0;
+    for (let i = 0; i < dateString.length; i++) {
+        const char = dateString.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Konwertuj do 32-bitowego integer
+    }
+    
+    // Zwróć dodatni hash jako hex
+    return "TEST-" + Math.abs(hash).toString(16).toUpperCase();
+}
+
 // Funkcja do pobrania parametrów z URL
 function getUrlParams() {
     const params = {};
@@ -201,11 +218,11 @@ function setupPaymentForm() {
             statusMessage.style.display = 'none';
             
             // Pobierz dane testu
-            const testResults = JSON.parse(localStorage.getItem('hearingTestResults')) || {};
+            const testResults = JSON.parse(sessionStorage.getItem('hearingTestResults')) || {};
             
             // Przygotuj payload JSON z pełnymi danymi testu
             const payload = {
-                testId: testResults.testId || "TEST-" + Date.now(),
+                testId: generateTestId(),
                 hearingLevels: testResults.hearingLevels || [],
                 maxAudibleFrequency: testResults.maxAudibleFrequency || 13000,
                 timestamp: testResults.timestamp || new Date().toISOString(),

@@ -124,13 +124,12 @@ function showModalStep(step) {
                     // Zapisz dane testu do localStorage
                     if (window.hearingTestInstance) {
                         const testResults = {
-                            testId: "TEST-" + Date.now(),
                             hearingLevels: window.hearingTestInstance.hearingLevels || [],
                             maxAudibleFrequency: window.hearingTestInstance.maxAudibleFrequency || 20000,
-                            timestamp: new Date().toISOString()
+                            timestamp: new Date().getDate().toString()
                         };
 
-                        localStorage.setItem('hearingTestResults', JSON.stringify(testResults));
+                        sessionStorage.setItem('hearingTestResults', JSON.stringify(testResults));
                     }
 
                     // Zamknij modal

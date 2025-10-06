@@ -15,6 +15,8 @@ public class HearingResult {
     @Id
     private Long id;
 
+    private String testId;
+    
     private String userEmail;
 
     @Lob
