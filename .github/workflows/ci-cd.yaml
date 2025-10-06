@@ -108,10 +108,10 @@ jobs:
           kubectl rollout status deployment/backend-core -n $K8S_NAMESPACE
 
       # 🧹 Cleanup
-      - name: Cleanup
-        if: always()
-        run: |
-          docker stop registry || true
-          docker rm registry || true
-          docker volume rm registry-data || true
-          docker system prune -f --volumes
+      # - name: Cleanup
+      #   if: always()
+      #   run: |
+      #     docker stop registry || true
+      #     docker rm registry || true
+      #     docker volume rm registry-data || true
+      #     docker system prune -f --volumes
