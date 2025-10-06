@@ -19,8 +19,11 @@ spec:
           ports:
             - containerPort: 8090
           env:
-            - name: MONGO_URL
-              value: mongodb://$(MONGO_USER):$(MONGO_PASSWORD)@mongodb-0.mongodb.myapp.svc.cluster.local:27017/mydb?authSource=admin
+            - name: SPRING_DATA_MONGODB_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: mongodb-config
+                  key: mongodb-uri
             - name: MONGO_USER
               valueFrom:
                 secretKeyRef:
@@ -31,5 +34,3 @@ spec:
                 secretKeyRef:
                   name: mongo-secret
                   key: mongo-root-password
-      imagePullSecrets:
-        - name: regcred
