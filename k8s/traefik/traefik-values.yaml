@@ -1,0 +1,29 @@
+deployment:
+  enabled: true
+
+ingressRoute:
+  dashboard:
+    enabled: true
+
+ports:
+  web:
+    exposedPort: 80
+    port: 80
+    expose: {}
+    protocol: TCP
+    
+  websecure:
+    exposedPort: 443
+    port: 443
+    expose: {}
+    protocol: TCP
+    
+providers:
+  kubernetesIngress:
+    enabled: true
+    allowExternalNameServices: true
+  kubernetesCRD:
+    enabled: true
+
+rbac:
+  enabled: true
