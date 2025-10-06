@@ -9,15 +9,21 @@ ports:
   web:
     exposedPort: 80
     port: 80
-    expose: {}
     protocol: TCP
-    
-  websecure:
-    exposedPort: 443
-    port: 443
-    expose: {}
+    nodePort: 30080   # <-- dodaj to, jeśli chcesz mieć dostęp z zewnątrz przez NodePort
+
+  mongoexpress:
+    exposedPort: 8081
+    port: 8081
     protocol: TCP
-    
+    nodePort: 30081   # <-- dodaj to
+
+  grafana:
+    exposedPort: 8082
+    port: 8082
+    protocol: TCP
+    nodePort: 30082   # <-- dodaj to
+
 providers:
   kubernetesIngress:
     enabled: true
