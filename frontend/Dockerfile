@@ -5,7 +5,7 @@ FROM nginx:alpine
 COPY src /usr/share/nginx/html
 
 # 3. (opcjonalnie) podmień własną konfigurację nginx
-#COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # 4. Domyślny port
 EXPOSE 80
