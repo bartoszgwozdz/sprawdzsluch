@@ -1,10 +1,10 @@
-package dev.gwozdz.audiogram.controller;
+package dev.gwozdz.sprawdzsluch.controller;
 
-import dev.gwozdz.audiogram.dto.ReportDto;
-import dev.gwozdz.audiogram.dto.ResultDto;
-import dev.gwozdz.audiogram.dto.UserDto;
-import dev.gwozdz.audiogram.service.HtmlService;
-import dev.gwozdz.audiogram.service.PdfService;
+import dev.gwozdz.sprawdzsluch.dto.ReportDto;
+import dev.gwozdz.sprawdzsluch.dto.ResultDto;
+import dev.gwozdz.sprawdzsluch.dto.UserDto;
+import dev.gwozdz.sprawdzsluch.service.HtmlService;
+import dev.gwozdz.sprawdzsluch.service.PdfService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

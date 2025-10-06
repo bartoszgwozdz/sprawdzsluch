@@ -1,6 +1,6 @@
-package dev.gwozdz.audiogram.repository;
+package dev.gwozdz.sprawdzsluch.repository;
 
-import dev.gwozdz.audiogram.entity.Payment;
+import dev.gwozdz.sprawdzsluch.entity.Payment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -1,8 +1,8 @@
-package dev.gwozdz.audiogram.service;
+package dev.gwozdz.sprawdzsluch.service;
 
-import dev.gwozdz.audiogram.entity.Payment;
-import dev.gwozdz.audiogram.entity.PaymentStatus;
-import dev.gwozdz.audiogram.repository.PaymentRepository;
+import dev.gwozdz.sprawdzsluch.entity.Payment;
+import dev.gwozdz.sprawdzsluch.entity.PaymentStatus;
+import dev.gwozdz.sprawdzsluch.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,4 +1,4 @@
-package dev.gwozdz.audiogram.service;
+package dev.gwozdz.sprawdzsluch.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

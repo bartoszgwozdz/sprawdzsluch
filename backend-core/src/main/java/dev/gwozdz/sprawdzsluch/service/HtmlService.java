@@ -1,4 +1,4 @@
-package dev.gwozdz.audiogram.service;
+package dev.gwozdz.sprawdzsluch.service;
 
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;

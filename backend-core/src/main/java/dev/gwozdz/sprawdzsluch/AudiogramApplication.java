@@ -1,4 +1,4 @@
-package dev.gwozdz.audiogram;
+package dev.gwozdz.sprawdzsluch;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -6,8 +6,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class AudiogramApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(AudiogramApplication.class, args);
-	}
+    public static void main(String[] args)
+    {
+        SpringApplication.run(AudiogramApplication.class, args);
+    }
 
 }

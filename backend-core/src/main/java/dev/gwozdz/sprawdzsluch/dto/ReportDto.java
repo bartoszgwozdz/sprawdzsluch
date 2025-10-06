@@ -1,4 +1,4 @@
-package dev.gwozdz.audiogram.dto;
+package dev.gwozdz.sprawdzsluch.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package dev.gwozdz.audiogram.entity;
+package dev.gwozdz.sprawdzsluch.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

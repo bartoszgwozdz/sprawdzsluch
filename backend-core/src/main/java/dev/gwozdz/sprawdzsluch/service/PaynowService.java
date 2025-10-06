@@ -1,6 +1,6 @@
-package dev.gwozdz.audiogram.service;
+package dev.gwozdz.sprawdzsluch.service;
 
-import dev.gwozdz.audiogram.entity.Payment;
+import dev.gwozdz.sprawdzsluch.entity.Payment;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;

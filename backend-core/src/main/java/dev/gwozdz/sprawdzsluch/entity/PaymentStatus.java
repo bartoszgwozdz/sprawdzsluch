@@ -1,4 +1,4 @@
-package dev.gwozdz.audiogram.entity;
+package dev.gwozdz.sprawdzsluch.entity;
 
 public enum PaymentStatus {
     INITIATED,    // Nowa płatność (Paynow -> NEW)

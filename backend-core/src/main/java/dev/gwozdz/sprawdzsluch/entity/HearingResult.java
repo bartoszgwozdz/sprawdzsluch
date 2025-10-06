@@ -1,15 +1,18 @@
-package dev.gwozdz.audiogram.entity;
+package dev.gwozdz.sprawdzsluch.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import lombok.Data;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 import java.time.LocalDateTime;
 
-@Entity
+@Document(collection = "hearing_results")
 @Data
 public class HearingResult {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String userEmail;
@@ -19,7 +22,7 @@ public class HearingResult {
 
     private String status; // NEW, PAID, SENT
 
-    @ManyToOne
+    @DocumentReference
     private Payment payment;
 
     private LocalDateTime createdAt = LocalDateTime.now();

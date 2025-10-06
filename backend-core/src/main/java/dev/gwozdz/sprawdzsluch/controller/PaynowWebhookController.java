@@ -1,8 +1,8 @@
-package dev.gwozdz.audiogram.controller;
+package dev.gwozdz.sprawdzsluch.controller;
 
-import dev.gwozdz.audiogram.entity.Payment;
-import dev.gwozdz.audiogram.entity.PaymentStatus;
-import dev.gwozdz.audiogram.service.PaymentService;
+import dev.gwozdz.sprawdzsluch.entity.Payment;
+import dev.gwozdz.sprawdzsluch.entity.PaymentStatus;
+import dev.gwozdz.sprawdzsluch.service.PaymentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
