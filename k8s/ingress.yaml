@@ -1,4 +1,22 @@
 ---
+# BACKEND-CORE API
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: sprawdzsluch-backend-core
+  namespace: sprawdzsluch
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: PathPrefix(`/api`)
+      kind: Rule
+      services:
+        - name: backend-core
+          port: 8090
+      middlewares:
+        - name: add-headers
+---
 # FRONTEND
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute

@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="pl">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wyniki testu słuchu | Sprawdź Słuch</title>
-  
+
   <!-- Style -->
   <link rel="stylesheet" href="/assets/styles.css">
-  
+
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
-  
+
   <style>
     /* Style specyficzne dla strony wyników */
     .results-container {
@@ -19,34 +20,34 @@
       margin: 2rem auto;
       padding: 0 1rem;
     }
-    
+
     .results-section {
       background: #fff;
       border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
       padding: 1.5rem;
       margin-bottom: 2rem;
     }
-    
+
     .results-title {
       margin-top: 0;
       font-weight: 700;
       font-size: 1.8rem;
     }
-    
+
     .results-subtitle {
       font-size: 1.3rem;
       font-weight: 700;
       margin-top: 0;
     }
-    
+
     .results-chart-container {
       border: 1px solid #e2e8f0;
       border-radius: 12px;
       padding: 1rem;
       margin: 1rem 0;
     }
-    
+
     /* Sekcja raportu z miniaturą */
     .report-grid {
       display: grid;
@@ -55,49 +56,49 @@
       align-items: center;
       justify-items: center;
     }
-    
+
     @media (max-width: 700px) {
       .report-grid {
         grid-template-columns: 1fr;
       }
     }
-    
+
     .preview-mock {
       width: 13rem;
       background: #f1f5f9;
       border-radius: 10px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
     }
-    
+
     .preview-mock img {
       max-width: 100%;
       max-height: 100%;
       object-fit: scale-down;
       padding: 0.5rem;
     }
-    
+
     ul.features {
       list-style: none;
       padding: 0;
       margin: 0 0 1rem 0;
     }
-    
+
     ul.features li {
       display: flex;
       align-items: flex-start;
       gap: 0.5rem;
       margin-bottom: 0.5rem;
     }
-    
+
     ul.features li span {
       color: #16a34a;
       font-weight: bold;
     }
-    
+
     /* Formularz */
     .form-label {
       font-size: 0.9rem;
@@ -105,7 +106,7 @@
       display: block;
       margin-bottom: 0.3rem;
     }
-    
+
     .input-email {
       width: 100%;
       padding: 0.75rem 1rem;
@@ -113,18 +114,18 @@
       border-radius: 8px;
       font-size: 1rem;
     }
-    
+
     .input-radio {
       accent-color: #16a34a;
     }
-    
+
     .radio-group {
       display: flex;
       gap: 1.5rem;
       flex-wrap: wrap;
       margin-top: 0.5rem;
     }
-    
+
     .radio-group label {
       font-weight: normal;
       color: #1e293b;
@@ -132,7 +133,7 @@
       align-items: center;
       gap: 0.4rem;
     }
-    
+
     .btn-submit {
       display: inline-flex;
       align-items: center;
@@ -149,16 +150,16 @@
       cursor: pointer;
       transition: background 0.2s ease;
     }
-    
+
     .btn-submit:hover {
       background: #15803d;
     }
-    
+
     .btn-submit:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
-    
+
     .price-tag {
       background: #dcfce7;
       color: #166534;
@@ -168,28 +169,48 @@
       border-radius: 9999px;
       font-size: 0.9rem;
     }
-    
+
     .status-message {
       margin-top: 0.8rem;
       font-size: 0.85rem;
       color: #475569;
     }
-    
+
     .status-message.error {
       color: #dc2626;
     }
-    
+
+    .status-message.success {
+      color: #16a34a;
+      background-color: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 6px;
+      padding: 0.75rem;
+    }
+
+    .voucher-field {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1rem;
+      background-color: #f8fafc;
+    }
+
+    .voucher-field .form-label {
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
     /* Wyniki szczegółowe */
     .detailed-results {
       margin-top: 1rem;
     }
-    
+
     .results-table {
       width: 100%;
       border-collapse: collapse;
       margin: 1rem 0;
     }
-    
+
     .results-table th {
       background-color: #f8fafc;
       padding: 0.75rem;
@@ -197,12 +218,19 @@
       border-bottom: 1px solid #e2e8f0;
       font-weight: 600;
     }
-    
+
     .results-table td {
       padding: 0.75rem;
       border-bottom: 1px solid #e2e8f0;
     }
-    
+
+    .paymentForm {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
     .interpretation {
       margin-top: 1.5rem;
       padding: 1rem;
@@ -210,89 +238,100 @@
       border-radius: 8px;
       border-left: 4px solid #16a34a;
     }
-    
+
     .interpretation p {
       margin: 0.5rem 0;
     }
   </style>
 </head>
+
 <body>
   <div class="container" style="min-height: 100vh; display: flex; flex-direction: column;">
-  <!-- Header placeholder - będzie wstrzyknięty przez JS -->
-  <div id="main-header"></div>
-  
-  <main class="results-container">
-    <section class="results-section">
-      <h1 class="results-title">Wyniki Twojego testu słuchu</h1>
-      <p>Poniżej prezentujemy Twój wykryty zakres słyszalności — bezpłatny podgląd wyników badania.</p>
-      
-      <div class="results-chart-container">
-        <canvas id="hearingRange" style="width:100%;height:200px;"></canvas>
-      </div>
-      <p id="rangeLabel" style="margin-top:0.6rem;font-size:0.85rem;">Twój maksymalny zakres słyszalny: <span id="maxFreqValue">—</span></p>
-    </section>
-    
-    <!-- Miniatura raportu + korzyści -->
-    <section class="results-section report-grid">
-      <div class="preview-mock">
-        <img src="/assets/img/report_preview.jpg" alt="Podgląd raportu">
-      </div>
-      <div>
-        <h2 class="results-subtitle">Pełny raport z badania</h2>
-        <p>Za jedyne <span class="price-tag">24,99 zł</span> otrzymasz kompletny raport PDF na podany e-mail.</p>
-        
-        <ul class="features">
-          <li><span>✓</span> Szczegółowy audiogram dla obu uszu</li>
-          <li><span>✓</span> Tabela wyników w dB i interpretacja</li>
-          <li><span>✓</span> Rekomendacje i dalsze kroki</li>
-        </ul>
-        
-        <p style="font-size:0.85rem;">PDF będzie wyglądał profesjonalnie — z logo, wykresami i pełnym opisem. W przypadku pytań odpowiemy pod adresem <a href="mailto:kontakt@sprawdzsluch.pl">kontakt@sprawdzsluch.pl</a>.</p>
-      </div>
-    </section>
-    
-    <!-- Formularz płatności -->
-    <section class="results-section">
-      <h2 class="results-subtitle">Dane do płatności</h2>
-      <form id="paymentForm">
+    <!-- Header placeholder - będzie wstrzyknięty przez JS -->
+    <div id="main-header"></div>
+
+    <main class="results-container">
+      <section class="results-section">
+        <h1 class="results-title">Wyniki Twojego testu słuchu</h1>
+        <p>Poniżej prezentujemy Twój wykryty zakres słyszalności — bezpłatny podgląd wyników badania.</p>
+
+        <div class="results-chart-container">
+          <canvas id="hearingRange" style="width:100%;height:200px;"></canvas>
+        </div>
+        <p id="rangeLabel" style="margin-top:0.6rem;font-size:0.85rem;">Twój maksymalny zakres słyszalny: <span
+            id="maxFreqValue">—</span></p>
+      </section>
+
+      <!-- Miniatura raportu + korzyści -->
+      <section class="results-section report-grid">
+        <div class="preview-mock">
+          <img src="/assets/img/report_preview.jpg" alt="Podgląd raportu">
+        </div>
         <div>
-          <label class="form-label" for="email">Twój e-mail</label>
-          <input id="email" name="email" type="email" class="input-email" placeholder="np. jan.kowalski@email.com" required>
-          <p id="emailError" class="status-message error" style="display:none;">Wprowadź poprawny adres e-mail.</p>
+          <h2 class="results-subtitle">Pełny raport z badania</h2>
+          <p>Za jedyne <span class="price-tag">24,99 zł</span> otrzymasz kompletny raport PDF na podany e-mail.</p>
+
+          <ul class="features">
+            <li><span>✓</span> Szczegółowy audiogram dla obu uszu</li>
+            <li><span>✓</span> Tabela wyników w dB i interpretacja</li>
+            <li><span>✓</span> Rekomendacje i dalsze kroki</li>
+          </ul>
+
+          <p style="font-size:0.85rem;">PDF będzie wyglądał profesjonalnie — z logo, wykresami i pełnym opisem. W
+            przypadku pytań odpowiemy pod adresem <a href="mailto:kontakt@sprawdzsluch.pl">kontakt@sprawdzsluch.pl</a>.
+          </p>
         </div>
-        
-        <div style="margin-top:1rem;">
-          <label class="form-label">Sposób płatności</label>
-          <div class="radio-group">
-            <label><input type="radio" class="input-radio" name="method" value="card" checked>Karta płatnicza</label>
-            <label><input type="radio" class="input-radio" name="method" value="blik">BLIK</label>
-            <label><input type="radio" class="input-radio" name="method" value="transfer">Szybki przelew</label>
+      </section>
+
+      <!-- Formularz płatności -->
+      <section class="results-section">
+        <h2 class="results-subtitle">Dane do płatności</h2>
+        <form id="paymentForm" class="paymentForm">
+          <div>
+            <label class="form-label" for="email">Twój e-mail</label>
+            <input id="email" name="email" type="email" class="input-email" placeholder="np. jan.kowalski@email.com"
+              required>
+            <p id="emailError" class="status-message error" style="display:none;">Wprowadź poprawny adres e-mail.</p>
           </div>
+
+          <div style="margin-top:1rem;">
+            <label class="form-label">Sposób płatności</label>
+            <div class="radio-group">
+              <label><input type="radio" class="input-radio" name="method" value="card" checked>Karta płatnicza</label>
+              <label><input type="radio" class="input-radio" name="method" value="blik">BLIK</label>
+              <label><input type="radio" class="input-radio" name="method" value="voucher">VOUCHER</label>
+            </div>
+            <div class="voucher-field" id="voucherField" style="display: none; margin-top: 1rem;">
+              <label class="form-label" for="voucher">Kod Voucher *</label>
+              <input id="voucher" name="voucher" type="text" class="input-email" placeholder="Wprowadź kod voucher">
+              <p id="voucherError" class="status-message error" style="display:none;">Kod voucher jest wymagany.</p>
+            </div>
+          </div>
+
+          <div style="margin-top:1.5rem;">
+            <button id="buyBtn" type="submit" class="btn-submit">
+              Kup raport PDF za 24,99 zł
+            </button>
+          </div>
+          <p id="statusMessage" class="status-message" style="display:none;"></p>
+        </form>
+      </section>
+
+      <!-- Dodatkowa sekcja - wstępna interpretacja -->
+      <section class="results-section">
+        <h2 class="results-subtitle">Wstępna interpretacja</h2>
+        <p>Poniżej znajduje się podstawowa interpretacja Twoich wyników. Pełna analiza będzie dostępna w raporcie PDF.
+        </p>
+
+        <div class="interpretation">
+          <p id="interpretation-text">Ładowanie interpretacji wyników...</p>
         </div>
-        
-        <div style="margin-top:1.5rem;">
-          <button id="buyBtn" type="submit" class="btn-submit">
-            Kup raport PDF za 24,99 zł
-          </button>
-        </div>
-        <p id="statusMessage" class="status-message" style="display:none;"></p>
-      </form>
-    </section>
-    
-    <!-- Dodatkowa sekcja - wstępna interpretacja -->
-    <section class="results-section">
-      <h2 class="results-subtitle">Wstępna interpretacja</h2>
-      <p>Poniżej znajduje się podstawowa interpretacja Twoich wyników. Pełna analiza będzie dostępna w raporcie PDF.</p>
-      
-      <div class="interpretation">
-        <p id="interpretation-text">Ładowanie interpretacji wyników...</p>
-      </div>
-    </section>
-  </main>
-  
-  <!-- Footer placeholder - będzie wstrzyknięty przez JS -->
-  <div id="main-footer"></div>
-</div>
+      </section>
+    </main>
+
+    <!-- Footer placeholder - będzie wstrzyknięty przez JS -->
+    <div id="main-footer"></div>
+  </div>
 
   <!-- MODALE (pozostają bez zmian) -->
   <div id="hearing-modal" class="modal">
@@ -316,4 +355,5 @@
   <script src="results.js"></script>
   <script src="/assets/js/main.js"></script>
 </body>
+
 </html>

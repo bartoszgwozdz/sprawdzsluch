@@ -146,17 +146,52 @@ function setupPaymentForm() {
     const paymentForm = document.getElementById('paymentForm');
     if (!paymentForm) return;
     
+    // Obsługa pokazywania/ukrywania pola voucher
+    const methodRadios = document.querySelectorAll('input[name="method"]');
+    const voucherField = document.getElementById('voucherField');
+    
+    methodRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'voucher') {
+                voucherField.style.display = 'block';
+            } else {
+                voucherField.style.display = 'none';
+                // Wyczyść pole voucher gdy nie jest potrzebne
+                document.getElementById('voucher').value = '';
+                // Ukryj błąd walidacji
+                document.getElementById('voucherError').style.display = 'none';
+            }
+        });
+    });
+    
     paymentForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
+        // Walidacja email
         const email = document.getElementById('email').value;
+        const emailError = document.getElementById('emailError');
         if (!email || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-            const emailError = document.getElementById('emailError');
             emailError.style.display = 'block';
             return;
+        } else {
+            emailError.style.display = 'none';
         }
         
         const method = document.querySelector('input[name="method"]:checked').value;
+        
+        // Walidacja voucher - jeśli wybrano voucher, pole musi być wypełnione
+        if (method === 'voucher') {
+            const voucherValue = document.getElementById('voucher').value.trim();
+            const voucherError = document.getElementById('voucherError');
+            
+            if (!voucherValue) {
+                voucherError.style.display = 'block';
+                return;
+            } else {
+                voucherError.style.display = 'none';
+            }
+        }
+        
         const buyBtn = document.getElementById('buyBtn');
         const statusMessage = document.getElementById('statusMessage');
         
@@ -168,27 +203,50 @@ function setupPaymentForm() {
             // Pobierz dane testu
             const testResults = JSON.parse(localStorage.getItem('hearingTestResults')) || {};
             
-            const response = await fetch('/api/payments/create', {
+            // Przygotuj payload JSON z pełnymi danymi testu
+            const payload = {
+                testId: testResults.testId || "TEST-" + Date.now(),
+                hearingLevels: testResults.hearingLevels || [],
+                maxAudibleFrequency: testResults.maxAudibleFrequency || 13000,
+                timestamp: testResults.timestamp || new Date().toISOString(),
+                paymentMethod: method
+            };
+            
+            // Dodaj kod voucher jeśli wybrano tę metodę
+            if (method === 'voucher') {
+                payload.voucherCode = document.getElementById('voucher').value.trim();
+            }
+            
+            // Przygotuj dane do wysłania do backend-core
+            const hearingResultData = {
+                userEmail: email,
+                payloadJson: JSON.stringify(payload),
+                status: "NEW"
+            };
+            
+            const response = await fetch('/api/results', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userEmail: email,
-                    testId: testResults.testId || "TEST-" + Date.now(),
-                    paymentMethod: method,
-                    testResults: testResults.hearingLevels || [],
-                    maxAudibleFrequency: testResults.maxAudibleFrequency || 13000
-                })
+                body: JSON.stringify(hearingResultData)
             });
             
             if (!response.ok) {
                 throw new Error(`Błąd HTTP: ${response.status}`);
             }
             
-            const payment = await response.json();
-            if (payment.redirectUrl) {
-                window.location.href = payment.redirectUrl;
+            const result = await response.json();
+            
+            // Po pomyślnym zapisaniu wyników
+            if (result.id) {
+                // Możesz przekierować do strony potwierdzenia lub pokazać komunikat
+                statusMessage.textContent = 'Wyniki zostały zapisane pomyślnie! Sprawdź swoją skrzynkę e-mail.';
+                statusMessage.style.display = 'block';
+                statusMessage.className = 'status-message success';
+                
+                // Opcjonalnie: wyczyść localStorage po pomyślnym zapisaniu
+                // localStorage.removeItem('hearingTestResults');
             } else {
-                throw new Error('Brak URL przekierowania w odpowiedzi.');
+                throw new Error('Brak ID w odpowiedzi serwera.');
             }
         } catch (error) {
             console.error('Błąd podczas przetwarzania płatności:', error);
