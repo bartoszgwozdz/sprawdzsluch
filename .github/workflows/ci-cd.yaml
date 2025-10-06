@@ -82,6 +82,9 @@ jobs:
 
           # Następnie secrets i configmapy (jeśli istnieją)
           kubectl apply -f k8s/mongodb/secret.yaml
+          kubectl apply -f k8s/mongodb/configmap.yaml
+
+          # Potem serwisy 
 
           # Potem deployment MongoDB
           kubectl apply -f k8s/mongodb/statefulset.yaml
