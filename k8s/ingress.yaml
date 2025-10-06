@@ -1,19 +1,4 @@
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: strip-frontend-prefix
-  namespace: sprawdzsluch
-spec:
-  stripPrefix:
-    prefixes:
-      - /o-nas
-      - /kontakt
-      - /test-sluchu
-      - /faq
-      - /results
-      - /polityka-prywatnosci
-      - /regulamin
----
+# --- MIDDLEWARE DLA MONGO-EXPRESS ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
@@ -24,16 +9,18 @@ spec:
     prefixes:
       - /mongo-express
 ---
+# --- MIDDLEWARE DLA GRAFANA ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: strip-grafana-prefix
-  namespace: observability    # zmiana namespace na observability
+  namespace: observability
 spec:
   stripPrefix:
     prefixes:
       - /grafana
 ---
+# --- FRONTEND: WSZYSTKIE ŚCIEŻKI ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -43,13 +30,6 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: PathPrefix(`/o-nas`) || PathPrefix(`/kontakt`) || PathPrefix(`/test-sluchu`) || PathPrefix(`/faq`) || PathPrefix(`/results`) || PathPrefix(`/polityka-prywatnosci`) || PathPrefix(`/regulamin`)
-      kind: Rule
-      services:
-        - name: frontend
-          port: 80
-      middlewares:
-        - name: strip-frontend-prefix
     - match: PathPrefix(`/`)
       kind: Rule
       services:
@@ -57,6 +37,7 @@ spec:
           port: 80
       priority: 1
 ---
+# --- MONGO-EXPRESS ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -74,11 +55,12 @@ spec:
       middlewares:
         - name: strip-mongo-express-prefix
 ---
+# --- GRAFANA ---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: sprawdzsluch-grafana
-  namespace: observability    # zmiana namespace na observability
+  namespace: observability
 spec:
   entryPoints:
     - web
@@ -86,8 +68,8 @@ spec:
     - match: PathPrefix(`/grafana`)
       kind: Rule
       services:
-        - name: grafana      # nazwa serwisu Grafany w namespace observability
+        - name: grafana
           port: 3000
       middlewares:
         - name: strip-grafana-prefix
-          namespace: observability    # dodanie namespace dla middleware
+          namespace: observability
