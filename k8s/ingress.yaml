@@ -53,12 +53,6 @@ spec:
         - name: mongo-express
           port: 8081
       priority: 100
-    - match: PathPrefix(`/mongo-express/static`)
-      kind: Rule
-      services:
-        - name: mongo-express
-          port: 8081
-      priority: 101
 ---
 # --- GRAFANA ---
 apiVersion: traefik.io/v1alpha1
