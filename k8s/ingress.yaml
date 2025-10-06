@@ -1,12 +1,18 @@
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: strip-grafana-prefix
-  namespace: observability
+  name: strip-frontend-prefix
+  namespace: sprawdzsluch
 spec:
   stripPrefix:
     prefixes:
-      - /grafana
+      - /o-nas
+      - /kontakt
+      - /test-sluchu
+      - /faq
+      - /results
+      - /polityka-prywatnosci
+      - /regulamin
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
@@ -18,90 +24,70 @@ spec:
     prefixes:
       - /mongo-express
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
 metadata:
-  name: sprawdzsluch-ingress
-  namespace: sprawdzsluch
-  annotations:
-    kubernetes.io/ingress.class: "traefik"
-    traefik.ingress.kubernetes.io/router.tls: "true"
+  name: strip-grafana-prefix
+  namespace: observability    # zmiana namespace na observability
 spec:
-  rules:
-    - host: ""  # Dodaj właściwą domenę
-      http:
-        paths:
-          # Frontend paths
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend
-                port:
-                  number: 80
-          - path: /o-nas
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend
-                port:
-                  number: 80
-          - path: /kontakt
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend
-                port:
-                  number: 80
-          - path: /test-sluchu
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend
-                port:
-                  number: 80
-          - path: /faq
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend
-                port:
-                  number: 80
-          - path: /results
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend
-                port:
-                  number: 80
-          - path: /polityka-prywatnosci
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend
-                port:
-                  number: 80
-          - path: /regulamin
-            pathType: Prefix
-            backend:
-              service:
-                name: frontend
-                port:
-                  number: 80
-          # Mongo Express
-          - path: /mongo-express
-            pathType: Prefix
-            backend:
-              service:
-                name: mongo-express
-                port:
-                  number: 8081
-
-          # Grafana (reference to external service)
-          - path: /grafana
-            pathType: Prefix
-            backend:
-              service:
-                name: grafana-external
-                port:
-                  number: 3000
+  stripPrefix:
+    prefixes:
+      - /grafana
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: sprawdzsluch-frontend
+  namespace: sprawdzsluch
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: PathPrefix(`/o-nas`) || PathPrefix(`/kontakt`) || PathPrefix(`/test-sluchu`) || PathPrefix(`/faq`) || PathPrefix(`/results`) || PathPrefix(`/polityka-prywatnosci`) || PathPrefix(`/regulamin`)
+      kind: Rule
+      services:
+        - name: frontend
+          port: 80
+      middlewares:
+        - name: strip-frontend-prefix
+    - match: PathPrefix(`/`)
+      kind: Rule
+      services:
+        - name: frontend
+          port: 80
+      priority: 1
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: sprawdzsluch-mongo-express
+  namespace: sprawdzsluch
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: PathPrefix(`/mongo-express`)
+      kind: Rule
+      services:
+        - name: mongo-express
+          port: 8081
+      middlewares:
+        - name: strip-mongo-express-prefix
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: sprawdzsluch-grafana
+  namespace: observability    # zmiana namespace na observability
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: PathPrefix(`/grafana`)
+      kind: Rule
+      services:
+        - name: grafana      # nazwa serwisu Grafany w namespace observability
+          port: 3000
+      middlewares:
+        - name: strip-grafana-prefix
+          namespace: observability    # dodanie namespace dla middleware
