@@ -54,6 +54,7 @@ spec:
           port: 8081
       middlewares:
         - name: strip-mongo-express-prefix
+      priority: 100
 ---
 # --- GRAFANA ---
 apiVersion: traefik.io/v1alpha1
@@ -73,3 +74,4 @@ spec:
       middlewares:
         - name: strip-grafana-prefix
           namespace: observability
+      priority: 100
