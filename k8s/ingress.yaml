@@ -1,26 +1,5 @@
-# --- MIDDLEWARE DLA MONGO-EXPRESS ---
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: strip-mongo-express-prefix
-  namespace: sprawdzsluch
-spec:
-  stripPrefix:
-    prefixes:
-      - /mongo-express
 ---
-# --- MIDDLEWARE DLA GRAFANA ---
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: strip-grafana-prefix
-  namespace: observability
-spec:
-  stripPrefix:
-    prefixes:
-      - /grafana
----
-# --- FRONTEND: WSZYSTKIE ŚCIEŻKI ---
+# FRONTEND
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -35,9 +14,8 @@ spec:
       services:
         - name: frontend
           port: 80
-      priority: 1
 ---
-# --- MONGO-EXPRESS ---
+# MONGO-EXPRESS
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -45,16 +23,15 @@ metadata:
   namespace: sprawdzsluch
 spec:
   entryPoints:
-    - web
+    - mongoexpress
   routes:
-    - match: PathPrefix(`/mongo-express`)
+    - match: PathPrefix(`/`)
       kind: Rule
       services:
         - name: mongo-express
           port: 8081
-      priority: 100
 ---
-# --- GRAFANA ---
+# GRAFANA
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -62,14 +39,10 @@ metadata:
   namespace: observability
 spec:
   entryPoints:
-    - web
+    - grafana
   routes:
-    - match: PathPrefix(`/grafana`)
+    - match: PathPrefix(`/`)
       kind: Rule
       services:
         - name: grafana
           port: 3000
-      middlewares:
-        - name: strip-grafana-prefix
-          namespace: observability
-      priority: 100

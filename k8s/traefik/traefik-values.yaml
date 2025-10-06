@@ -27,3 +27,11 @@ providers:
 
 rbac:
   enabled: true
+
+entryPoints:
+  web:
+    address: ":80"
+  mongoexpress:
+    address: ":8081"
+  grafana:
+    address: ":8082"
