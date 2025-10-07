@@ -312,12 +312,7 @@
                 <label><input type="radio" class="input-radio" name="method" value="blik">BLIK</label>
                 <label><input type="radio" class="input-radio" name="method" value="voucher">VOUCHER</label>
               </div>
-            </div>
-            <div class="voucher-field" id="voucherField" style="visibility: hidden; margin-top: 1rem;">
-              <label class="form-label" for="voucher">Kod Voucher *</label>
-              <input id="voucher" name="voucher" type="text" class="input-email" placeholder="Wprowadź kod voucher">
-              <p id="voucherError" class="status-message error" style="display:none;">Kod voucher jest wymagany.</p>
-            </div>
+            </div>         
           </div>
 
           <div style="margin-top:1.5rem;">
@@ -325,6 +320,11 @@
               Kup raport PDF za 24,99 zł
             </button>
           </div>
+          <div class="voucher-field" id="voucherField" style="visibility: hidden; margin-top: 1rem;">
+              <label class="form-label" for="voucher">Kod Voucher *</label>
+              <input id="voucher" name="voucher" type="text" class="input-email" placeholder="Wprowadź kod voucher">
+              <p id="voucherError" class="status-message error" style="display:none;">Kod voucher jest wymagany.</p>
+            </div>
           <p id="statusMessage" class="status-message" style="display:none;"></p>
         </form>
       </section>
