@@ -19,21 +19,45 @@ spec:
           ports:
             - containerPort: 8090
           env:
+            # Spring Profile
+            - name: SPRING_PROFILES_ACTIVE
+              value: "production"
+            
+            # MongoDB - pobierane z ConfigMap
             - name: SPRING_DATA_MONGODB_URI
               valueFrom:
                 configMapKeyRef:
                   name: mongodb-config
                   key: mongodb-uri
-            - name: SPRING_PROFILES_ACTIVE
-              value: "production"
-            # MongoDB credentials (jeśli potrzebne)
-            - name: MONGO_INITDB_ROOT_USERNAME
+            
+            # Mail - pobierane z Secrets
+            - name: MAIL_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: mongo-secret
-                  key: mongo-root-username
-            - name: MONGO_INITDB_ROOT_PASSWORD
+                  name: mail-secret
+                  key: username
+                  optional: true
+            - name: MAIL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mongo-secret
-                  key: mongo-root-password
+                  name: mail-secret
+                  key: password
+                  optional: true
+            
+            # PayNow - pobierane z Secrets
+            - name: PAYNOW_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: paynow-secret
+                  key: api-key
+                  optional: true
+            - name: PAYNOW_SIGNATURE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: paynow-secret
+                  key: signature-key
+                  optional: true
+            - name: PAYNOW_REDIRECT_URL
+              value: "http://213.199.63.237/payment/return"
+            - name: PAYNOW_NOTIFY_URL
+              value: "http://213.199.63.237/api/paynow/webhook"

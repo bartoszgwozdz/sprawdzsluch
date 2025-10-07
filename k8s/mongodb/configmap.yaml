@@ -4,4 +4,4 @@ metadata:
   name: mongodb-config
   namespace: sprawdzsluch
 data:
-  mongodb-uri: mongodb://admin:supersecret@mongodb-service:27017/sprawdzsluch?authSource=admin
+  mongodb-uri: mongodb://admin:supersecret@mongodb:27017/sprawdzsluch?authSource=admin
