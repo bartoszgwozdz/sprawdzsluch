@@ -170,13 +170,13 @@ function setupPaymentForm() {
     methodRadios.forEach(radio => {
         radio.addEventListener('change', function() {
             if (this.value === 'voucher') {
-                voucherField.style.display = 'block';
+                voucherField.style.visibility = 'visible';
             } else {
-                voucherField.style.display = 'none';
+                voucherField.style.visibility = 'hidden';
                 // Wyczyść pole voucher gdy nie jest potrzebne
                 document.getElementById('voucher').value = '';
                 // Ukryj błąd walidacji
-                document.getElementById('voucherError').style.display = 'none';
+                document.getElementById('voucherError').style.visibility = 'hidden';
             }
         });
     });
@@ -216,35 +216,29 @@ function setupPaymentForm() {
             buyBtn.disabled = true;
             buyBtn.textContent = "Przetwarzanie...";
             statusMessage.style.display = 'none';
-            
-            // Pobierz dane testu
-            const testResults = JSON.parse(sessionStorage.getItem('hearingTestResults')) || {};
+            const hearingResults = sessionStorage.getItem('hearingTestResults');
+            const testResults = JSON.parse(hearingResults) || {};
             
             // Przygotuj payload JSON z pełnymi danymi testu
-            const payload = {
+            const payloadData = {
                 testId: generateTestId(),
+                userEmail: email,
                 hearingLevels: testResults.hearingLevels || [],
                 maxAudibleFrequency: testResults.maxAudibleFrequency || 13000,
-                timestamp: testResults.timestamp || new Date().toISOString(),
-                paymentMethod: method
+                executed: testResults.timestamp || new Date().toISOString(),
+                paymentMethod: method,
+                status: "NEW"
             };
             
             // Dodaj kod voucher jeśli wybrano tę metodę
             if (method === 'voucher') {
-                payload.voucherCode = document.getElementById('voucher').value.trim();
+                payloadData.voucherCode = document.getElementById('voucher').value.trim();
             }
-            
-            // Przygotuj dane do wysłania do backend-core
-            const hearingResultData = {
-                userEmail: email,
-                payloadJson: JSON.stringify(payload),
-                status: "NEW"
-            };
             
             const response = await fetch('/api/results', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(hearingResultData)
+                body: JSON.stringify(payloadData)
             });
             
             if (!response.ok) {
