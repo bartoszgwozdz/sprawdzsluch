@@ -1,9 +1,9 @@
 package dev.gwozdz.sprawdzsluch.entity;
 
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
@@ -21,7 +21,7 @@ public class HearingResult {
     private String id;
 
     private String testId;
-    
+
     private String userEmail;
 
     private int maxAudibleFrequency;
@@ -38,6 +38,9 @@ public class HearingResult {
     private LocalDateTime executed;
 
     private String voucherCode;
+
+    @CreatedDate
+    private LocalDateTime createdAt;
 }
 
 
