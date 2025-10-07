@@ -17,8 +17,6 @@ const btnClose = document.getElementById('modal-close');
 
 // Funkcja otwierająca modal
 function openModal() {
-    // Upewnij się, że style dla scrollowania są dodane
-    addModalScrollStyles();
 
     // Reszta kodu pozostaje bez zmian
     currentStep = 0;
