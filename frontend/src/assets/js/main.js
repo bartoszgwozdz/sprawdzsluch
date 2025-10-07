@@ -255,7 +255,30 @@ fetch('/assets/js/hearing-test.js')
         document.head.appendChild(script);
     });
 
+// Wstrzykiwanie headera i footera
+function injectHeaderAndFooter() {
+    fetch('/assets/partials/header.html')
+        .then(res => res.text())
+        .then(html => {
+            const headerElement = document.getElementById('main-header');
+            if (headerElement) {
+                headerElement.innerHTML = html;
+            }
+        })
+        .catch(err => console.error('Error loading header:', err));
 
+    fetch('/assets/partials/footer.html')
+        .then(res => res.text())
+        .then(html => {
+            const footerElement = document.getElementById('main-footer');
+            if (footerElement) {
+                footerElement.innerHTML = html;
+            }
+        })
+        .catch(err => console.error('Error loading footer:', err));
+}
 
-
-
+// Wywołaj na załadowaniu strony
+document.addEventListener('DOMContentLoaded', function() {
+    injectHeaderAndFooter();
+});
