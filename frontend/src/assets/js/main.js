@@ -6,7 +6,8 @@ const modalSteps = [
     // "/assets/partials/modal-test-2-intro.html",
     "/assets/partials/modal-test-2.html",           // Test maksymalnej częstotliwości
     // "/assets/partials/modal-test-3-intro.html",
-    "/assets/partials/modal-test-3.html"            // Test losowych częstotliwości - po tym następuje przekierowanie do /results/
+    "/assets/partials/modal-test-3.html",           // Test losowych częstotliwości
+    "/assets/partials/modal-results.html"           // Wyniki
 ];
 let currentStep = 0;
 
@@ -16,8 +17,8 @@ const modalContent = document.getElementById('modal-content');
 const btnClose = document.getElementById('modal-close');
 
 // Funkcja otwierająca modal
-function openModal() {
-
+function openModal() {aa
+    
     // Reszta kodu pozostaje bez zmian
     currentStep = 0;
     showModalStep(currentStep);
@@ -45,13 +46,26 @@ btnClose.onclick = () => {
     }
 };
 
+
+// Ładowanie zawartości kroku - NOWA, ZAKTUALIZOWANA WERSJA
 function showModalStep(step) {
     const modalDialog = modal.querySelector('.modal-container'); // Zmiana selektora na właściwy
 
-    // Ustaw standardową szerokość dla wszystkich kroków
-    modalDialog.classList.remove('wide-width');
-    modalDialog.classList.add('standard-width');
-    modalDialog.style.maxHeight = '';
+    // Dynamicznie dostosuj szerokość modala w zależności od kroku
+    if (step === 5) { // Krok z wynikami
+        modalDialog.classList.remove('standard-width');
+        modalDialog.classList.add('wide-width'); // Ustaw większą szerokość dla wyników
+        
+        // Upewnij się, że możliwe jest scrollowanie
+        modalDialog.style.overflowY = 'auto';
+        modalDialog.style.maxHeight = '90vh';
+    } else {
+        modalDialog.classList.remove('wide-width');
+        modalDialog.classList.add('standard-width'); // Przywróć domyślną szerokość dla innych kroków
+        
+        // Dla mniejszych kroków możemy zachować standardową wysokość
+        modalDialog.style.maxHeight = '';
+    }
 
     fetch(modalSteps[step])
         .then(res => res.text())
@@ -87,54 +101,45 @@ function showModalStep(step) {
                         showModalStep(currentStep);
                     };
                 }
-            } else if (step === 2) { // Test 1: Test 1kHz
+            } else if (step === 2) { // Test 1kHz
                 window.hearingTestInstance.initialize('hear-button', 'test-instruction', 'sound-wave-canvas');
-                window.hearingTestInstance.start1kHzTest();
-
+                window.hearingTestInstance.startAdjusting1kHz();
                 document.getElementById('hear-button').onclick = () => {
                     window.hearingTestInstance.recordHearing();
-                };
-
-                // Event listener dla zakończenia testu 1kHz
-                window.addEventListener('test1kHzCompleted', () => {
                     setTimeout(() => { currentStep++; showModalStep(currentStep); }, 500);
-                }, { once: true });
-            } else if (step === 3) { // Test 2: Test maksymalnej częstotliwości
+                };
+            } else if (step === 3) { // Test max częstotliwości
                 window.hearingTestInstance.initialize('hear-button', 'test-instruction', 'sound-wave-canvas');
-                window.hearingTestInstance.startMaxFrequencyTest();
-
+                window.hearingTestInstance.findMaxFrequency();
                 document.getElementById('hear-button').onclick = () => {
                     window.hearingTestInstance.recordHearing();
-                };
-
-                // Event listener dla zakończenia testu maksymalnej częstotliwości
-                window.addEventListener('maxFrequencyTestCompleted', () => {
                     setTimeout(() => { currentStep++; showModalStep(currentStep); }, 500);
-                }, { once: true });
-            } else if (step === 4) { // Test 3: Test losowych częstotliwości
+                };
+            } else if (step === 4) { // Test losowych częstotliwości
                 window.hearingTestInstance.initialize('hear-button', 'test-instruction', 'sound-wave-canvas');
                 window.hearingTestInstance.startRandomFrequencyTest();
 
                 // Nasłuchuj na niestandardowy event, który zasygnalizuje koniec tego etapu
                 window.addEventListener('randomTestCompleted', () => {
                     console.log('Event "randomTestCompleted" received. Advancing to results page.');
-
+                    
                     // Zapisz dane testu do localStorage
                     if (window.hearingTestInstance) {
                         const testResults = {
+                            testId: "TEST-" + Date.now(),
                             hearingLevels: window.hearingTestInstance.hearingLevels || [],
                             maxAudibleFrequency: window.hearingTestInstance.maxAudibleFrequency || 20000,
-                            timestamp: new Date().getDate().toString()
+                            timestamp: new Date().toISOString()
                         };
-
+                        
                         sessionStorage.setItem('hearingTestResults', JSON.stringify(testResults));
                     }
-
+                    
                     // Zamknij modal
                     if (modal) {
                         modal.classList.remove('show');
                     }
-
+                    
                     // Przekieruj do strony z wynikami
                     window.location.href = '/results/';
                 }, { once: true }); // { once: true } sprawi, że listener usunie się sam po jednym wywołaniu
@@ -142,11 +147,7 @@ function showModalStep(step) {
                 document.getElementById('hear-button').onclick = () => {
                     window.hearingTestInstance.recordHearing();
                 };
-            } else {
-                // Nieznany krok
-                console.error('Nieznany krok modala:', step);
-                return;
-            }
+            } 
         })
         .catch(error => {
             console.error('Error loading step:', error);
@@ -253,30 +254,62 @@ fetch('/assets/js/hearing-test.js')
         document.head.appendChild(script);
     });
 
-// Wstrzykiwanie headera i footera
-function injectHeaderAndFooter() {
-    fetch('/assets/partials/header.html')
-        .then(res => res.text())
-        .then(html => {
-            const headerElement = document.getElementById('main-header');
-            if (headerElement) {
-                headerElement.innerHTML = html;
-            }
-        })
-        .catch(err => console.error('Error loading header:', err));
+// Wstrzykiwanie headera z pliku header.html
+fetch('/assets/partials/header.html')
+    .then(res => res.text())
+    .then(html => {
+        const mainHeader = document.getElementById('main-header');
+        if (mainHeader) {
+            mainHeader.innerHTML = html;
+        }
 
-    fetch('/assets/partials/footer.html')
-        .then(res => res.text())
-        .then(html => {
-            const footerElement = document.getElementById('main-footer');
-            if (footerElement) {
-                footerElement.innerHTML = html;
-            }
-        })
-        .catch(err => console.error('Error loading footer:', err));
-}
+        // --- CAŁA LOGIKA ZALEŻNA OD HEADERA MUSI BYĆ TUTAJ ---
 
-// Wywołaj na załadowaniu strony
-document.addEventListener('DOMContentLoaded', function() {
-    injectHeaderAndFooter();
-});
+        // 1. Obsługa przycisku "Rozpocznij test" w headerze
+        const headerTestBtn = document.getElementById('start-test-btn-header');
+        if (headerTestBtn) {
+            headerTestBtn.addEventListener('click', openModal);
+        }
+
+        // 2. Logika menu mobilnego
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        
+        if (mobileMenuBtn && mobileMenu) {
+            const mobileMenuIcon = mobileMenuBtn.querySelector('.material-icons');
+
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('is-open');
+                // Zmiana ikony z menu na 'close' i z powrotem
+                if (mobileMenu.classList.contains('is-open')) {
+                    mobileMenuIcon.textContent = 'close';
+                } else {
+                    mobileMenuIcon.textContent = 'menu';
+                }
+            });
+
+            // Dodatkowa obsługa przycisku w menu mobilnym
+            const mobileTestBtn = document.getElementById('start-test-btn-mobile');
+            if (mobileTestBtn) {
+                mobileTestBtn.addEventListener('click', () => {
+                    mobileMenu.classList.remove('is-open'); // Zamknij menu
+                    if(mobileMenuIcon) mobileMenuIcon.textContent = 'menu';
+                    openModal(); // Otwórz modal testu
+                });
+            }
+        }
+    });
+
+// Wstrzykiwanie footera z pliku footer.html
+fetch('/assets/partials/footer.html')
+    .then(res => res.text())
+    .then(html => {
+        const mainFooter = document.getElementById('main-footer');
+        if(mainFooter) {
+            mainFooter.innerHTML = html;
+        }
+    });
+
+
+
+
