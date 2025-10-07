@@ -14,7 +14,7 @@ COPY src ./src
 RUN npm install
 
 # Uruchom build.js (obfuskacja i minifikacja)
-RUN npm run obf:build
+# RUN npm run obf:build
 
 # ETAP 2: Nginx (produkcyjny obraz)
 FROM nginx:alpine
