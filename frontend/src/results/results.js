@@ -202,10 +202,10 @@ function setupPaymentForm() {
             const voucherError = document.getElementById('voucherError');
             
             if (!voucherValue) {
-                voucherError.style.display = 'block';
+                voucherError.style.visibility = 'visible';
                 return;
             } else {
-                voucherError.style.display = 'none';
+                voucherError.style.visibility = 'hidden';
             }
         }
         

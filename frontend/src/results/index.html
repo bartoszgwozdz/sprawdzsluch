@@ -224,7 +224,16 @@
       border-bottom: 1px solid #e2e8f0;
     }
 
+    .paymentSelection {
+      display: flex;
+      margin-top: 1rem;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+
     .paymentForm {
+      margin-top:1rem;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1.5rem;
@@ -294,14 +303,17 @@
             <p id="emailError" class="status-message error" style="display:none;">Wprowadź poprawny adres e-mail.</p>
           </div>
 
-          <div style="margin-top:1rem;">
-            <label class="form-label">Sposób płatności</label>
-            <div class="radio-group">
-              <label><input type="radio" class="input-radio" name="method" value="card" checked>Karta płatnicza</label>
-              <label><input type="radio" class="input-radio" name="method" value="blik">BLIK</label>
-              <label><input type="radio" class="input-radio" name="method" value="voucher">VOUCHER</label>
+          <div class="payment-selection">
+            <div>
+              <label class="form-label">Sposób płatności</label>
+              <div class="radio-group">
+                <label><input type="radio" class="input-radio" name="method" value="card" checked>Karta
+                  płatnicza</label>
+                <label><input type="radio" class="input-radio" name="method" value="blik">BLIK</label>
+                <label><input type="radio" class="input-radio" name="method" value="voucher">VOUCHER</label>
+              </div>
             </div>
-            <div class="voucher-field" id="voucherField" style="display: none; margin-top: 1rem;">
+            <div class="voucher-field" id="voucherField" style="visibility: hidden; margin-top: 1rem;">
               <label class="form-label" for="voucher">Kod Voucher *</label>
               <input id="voucher" name="voucher" type="text" class="input-email" placeholder="Wprowadź kod voucher">
               <p id="voucherError" class="status-message error" style="display:none;">Kod voucher jest wymagany.</p>
