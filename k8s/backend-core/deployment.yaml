@@ -24,12 +24,15 @@ spec:
                 configMapKeyRef:
                   name: mongodb-config
                   key: mongodb-uri
-            - name: MONGO_USER
+            - name: SPRING_PROFILES_ACTIVE
+              value: "production"
+            # MongoDB credentials (jeśli potrzebne)
+            - name: MONGO_INITDB_ROOT_USERNAME
               valueFrom:
                 secretKeyRef:
                   name: mongo-secret
                   key: mongo-root-username
-            - name: MONGO_PASSWORD
+            - name: MONGO_INITDB_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: mongo-secret
