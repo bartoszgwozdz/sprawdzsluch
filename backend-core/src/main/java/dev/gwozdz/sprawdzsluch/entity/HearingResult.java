@@ -1,8 +1,7 @@
 package dev.gwozdz.sprawdzsluch.entity;
 
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
@@ -19,8 +18,7 @@ public class HearingResult {
 
     private String userEmail;
 
-    @Lob
-    private String payloadJson;
+    private String payloadJson; 
 
     private String status; // NEW, PAID, SENT
 
