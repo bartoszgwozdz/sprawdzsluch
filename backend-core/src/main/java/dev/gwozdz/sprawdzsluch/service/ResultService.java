@@ -1,8 +1,8 @@
 package dev.gwozdz.sprawdzsluch.service;
 
-import org.springframework.stereotype.Service;
 import dev.gwozdz.sprawdzsluch.entity.HearingResult;
 import dev.gwozdz.sprawdzsluch.repository.HearingResultRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +21,7 @@ public class ResultService {
         return repo.save(result);
     }
 
-    public HearingResult find(Long id)
+    public HearingResult find(String id)
     {
         return repo.findById(id).orElseThrow();
     }
