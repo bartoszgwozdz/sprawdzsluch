@@ -1,7 +1,9 @@
 package dev.gwozdz.sprawdzsluch.entity;
 
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -15,18 +17,18 @@ import java.time.LocalDateTime;
 public class Payment {
 
     @Id
-    private String id; 
+    private String id;
 
     private String userEmail;         // email klienta
     private String testId;            // ID testu słuchu (do raportu)
     private String paynowPaymentId;   // ID transakcji Paynow
 
-    private PaymentStatus status;     
+    private PaymentStatus status;
 
-    @CreationTimestamp
+    @CreatedDate
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
+    @LastModifiedDate
     private LocalDateTime updatedAt;
 }
 
