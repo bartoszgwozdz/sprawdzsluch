@@ -55,6 +55,13 @@ spec:
       middlewares:
         - name: strip-mongo-express
         - name: add-headers
+    - match: PathPrefix(`/public`)
+      kind: Rule
+      services:
+        - name: mongo-express
+          port: 8081
+      middlewares:
+        - name: add-headers
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
