@@ -220,10 +220,20 @@ function setupPaymentForm() {
             const testResults = JSON.parse(hearingResults) || {};
             
             // Przygotuj payload JSON z pełnymi danymi testu
+            const hearingLevelsArray = testResults.hearingLevels || [];
+            
+            // Konwertuj tablicę na obiekt Map<Integer, Double> zgodny z backendem
+            const hearingLevelsMap = {};
+            hearingLevelsArray.forEach(item => {
+                if (item.frequency && item.gain !== undefined) {
+                    hearingLevelsMap[item.frequency] = item.gain;
+                }
+            });
+            
             const payloadData = {
                 testId: generateTestId(),
                 userEmail: email,
-                hearingLevels: testResults.hearingLevels || {},
+                hearingLevels: hearingLevelsMap,
                 maxAudibleFrequency: testResults.maxAudibleFrequency || 13000,
                 paymentMethod: method,
                 status: "NEW"
