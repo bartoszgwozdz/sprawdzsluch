@@ -226,7 +226,7 @@ function setupPaymentForm() {
             const hearingLevelsMap = {};
             hearingLevelsArray.forEach(item => {
                 if (item.frequency && item.gain !== undefined) {
-                    hearingLevelsMap[item.frequency] = item.gain;
+                    hearingLevelsMap[parseInt(item.frequency)] = parseFloat(item.gain);
                 }
             });
             
@@ -234,10 +234,12 @@ function setupPaymentForm() {
                 testId: generateTestId(),
                 userEmail: email,
                 hearingLevels: hearingLevelsMap,
-                maxAudibleFrequency: testResults.maxAudibleFrequency || 13000,
+                maxAudibleFrequency: parseInt(testResults.maxAudibleFrequency) || 13000,
                 paymentMethod: method,
                 status: "NEW"
             };
+            
+            console.log('Cały payload przed wysłaniem:', JSON.stringify(payloadData, null, 2));
             
             // Usuń pole executed na razie, żeby sprawdzić czy to powoduje problem
             // executed: testResults.timestamp ? new Date(testResults.timestamp).toISOString().slice(0, 19) : new Date().toISOString().slice(0, 19),
