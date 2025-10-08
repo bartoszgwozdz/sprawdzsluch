@@ -216,7 +216,7 @@ function setupPaymentForm() {
             buyBtn.disabled = true;
             buyBtn.textContent = "Przetwarzanie...";
             statusMessage.style.display = 'none';
-            const hearingResults = localStorage.getItem('hearingTestResults');
+            const hearingResults = sessionStorage.getItem('hearingTestResults');
             const testResults = JSON.parse(hearingResults) || {};
             
             // Przygotuj payload JSON z pełnymi danymi testu
@@ -239,8 +239,6 @@ function setupPaymentForm() {
                 status: "NEW"
             };
             
-            console.log('Cały payload przed wysłaniem:', JSON.stringify(payloadData, null, 2));
-            
             // Usuń pole executed na razie, żeby sprawdzić czy to powoduje problem
             // executed: testResults.timestamp ? new Date(testResults.timestamp).toISOString().slice(0, 19) : new Date().toISOString().slice(0, 19),
             
@@ -248,8 +246,6 @@ function setupPaymentForm() {
             if (method === 'voucher') {
                 payloadData.voucherCode = document.getElementById('voucher').value.trim();
             }
-            
-            console.log('Wysyłane dane:', payloadData);
             
             const response = await fetch('/api/results', {
                 method: 'POST',
