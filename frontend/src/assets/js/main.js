@@ -17,7 +17,9 @@ const modalContent = document.getElementById('modal-content');
 const btnClose = document.getElementById('modal-close');
 
 // Funkcja otwierająca modal
-function openModal() {aa
+function openModal() {
+    // Upewnij się, że style dla scrollowania są dodane
+    addModalScrollStyles();
     
     // Reszta kodu pozostaje bez zmian
     currentStep = 0;
@@ -46,6 +48,39 @@ btnClose.onclick = () => {
     }
 };
 
+// Dodaj style dla scrollowania modalu - umieść tę funkcję na początku pliku
+function addModalScrollStyles() {
+    // Sprawdź czy style już istnieją
+    if (document.getElementById('modal-scroll-styles')) return;
+    
+    // Utwórz element style
+    const style = document.createElement('style');
+    style.id = 'modal-scroll-styles';
+    style.textContent = `
+        #hearing-modal .modal-container {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        #modal-content {
+            overflow-y: visible;
+            max-height: none;
+        }
+        
+        /* Style do obsługi mobile */
+        @media (max-width: 768px) {
+            #hearing-modal .modal-container {
+                max-height: 85vh;
+            }
+        }
+    `;
+    
+    // Dodaj style do head
+    document.head.appendChild(style);
+}
+
+// Wywołaj funkcję przy inicjalizacji
+addModalScrollStyles();
 
 // Ładowanie zawartości kroku - NOWA, ZAKTUALIZOWANA WERSJA
 function showModalStep(step) {
@@ -132,7 +167,7 @@ function showModalStep(step) {
                             timestamp: new Date().toISOString()
                         };
                         
-                        sessionStorage.setItem('hearingTestResults', JSON.stringify(testResults));
+                        localStorage.setItem('hearingTestResults', JSON.stringify(testResults));
                     }
                     
                     // Zamknij modal
@@ -147,7 +182,98 @@ function showModalStep(step) {
                 document.getElementById('hear-button').onclick = () => {
                     window.hearingTestInstance.recordHearing();
                 };
-            } 
+            } else if (step === 5) { // Wyniki
+                fetch('/assets/partials/modal-results-part.html')
+                    .then(res => res.text())
+                    .then(html => {
+                        // Wyciągnij zawartość body z pobranego pliku
+                        const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+                        const resultsContent = bodyMatch ? bodyMatch[1] : html;
+                        
+                        // Wyciągnij style z pobranego pliku
+                        const styleMatch = html.match(/<style>([\s\S]*?)<\/style>/i);
+                        const resultStyles = styleMatch ? styleMatch[1] : '';
+                        
+                        // Wstaw style do modal-content
+                        if (resultStyles) {
+                            const styleElement = document.createElement('style');
+                            styleElement.textContent = resultStyles;
+                            modalContent.appendChild(styleElement);
+                        }
+                        
+                        // Wstaw zawartość do modal-content
+                        modalContent.innerHTML += resultsContent;
+                        
+                        // Dodaj obsługę przycisku kończącego test
+                        const finishBtn = document.getElementById('finish-button');
+                        if (finishBtn) {
+                            finishBtn.onclick = () => modal.classList.remove('show');
+                        }
+                        
+                        // Obsługa formularza płatności
+                        const paymentForm = document.getElementById('paymentForm');
+                        if (paymentForm) {
+                            paymentForm.addEventListener('submit', async (e) => {
+                                e.preventDefault();
+                                
+                                const email = document.getElementById('email').value;
+                                const method = document.querySelector('input[name="method"]:checked').value;
+                                
+                                try {
+                                    const buyBtn = document.getElementById('buyBtn');
+                                    buyBtn.disabled = true;
+                                    buyBtn.textContent = "Przetwarzanie...";
+                                    
+                                    const response = await fetch('/api/payments/create', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                            userEmail: email,
+                                            testId: "TEST-" + Math.floor(Math.random() * 1000000), 
+                                            paymentMethod: method,
+                                            testResults: window.hearingTestInstance.hearingLevels 
+                                        })
+                                    });
+                                    
+                                    if (!response.ok) {
+                                        throw new Error(`Błąd HTTP: ${response.status}`);
+                                    }
+                                    
+                                    const payment = await response.json();
+                                    
+                                    if (payment.redirectUrl) {
+                                        window.location.href = payment.redirectUrl;
+                                    } else {
+                                        throw new Error('Brak URL przekierowania w odpowiedzi.');
+                                    }
+                                } catch (error) {
+                                    console.error('Błąd podczas przetwarzania płatności:', error);
+                                    const statusMessage = document.getElementById('statusMessage');
+                                    statusMessage.textContent = 'Wystąpił błąd podczas przetwarzania płatności. Spróbuj ponownie.';
+                                    statusMessage.style.display = 'block';
+                                    statusMessage.className = 'status error';
+                                    
+                                    const buyBtn = document.getElementById('buyBtn');
+                                    buyBtn.disabled = false;
+                                    buyBtn.textContent = "Kup raport PDF za 24,99 zł";
+                                }
+                            });
+                        }
+                        
+                        // Usunięcie istniejących skryptów wykresu
+                        setTimeout(() => {
+                            // Scrolluj na górę modalu po załadowaniu zawartości
+                            modalDialog.scrollTop = 0;
+                            
+                            // Aktualizuj wykres z wynikami testu
+                            updateHearingRangeChart();
+                        }, 100);
+                    })
+                    .catch(error => {
+                        console.error('Error loading results part:', error);
+                        modalContent.innerHTML = '<p class="p-4 text-red-500">Wystąpił błąd podczas ładowania wyników. Spróbuj ponownie.</p>';
+                    });
+            }
         })
         .catch(error => {
             console.error('Error loading step:', error);
@@ -309,6 +435,183 @@ fetch('/assets/partials/footer.html')
             mainFooter.innerHTML = html;
         }
     });
+
+// Dodaj funkcję do dynamicznego ładowania biblioteki Chart.js
+function loadChartJS() {
+    return new Promise((resolve, reject) => {
+        // Sprawdź, czy Chart.js jest już załadowany
+        if (typeof Chart !== 'undefined') {
+            resolve();
+            return;
+        }
+
+        // Ładowanie biblioteki Chart.js
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        script.onload = () => {
+            // Ładowanie wtyczki Chart.js Annotation
+            const annotationScript = document.createElement('script');
+            annotationScript.src = 'https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation';
+            annotationScript.onload = resolve;
+            annotationScript.onerror = reject;
+            document.head.appendChild(annotationScript);
+        };
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
+}
+
+// Zmodyfikowana funkcja updateHearingRangeChart
+function updateHearingRangeChart() {
+    // Najpierw załaduj Chart.js
+    loadChartJS()
+        .then(() => {
+            // Poczekaj na załadowanie wykresu
+            setTimeout(() => {
+                const hearingRangeCanvas = document.getElementById('hearingRange');
+                if (!hearingRangeCanvas) {
+                    console.error('Nie znaleziono elementu canvas dla wykresu');
+                    return;
+                }
+
+                // Sprawdź, czy mamy wyniki testu i instancję HearingTest
+                if (!window.hearingTestInstance || !window.hearingTestInstance.hearingLevels) {
+                    console.error('Brak wyników testu słuchu');
+                    return;
+                }
+
+                try {
+                    // Pobierz wykres, jeśli został już zainicjalizowany
+                    let chart;
+                    if (Chart.instances) {
+                        for (let i = 0; i < Chart.instances.length; i++) {
+                            if (Chart.instances[i].canvas.id === 'hearingRange') {
+                                chart = Chart.instances[i];
+                                break;
+                            }
+                        }
+                    } else if (Chart.getChart) {
+                        // Nowsza wersja Chart.js używa Chart.getChart
+                        chart = Chart.getChart(hearingRangeCanvas);
+                    }
+
+                    // Jeśli nie ma istniejącego wykresu, utwórz nowy
+                    if (!chart) {
+                        console.log('Tworzenie nowego wykresu zakresu słuchu');
+                        chart = new Chart(hearingRangeCanvas, {
+                            type: 'line',
+                            data: {
+                                labels: [20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000],
+                                datasets: [{
+                                    label: 'Baseline',
+                                    data: new Array(10).fill(0),
+                                    borderColor: 'transparent',
+                                    pointRadius: 0
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    x: {
+                                        type: 'logarithmic',
+                                        min: 100,
+                                        max: 20000,
+                                        ticks: {
+                                            callback: (val) => val >= 1000 ? val / 1000 + " kHz" : val + " Hz"
+                                        }
+                                    },
+                                    y: {
+                                        display: false,
+                                        min: 0,
+                                        max: 1
+                                    }
+                                },
+                                plugins: {
+                                    legend: { display: false },
+                                    annotation: {
+                                        annotations: {
+                                            hearingRange: {
+                                                type: 'box',
+                                                xMin: 100,
+                                                xMax: 13000,
+                                                yMin: 0,
+                                                yMax: 1,
+                                                backgroundColor: 'rgba(34,197,94,0.25)',
+                                                borderWidth: 0
+                                            },
+                                            maxLine: {
+                                                type: 'line',
+                                                xMin: 13000,
+                                                xMax: 13000,
+                                                borderColor: '#22c55e',
+                                                borderWidth: 2,
+                                                borderDash: [4, 4],
+                                                label: {
+                                                    display: true,
+                                                    content: 'Twój maksymalny zakres słyszalny',
+                                                    position: 'start',
+                                                    yAdjust: -20,
+                                                    backgroundColor: 'rgba(34,197,94,0.9)',
+                                                    color: '#fff',
+                                                    font: {
+                                                        size: 12,
+                                                        weight: '600'
+                                                    },
+                                                    padding: 6,
+                                                    borderRadius: 6
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    // Pobierz maksymalną częstotliwość słyszalną
+                    const maxFreq = window.hearingTestInstance.maxAudibleFrequency || 20000;
+                    
+                    // Aktualizuj adnotację zakresu słyszalnego
+                    if (chart.options.plugins && chart.options.plugins.annotation && 
+                        chart.options.plugins.annotation.annotations) {
+                        
+                        // Aktualizuj zakres słyszalny (hearingRange)
+                        chart.options.plugins.annotation.annotations.hearingRange.xMax = maxFreq;
+                        
+                        // Aktualizuj linię maksymalnej częstotliwości (maxLine)
+                        chart.options.plugins.annotation.annotations.maxLine.xMin = maxFreq;
+                        chart.options.plugins.annotation.annotations.maxLine.xMax = maxFreq;
+
+                        // Aktualizuj tekst etykiety z dokładnością do 0.1 kHz
+                        const maxKHz = (maxFreq / 1000).toFixed(1);
+                        chart.options.plugins.annotation.annotations.maxLine.label.content = 
+                            `Twój maksymalny zakres słyszalny: ${maxKHz} kHz`;
+                    }
+
+                    // Aktualizuj skalę X, aby pokazać odpowiedni zakres częstotliwości
+                    chart.options.scales.x.min = 100;  // Dolna granica 100 Hz
+                    chart.options.scales.x.max = Math.max(maxFreq + 2000, 20000);  // Górna granica
+                    
+                    // Zaktualizuj wykres
+                    chart.update();
+                    
+                    console.log('Wykres zakresu słuchu zaktualizowany, maks. częstotliwość:', maxFreq);
+                } catch (err) {
+                    console.error('Błąd podczas aktualizacji wykresu:', err);
+                }
+            }, 300); // Krótkie opóźnienie, aby upewnić się, że wykres został już utworzony
+
+            // Również wyświetl pełne wyniki, jeśli jest taki kontener
+            const resultsContainer = document.getElementById('results-container');
+            if (resultsContainer && window.hearingTestInstance && 
+                typeof window.hearingTestInstance.displayResults === 'function') {
+                window.hearingTestInstance.displayResults('results-container');
+            }
+        })
+        .catch(error => {
+            console.error('Błąd ładowania Chart.js:', error);
+        });
+}
 
 
 
