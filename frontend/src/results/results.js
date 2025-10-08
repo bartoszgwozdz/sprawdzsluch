@@ -223,9 +223,9 @@ function setupPaymentForm() {
             const payloadData = {
                 testId: generateTestId(),
                 userEmail: email,
-                hearingLevels: testResults.hearingLevels || [],
+                hearingLevels: testResults.hearingLevels || {},
                 maxAudibleFrequency: testResults.maxAudibleFrequency || 13000,
-                executed: testResults.timestamp || new Date().toISOString(),
+                executed: testResults.timestamp ? new Date(testResults.timestamp).toISOString().slice(0, 19) : new Date().toISOString().slice(0, 19),
                 paymentMethod: method,
                 status: "NEW"
             };

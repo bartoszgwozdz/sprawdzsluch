@@ -39,6 +39,8 @@ public class HearingResult {
 
     private String voucherCode;
 
+    private String paymentMethod;
+
     @CreatedDate
     private LocalDateTime createdAt;
 }
