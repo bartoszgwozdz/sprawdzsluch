@@ -167,7 +167,7 @@ function showModalStep(step) {
                             timestamp: new Date().toISOString()
                         };
                         
-                        sessionStorage.setItem('hearingTestResults', JSON.stringify(testResults));
+                        localStorage.setItem('hearingTestResults', JSON.stringify(testResults));
                     }
                     
                     // Zamknij modal

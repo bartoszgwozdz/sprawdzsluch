@@ -28,8 +28,6 @@ public class HearingResult {
 
     private Map<Integer, Double> hearingLevels;
 
-    private String payloadJson;
-
     private String status; // NEW, PAID, SENT
 
     @DocumentReference

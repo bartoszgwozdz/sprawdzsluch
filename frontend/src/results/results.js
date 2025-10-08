@@ -216,7 +216,7 @@ function setupPaymentForm() {
             buyBtn.disabled = true;
             buyBtn.textContent = "Przetwarzanie...";
             statusMessage.style.display = 'none';
-            const hearingResults = sessionStorage.getItem('hearingTestResults');
+            const hearingResults = localStorage.getItem('hearingTestResults');
             const testResults = JSON.parse(hearingResults) || {};
             
             // Przygotuj payload JSON z pełnymi danymi testu
@@ -225,15 +225,19 @@ function setupPaymentForm() {
                 userEmail: email,
                 hearingLevels: testResults.hearingLevels || {},
                 maxAudibleFrequency: testResults.maxAudibleFrequency || 13000,
-                executed: testResults.timestamp ? new Date(testResults.timestamp).toISOString().slice(0, 19) : new Date().toISOString().slice(0, 19),
                 paymentMethod: method,
                 status: "NEW"
             };
+            
+            // Usuń pole executed na razie, żeby sprawdzić czy to powoduje problem
+            // executed: testResults.timestamp ? new Date(testResults.timestamp).toISOString().slice(0, 19) : new Date().toISOString().slice(0, 19),
             
             // Dodaj kod voucher jeśli wybrano tę metodę
             if (method === 'voucher') {
                 payloadData.voucherCode = document.getElementById('voucher').value.trim();
             }
+            
+            console.log('Wysyłane dane:', payloadData);
             
             const response = await fetch('/api/results', {
                 method: 'POST',
@@ -242,7 +246,9 @@ function setupPaymentForm() {
             });
             
             if (!response.ok) {
-                throw new Error(`Błąd HTTP: ${response.status}`);
+                const errorText = await response.text();
+                console.error('Błąd serwera:', errorText);
+                throw new Error(`Błąd HTTP: ${response.status} - ${errorText}`);
             }
             
             const result = await response.json();
