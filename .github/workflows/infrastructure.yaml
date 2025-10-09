@@ -36,7 +36,7 @@ jobs:
         kubectl wait --for=condition=ready --timeout=300s pod/kafka-0 -n sprawdzsluch
         
         echo "Testing Kafka connectivity..."
-        kubectl exec -it kafka-0 -n sprawdzsluch -- kafka-topics --bootstrap-server localhost:9092 --list
+        kubectl exec -it kafka-0 -n sprawdzsluch -- /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
 
     - name: Deploy Monitoring (placeholder)
       if: inputs.component == 'monitoring' || inputs.component == 'all'
