@@ -28,6 +28,8 @@ spec:
           value: "broker,controller"  # Combined mode for single node
         - name: KAFKA_CLUSTER_ID
           value: "YWJjZGVmZ2hpams1NjcwMD"  # Valid base64 UUID for KRaft (22 chars)
+        - name: CLUSTER_ID
+          value: "YWJjZGVmZ2hpams1NjcwMD"  # Same UUID for storage formatting script
         - name: KAFKA_CONTROLLER_QUORUM_VOTERS
           value: "1@kafka-0.kafka-headless:9093"
         - name: KAFKA_CONTROLLER_LISTENER_NAMES
@@ -79,12 +81,14 @@ spec:
         - |
           # Extract node ID from pod name (kafka-0 -> 1, kafka-1 -> 2, etc.)
           export KAFKA_NODE_ID=$((${HOSTNAME##*-} + 1))
+          export CLUSTER_ID="YWJjZGVmZ2hpams1NjcwMD"
           echo "Starting Kafka in KRaft mode with node ID: $KAFKA_NODE_ID"
+          echo "Using Cluster ID: $CLUSTER_ID"
           
           # Format storage if first run
           if [ ! -f /var/lib/kafka/data/meta.properties ]; then
             echo "Formatting Kafka storage for KRaft mode..."
-            kafka-storage format -t YWJjZGVmZ2hpams1NjcwMD -c /etc/kafka/server.properties --ignore-formatted
+            kafka-storage format -t $CLUSTER_ID -c /etc/kafka/server.properties --ignore-formatted
           fi
           
           exec /etc/confluent/docker/run
