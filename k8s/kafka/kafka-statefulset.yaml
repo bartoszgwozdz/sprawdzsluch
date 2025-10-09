@@ -27,7 +27,7 @@ spec:
         - name: KAFKA_PROCESS_ROLES
           value: "broker,controller"  # Combined mode for single node
         - name: KAFKA_CLUSTER_ID
-          value: "sprawdzsluch-kafka-cluster"  # Required for KRaft mode
+          value: "YWJjZGVmZ2hpams1NjcwMDEyMzQ"  # Valid base64 UUID for KRaft (22 chars)
         - name: KAFKA_CONTROLLER_QUORUM_VOTERS
           value: "1@kafka-0.kafka-headless:9093"
         - name: KAFKA_CONTROLLER_LISTENER_NAMES
@@ -84,7 +84,7 @@ spec:
           # Format storage if first run
           if [ ! -f /var/lib/kafka/data/meta.properties ]; then
             echo "Formatting Kafka storage for KRaft mode..."
-            kafka-storage format -t sprawdzsluch-kafka-cluster -c /etc/kafka/server.properties --ignore-formatted
+            kafka-storage format -t YWJjZGVmZ2hpams1NjcwMDEyMzQ -c /etc/kafka/server.properties --ignore-formatted
           fi
           
           exec /etc/confluent/docker/run
