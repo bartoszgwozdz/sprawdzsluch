@@ -1,5 +1,179 @@
 // Skrypt do obsługi strony wyników
 
+// Klasa do obsługi polling statusu testu
+class TestProgressTracker {
+    constructor() {
+        this.pollInterval = null;
+        this.maxPolls = 60; // 60 * 1s = 60 sekund max
+        this.currentPolls = 0;
+        this.testId = null;
+    }
+
+    async submitTest(testData) {
+        try {
+            this.showProcessingUI();
+            this.updateProgress(10, 'Przesyłanie testu...');
+
+            // Wyślij test do backend
+            const response = await fetch('/api/hearing-test/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(testData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                this.testId = result.testId;
+                this.updateProgress(20, 'Test przesłany, rozpoczynanie przetwarzania...');
+                this.startPolling(result.testId);
+            } else {
+                throw new Error(result.message || 'Nieznany błąd');
+            }
+
+        } catch (error) {
+            console.error('Błąd podczas przesyłania testu:', error);
+            this.showError('Wystąpił błąd podczas przesyłania testu: ' + error.message);
+        }
+    }
+
+    startPolling(testId) {
+        this.currentPolls = 0;
+        
+        this.pollInterval = setInterval(async () => {
+            try {
+                const response = await fetch(`/api/hearing-test/status/${testId}`);
+                
+                if (response.ok) {
+                    const status = await response.json();
+                    console.log('Status update:', status);
+                    this.handleStatusUpdate(status);
+
+                    // Zatrzymaj polling dla finalnych statusów
+                    if (this.isFinalStatus(status.status)) {
+                        this.stopPolling();
+                    }
+                } else if (response.status === 404) {
+                    this.showError('Nie znaleziono testu. Spróbuj ponownie.');
+                    this.stopPolling();
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                // Timeout protection
+                this.currentPolls++;
+                if (this.currentPolls >= this.maxPolls) {
+                    this.stopPolling();
+                    this.showError('Przekroczono limit czasu oczekiwania na przetworzenie testu.');
+                }
+
+            } catch (error) {
+                console.error('Błąd podczas sprawdzania statusu:', error);
+                this.stopPolling();
+                this.showError('Błąd podczas sprawdzania statusu testu.');
+            }
+        }, 1000); // Poll co 1 sekundę
+    }
+
+    stopPolling() {
+        if (this.pollInterval) {
+            clearInterval(this.pollInterval);
+            this.pollInterval = null;
+        }
+    }
+
+    handleStatusUpdate(status) {
+        const progressMap = {
+            'SUBMITTED': { progress: 25, message: 'Test przesłany...' },
+            'PROCESSING': { progress: 50, message: 'Przetwarzanie wyników testu...' },
+            'PROCESSED': { progress: 75, message: 'Wyniki zostały przetworzone' },
+            'PAYMENT_REQUIRED': { progress: 90, message: 'Przekierowywanie do płatności...' },
+            'COMPLETED': { progress: 100, message: 'Zakończono pomyślnie!' },
+            'ERROR': { progress: 0, message: 'Wystąpił błąd podczas przetwarzania' }
+        };
+
+        const info = progressMap[status.status] || { progress: 0, message: status.message };
+        this.updateProgress(info.progress, status.message || info.message);
+
+        // Akcje finalne
+        if (status.status === 'COMPLETED' && status.redirectUrl) {
+            setTimeout(() => {
+                window.location.href = status.redirectUrl;
+            }, 2000);
+        } else if (status.status === 'PAYMENT_REQUIRED' && status.paymentUrl) {
+            setTimeout(() => {
+                window.location.href = status.paymentUrl;
+            }, 2000);
+        } else if (status.status === 'ERROR') {
+            this.showError(status.message);
+        }
+    }
+
+    isFinalStatus(status) {
+        return ['COMPLETED', 'PAYMENT_REQUIRED', 'ERROR'].includes(status);
+    }
+
+    updateProgress(percent, message) {
+        const progressFill = document.getElementById('progressFill');
+        const processingMessage = document.getElementById('processingMessage');
+        const progressPercent = document.getElementById('progressPercent');
+
+        if (progressFill) {
+            progressFill.style.width = percent + '%';
+            if (percent === 100) {
+                progressFill.style.background = 'linear-gradient(90deg, #22c55e, #16a34a)'; // Zielony
+            } else if (percent === 0) {
+                progressFill.style.background = 'linear-gradient(90deg, #dc2626, #b91c1c)'; // Czerwony
+            }
+        }
+
+        if (processingMessage) {
+            processingMessage.textContent = message;
+        }
+
+        if (progressPercent) {
+            progressPercent.textContent = Math.round(percent) + '%';
+        }
+    }
+
+    showProcessingUI() {
+        const paymentSection = document.getElementById('paymentSection');
+        const processingSection = document.getElementById('processingSection');
+
+        if (paymentSection) paymentSection.style.display = 'none';
+        if (processingSection) processingSection.style.display = 'block';
+    }
+
+    showError(message) {
+        const statusMessage = document.getElementById('statusMessage');
+        const buyBtn = document.getElementById('buyBtn');
+
+        if (statusMessage) {
+            statusMessage.textContent = message;
+            statusMessage.style.display = 'block';
+            statusMessage.className = 'status-message error';
+        }
+
+        if (buyBtn) {
+            buyBtn.disabled = false;
+            buyBtn.textContent = "Kup raport PDF za 24,99 zł";
+        }
+
+        // Pokaż ponownie formularz płatności
+        const paymentSection = document.getElementById('paymentSection');
+        const processingSection = document.getElementById('processingSection');
+        if (paymentSection) paymentSection.style.display = 'block';
+        if (processingSection) processingSection.style.display = 'none';
+    }
+}
+
+// Globalna instancja trackera
+const progressTracker = new TestProgressTracker();
+
 // Funkcja do generowania hash z daty
 function generateTestId() {
     const now = new Date();
@@ -216,66 +390,32 @@ function setupPaymentForm() {
             buyBtn.disabled = true;
             buyBtn.textContent = "Przetwarzanie...";
             statusMessage.style.display = 'none';
-            const hearingResults = sessionStorage.getItem('hearingTestResults');
+            
+            const hearingResults = sessionStorage.getItem('hearingTestResults') || localStorage.getItem('hearingTestResults');
             const testResults = JSON.parse(hearingResults) || {};
             
             // Przygotuj payload JSON z pełnymi danymi testu
-            const hearingLevelsArray = testResults.hearingLevels || [];
-            
-            // Konwertuj tablicę na obiekt Map<Integer, Double> zgodny z backendem
-            const hearingLevelsMap = {};
-            hearingLevelsArray.forEach(item => {
-                if (item.frequency && item.gain !== undefined) {
-                    hearingLevelsMap[parseInt(item.frequency)] = parseFloat(item.gain);
-                }
-            });
-            
             const payloadData = {
                 testId: generateTestId(),
                 userEmail: email,
-                hearingLevels: hearingLevelsMap,
-                maxAudibleFrequency: parseInt(testResults.maxAudibleFrequency) || 13000,
+                hearingLevels: testResults.hearingLevels || [],
+                maxAudibleFrequency: testResults.maxAudibleFrequency || 13000,
+                executed: testResults.timestamp || new Date().toISOString(),
                 paymentMethod: method,
                 status: "NEW"
             };
-            
-            // Usuń pole executed na razie, żeby sprawdzić czy to powoduje problem
-            // executed: testResults.timestamp ? new Date(testResults.timestamp).toISOString().slice(0, 19) : new Date().toISOString().slice(0, 19),
             
             // Dodaj kod voucher jeśli wybrano tę metodę
             if (method === 'voucher') {
                 payloadData.voucherCode = document.getElementById('voucher').value.trim();
             }
             
-            const response = await fetch('/api/results', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payloadData)
-            });
+            // Użyj nowego systemu polling + Kafka
+            await progressTracker.submitTest(payloadData);
             
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Błąd serwera:', errorText);
-                throw new Error(`Błąd HTTP: ${response.status} - ${errorText}`);
-            }
-            
-            const result = await response.json();
-            
-            // Po pomyślnym zapisaniu wyników
-            if (result.id) {
-                // Możesz przekierować do strony potwierdzenia lub pokazać komunikat
-                statusMessage.textContent = 'Wyniki zostały zapisane pomyślnie! Sprawdź swoją skrzynkę e-mail.';
-                statusMessage.style.display = 'block';
-                statusMessage.className = 'status-message success';
-                
-                // Opcjonalnie: wyczyść localStorage po pomyślnym zapisaniu
-                // localStorage.removeItem('hearingTestResults');
-            } else {
-                throw new Error('Brak ID w odpowiedzi serwera.');
-            }
         } catch (error) {
-            console.error('Błąd podczas przetwarzania płatności:', error);
-            statusMessage.textContent = 'Wystąpił błąd podczas przetwarzania płatności. Spróbuj ponownie.';
+            console.error('Błąd podczas przetwarzania:', error);
+            statusMessage.textContent = 'Wystąpił błąd podczas przetwarzania. Spróbuj ponownie.';
             statusMessage.style.display = 'block';
             statusMessage.className = 'status-message error';
             buyBtn.disabled = false;

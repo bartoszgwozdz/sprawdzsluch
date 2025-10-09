@@ -195,6 +195,63 @@
       padding: 0.75rem;
     }
 
+    .status-message.info {
+      color: #2563eb;
+      background-color: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      padding: 0.75rem;
+      text-align: center;
+    }
+
+    /* Progress bar styles */
+    .processing-container {
+      text-align: center;
+      padding: 1rem 0;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background-color: #e5e7eb;
+      border-radius: 6px;
+      margin: 1rem 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+      width: 0%;
+      transition: width 0.5s ease;
+      border-radius: 6px;
+      position: relative;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .progress-text {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #374151;
+      margin-top: 0.5rem;
+    }
+
     .voucher-field {
       border: 1px solid #e2e8f0;
       border-radius: 8px;
@@ -299,8 +356,24 @@
         </div>
       </section>
 
+      <!-- Sekcja statusu przetwarzania -->
+      <section id="processingSection" class="results-section" style="display:none;">
+        <h2 class="results-subtitle">Status przetwarzania</h2>
+        <div class="processing-container">
+          <div class="status-message info">
+            <p id="processingMessage">Przetwarzanie wyników...</p>
+          </div>
+          <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
+          <div class="progress-text">
+            <span id="progressPercent">0%</span>
+          </div>
+        </div>
+      </section>
+
       <!-- Formularz płatności -->
-      <section class="results-section">
+      <section id="paymentSection" class="results-section">
         <h2 class="results-subtitle">Dane do płatności</h2>
         <form id="paymentForm" class="paymentForm">
           <div>
