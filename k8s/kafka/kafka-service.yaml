@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-headless
+  namespace: sprawdzsluch
+spec:
+  clusterIP: None  # Headless service for StatefulSet
+  selector:
+    app: kafka
+  ports:
+  - name: internal
+    port: 9092
+    targetPort: 9092
+---
+# Regular service dla convenience - można usunąć dla single node
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  namespace: sprawdzsluch
+spec:
+  selector:
+    app: kafka
+  ports:
+  - name: internal
+    port: 9092
+    targetPort: 9092
+  type: ClusterIP

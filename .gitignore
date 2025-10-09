@@ -1,5 +1,6 @@
 # Node / Java / Python / etc
 node_modules/
+backups/
 target/
 *.log
 *.jar

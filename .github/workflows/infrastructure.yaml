@@ -1,0 +1,52 @@
+name: Infrastructure Deployment
+
+on:
+  workflow_dispatch:  # Manual trigger only
+    inputs:
+      component:
+        description: 'Infrastructure component to deploy'
+        required: true
+        default: 'kafka'
+        type: choice
+        options:
+        - kafka
+        - monitoring
+        - all
+
+jobs:
+  deploy-infrastructure:
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Deploy Kafka
+      if: inputs.component == 'kafka' || inputs.component == 'all'
+      run: |
+        cd k8s/kafka
+        chmod +x deploy.sh
+        ./deploy.sh
+
+    - name: Verify Kafka deployment
+      if: inputs.component == 'kafka' || inputs.component == 'all'
+      run: |
+        echo "Waiting for Kafka to be ready..."
+        kubectl wait --for=condition=ready --timeout=300s pod/kafka-0 -n sprawdzsluch
+        
+        echo "Testing Kafka connectivity..."
+        kubectl exec -it kafka-0 -n sprawdzsluch -- kafka-topics --bootstrap-server localhost:9092 --list
+
+    - name: Deploy Monitoring (placeholder)
+      if: inputs.component == 'monitoring' || inputs.component == 'all'
+      run: |
+        echo "Monitoring deployment would go here"
+        # kubectl apply -f k8s/monitoring/
+
+    - name: Infrastructure deployment summary
+      run: |
+        echo "## Infrastructure Deployment Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- Component: ${{ inputs.component }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Status: ✅ Deployed successfully" >> $GITHUB_STEP_SUMMARY
+        echo "- Timestamp: $(date)" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,132 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka
+  namespace: sprawdzsluch
+spec:
+  serviceName: "kafka-headless"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+      - name: kafka
+        image: confluentinc/cp-kafka:7.4.0
+        ports:
+        - containerPort: 9092  # Client port
+        - containerPort: 9093  # Controller port (KRaft)
+        env:
+        # KRaft Mode Configuration
+        - name: KAFKA_NODE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['statefulset.kubernetes.io/pod-name']
+        - name: KAFKA_PROCESS_ROLES
+          value: "broker,controller"  # Combined mode for single node
+        - name: KAFKA_CONTROLLER_QUORUM_VOTERS
+          value: "1@kafka-0.kafka-headless:9093"
+        - name: KAFKA_CONTROLLER_LISTENER_NAMES
+          value: "CONTROLLER"
+        - name: KAFKA_LISTENERS
+          value: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
+        - name: KAFKA_INTER_BROKER_LISTENER_NAME
+          value: "PLAINTEXT"
+        - name: KAFKA_ADVERTISED_LISTENERS
+          value: "PLAINTEXT://$(POD_NAME).kafka-headless:9092"
+        - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+          value: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+        
+        # Cluster and Topic Settings
+        - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+          value: "1"
+        - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+          value: "1"
+        - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+          value: "1"
+        - name: KAFKA_DEFAULT_REPLICATION_FACTOR
+          value: "1"
+        - name: KAFKA_MIN_INSYNC_REPLICAS
+          value: "1"
+        
+        # Feature Flags
+        - name: KAFKA_AUTO_CREATE_TOPICS_ENABLE
+          value: "true"
+        - name: KAFKA_DELETE_TOPIC_ENABLE
+          value: "true"
+        
+        # Performance
+        - name: KAFKA_NUM_PARTITIONS
+          value: "3"
+        - name: KAFKA_LOG_RETENTION_HOURS
+          value: "168"  # 7 days
+        - name: KAFKA_LOG_SEGMENT_BYTES
+          value: "1073741824"  # 1GB
+        
+        # Pod name for advertised listeners
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+              
+        command:
+        - sh
+        - -c
+        - |
+          # Extract node ID from pod name (kafka-0 -> 1, kafka-1 -> 2, etc.)
+          export KAFKA_NODE_ID=$((${HOSTNAME##*-} + 1))
+          echo "Starting Kafka in KRaft mode with node ID: $KAFKA_NODE_ID"
+          
+          # Format storage if first run
+          if [ ! -f /var/lib/kafka/data/meta.properties ]; then
+            echo "Formatting Kafka storage for KRaft mode..."
+            kafka-storage format -t $(kafka-storage random-uuid) -c /etc/kafka/server.properties --ignore-formatted
+          fi
+          
+          exec /etc/confluent/docker/run
+        
+        volumeMounts:
+        - name: kafka-data
+          mountPath: /var/lib/kafka/data
+        
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+            
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "kafka-broker-api-versions --bootstrap-server localhost:9092"
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
+          periodSeconds: 30
+          
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "kafka-topics --bootstrap-server localhost:9092 --list"
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+          periodSeconds: 10
+            
+  volumeClaimTemplates:
+  - metadata:
+      name: kafka-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "local-path"
+      resources:
+        requests:
+          storage: 10Gi
