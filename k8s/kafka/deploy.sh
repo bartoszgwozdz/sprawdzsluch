@@ -13,8 +13,14 @@ echo "🖥️ Deploying Kafka UI..."
 kubectl apply -f kafka-ui-service.yaml
 kubectl apply -f kafka-ui-deployment.yaml
 
+echo "⏳ Waiting for Kafka UI to be ready..."
+kubectl wait --for=condition=ready --timeout=120s pod -l app=kafka-ui -n sprawdzsluch
 
-echo "✅ Kafka StatefulSets deployment complete!"
+echo "🔗 Creating Kafka topics..."
+chmod +x create-topics.sh
+./create-topics.sh
+
+echo "✅ Kafka deployment complete!"
 echo ""
 echo "📊 Access Kafka UI at: http://your-server-ip:30082"
 echo "🔗 Kafka broker (internal): kafka:9092 or kafka-0.kafka-headless:9092"
