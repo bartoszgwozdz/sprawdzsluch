@@ -16,7 +16,7 @@ kubectl apply -f kafka-ui-deployment.yaml
 
 echo "✅ Kafka StatefulSets deployment complete!"
 echo ""
-echo "📊 Access Kafka UI at: http://your-server-ip:30080"
+echo "📊 Access Kafka UI at: http://your-server-ip:30082"
 echo "🔗 Kafka broker (internal): kafka:9092 or kafka-0.kafka-headless:9092"
 echo ""
 echo "📋 Check status:"
