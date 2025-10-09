@@ -79,9 +79,6 @@ spec:
         - sh
         - -c
         - |
-          # Extract node ID from pod name (kafka-0 -> 1, kafka-1 -> 2, etc.)
-          export KAFKA_NODE_ID=$((${HOSTNAME##*-} + 1))
-          export CLUSTER_ID="YWJjZGVmZ2hpams1NjcwMD"
           echo "Starting Kafka in KRaft mode with node ID: $KAFKA_NODE_ID"
           echo "Using Cluster ID: $CLUSTER_ID"
           
