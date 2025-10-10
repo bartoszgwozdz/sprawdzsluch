@@ -20,7 +20,6 @@ public class KafkaService {
   private final KafkaTemplate<String, String> kafkaTemplate;
   private final ObjectMapper objectMapper;
   private final TestProcessingStatusRepository statusRepository;
-  private final ResultService resultService;
 
   private static final String HEARING_TEST_TOPIC = "hearing-test-results";
 
