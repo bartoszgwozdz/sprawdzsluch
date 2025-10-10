@@ -56,9 +56,6 @@ public class KafkaService {
       // Symulacja processing time
       Thread.sleep(1500);
 
-      // KROK 2: Zapisz wyniki do bazy danych
-      saveTestToDatabase(testData);
-
       // KROK 3: Update status na PROCESSED
       updateTestStatus(testId, "PROCESSED", "Wyniki zostały zapisane");
 
@@ -68,7 +65,6 @@ public class KafkaService {
       // KROK 4: Sprawdź metodę płatności i podejmij decyzję
       String paymentMethod = (String) testData.get("paymentMethod");
       if ("voucher".equals(paymentMethod)) {
-        handleVoucherPayment(testId, testData);
       } else {
         handleCardPayment(testId, testData);
       }

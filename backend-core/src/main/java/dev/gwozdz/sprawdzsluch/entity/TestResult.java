@@ -7,7 +7,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 @Document(collection = "hearing_results")
 @CompoundIndex(def = "{'testId': 1, 'userEmail': 1}", unique = true)
@@ -26,9 +25,6 @@ public class TestResult {
   private Map<Integer, Double> hearingLevels;
 
   private String status; // NEW, PAID, SENT
-
-  @DocumentReference
-  private Payment payment;
 
   private LocalDateTime executed;
 

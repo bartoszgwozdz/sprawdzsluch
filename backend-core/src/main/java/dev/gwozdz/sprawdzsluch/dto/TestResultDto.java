@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 @Data
 @NoArgsConstructor
@@ -19,9 +18,6 @@ public class TestResultDto {
   private Map<Integer, Double> hearingLevels;
 
   private String status; // NEW, PAID, SENT
-
-  @DocumentReference
-  private Payment payment;
 
   private LocalDateTime executed;
 
