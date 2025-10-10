@@ -1,89 +1,80 @@
 package dev.gwozdz.sprawdzsluch.service;
 
-import dev.gwozdz.sprawdzsluch.entity.HearingResult;
-import dev.gwozdz.sprawdzsluch.repository.HearingResultRepository;
+import dev.gwozdz.sprawdzsluch.dto.TestResultDto;
+import dev.gwozdz.sprawdzsluch.entity.TestResult;
+import dev.gwozdz.sprawdzsluch.repository.TestResultRepository;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.validator.routines.EmailValidator;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 @Service
+@RequiredArgsConstructor
 public class ResultService {
-    private final HearingResultRepository repo;
 
-    public ResultService(HearingResultRepository repo) {
-        this.repo = repo;
+  private final KafkaService kafkaService;
+  private final TestResultRepository resultRepository;
+  private static final String SUBMITTED_RESULTS_TOPIC = "sprawdzsluch-result-stored";
+
+
+  public boolean processResults(TestResultDto testResultDto) throws BadRequestException {
+    //validation before checking existance to avoid
+    //malicious sql injection through email and testId parameters
+    validateFields(testResultDto);
+    checkIfExists(testResultDto);
+
+    //save proper entity
+    TestResult testResult = convertToTestResult(testResultDto);
+    testResult = resultRepository.save(testResult);
+
+    //send message to kafka, topic: sprawdzsluch-result-stored
+    kafkaService.sendToKafka(SUBMITTED_RESULTS_TOPIC, testResult.getId(),
+        testResult.getPaymentMethod());
+    return true;
+  }
+
+  //it is theoretically possible that testId can duplicate
+  //what we want to avoid
+  private void checkIfExists(TestResultDto dto) throws BadRequestException {
+
+    if (resultRepository.existsByTestIdAndUserEmail(dto.getTestId(), dto.getUserEmail())) {
+      throw new BadRequestException("Test ID related to this email already exists.");
+    }
+  }
+
+
+  private TestResult convertToTestResult(TestResultDto dto) throws BadRequestException {
+    if (dto.getMaxAudibleFrequency() < 1000) {
+      throw new BadRequestException("Max audible frequency cannot be negative.");
     }
 
-    public HearingResult save(HearingResult result) {
-        return repo.save(result);
-    }
+    TestResult testResult = new TestResult();
+    testResult.setTestId(dto.getTestId());
+    testResult.setUserEmail(dto.getUserEmail());
+    testResult.setMaxAudibleFrequency(dto.getMaxAudibleFrequency());
+    testResult.setHearingLevels(dto.getHearingLevels());
+    testResult.setPaymentMethod(dto.getPaymentMethod());
+    testResult.setVoucherCode(dto.getVoucherCode());
+    testResult.setStatus("NEW");
 
-    public HearingResult find(String id) {
-        return repo.findById(id).orElseThrow();
-    }
+    return testResult;
+  }
 
-    // Wykorzystuje indeks złożony: testId + userEmail
-    public Optional<HearingResult> findByTestIdAndUserEmail(String testId, String userEmail) {
-        return repo.findByTestIdAndUserEmail(testId, userEmail);
-    }
+  private void validateFields(TestResultDto dto) throws BadRequestException {
+    validateTestId(dto.getTestId());
+    validateEmail(dto.getUserEmail());
+  }
 
-    // Wykorzystuje indeks: testId (prefix indeksu złożonego)
-    public Optional<HearingResult> findByTestId(String testId) {
-        return repo.findByTestId(testId);
+  private void validateEmail(String email) throws BadRequestException {
+    if (!EmailValidator.getInstance().isValid(email)) {
+      throw new BadRequestException("Incorrect email format.");
     }
+  }
 
-    // Wszystkie wyniki użytkownika według statusu (wykorzystuje indeks)
-    public List<HearingResult> getUserResultsByStatus(String userEmail, String status) {
-        return repo.findByUserEmailAndStatus(userEmail, status);
+  private void validateTestId(String testId) throws BadRequestException {
+    if (!(testId.startsWith("TEST-") && testId.length() > 21)) {
+      throw new BadRequestException("Incorrect testId format.");
     }
-
-    // Historia użytkownika (sortowana po dacie)
-    public List<HearingResult> getUserHistory(String userEmail) {
-        return repo.findByUserEmailOrderByCreatedAtDesc(userEmail);
-    }
-
-    // Wyniki według statusu (wykorzystuje indeks z sortowaniem)
-    public List<HearingResult> getResultsByStatus(String status) {
-        return repo.findByStatusOrderByCreatedAtDesc(status);
-    }
-
-    // Wyniki w przedziale czasowym dla statusu
-    public List<HearingResult> getResultsByStatusAndDateRange(String status, LocalDateTime startDate, LocalDateTime endDate) {
-        return repo.findByStatusAndCreatedAtBetweenOrderByCreatedAtDesc(status, startDate, endDate);
-    }
-
-    // Statystyki użytkownika
-    public long countUserResultsByStatus(String userEmail, String status) {
-        return repo.countByUserEmailAndStatus(userEmail, status);
-    }
-
-    // Sprawdzenie unikalności testId dla użytkownika
-    public boolean isTestIdUniqueForUser(String testId, String userEmail) {
-        return !repo.existsByTestIdAndUserEmail(testId, userEmail);
-    }
-
-    // Bezpieczne zapisywanie z sprawdzeniem unikalności
-    public HearingResult saveWithUniqueCheck(HearingResult result) {
-        if (!isTestIdUniqueForUser(result.getTestId(), result.getUserEmail())) {
-            throw new IllegalArgumentException(
-                String.format("TestId '%s' already exists for user '%s'", 
-                    result.getTestId(), result.getUserEmail())
-            );
-        }
-        return repo.save(result);
-    }
-
-    // Panel administratora - najnowsze wyniki według statusu
-    public List<HearingResult> getLatestResultsByStatus(String status) {
-        return repo.findTopByStatusOrderByCreatedAtDesc(status);
-    }
-
-    public Map<String, Object> getVariablesFromResult(HearingResult result) {
-        return HashMap.newHashMap(1);
-    }
+  }
 }
 
