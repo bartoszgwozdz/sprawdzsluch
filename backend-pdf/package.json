@@ -1,13 +1,31 @@
 {
-  "name": "pdf-service",
+  "name": "sprawdzsluch-pdf-service",
   "version": "1.0.0",
-  "description": "Mikroserwis do generowania plików PDF",
-  "main": "pdf-service.js",
+  "description": "Mikroserwis do generowania PDF i wysyłki maili dla aplikacji sprawdzsluch",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node pdf-service.js"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest",
+    "legacy": "node pdf-service.js"
   },
   "dependencies": {
     "express": "^5.1.0",
-    "puppeteer": "^24.20.0"
+    "puppeteer": "^24.20.0",
+    "kafkajs": "^2.2.4",
+    "handlebars": "^4.7.8",
+    "nodemailer": "^6.9.7",
+    "mongodb": "^6.3.0",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

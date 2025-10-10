@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raport z badania słuchu - SprawdźSłuch</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .report-date {
+            font-size: 0.9em;
+            color: #888;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .section-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 5px;
+        }
+        
+        .patient-info {
+            background: #f8f9fa;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .info-item {
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #555;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            color: #333;
+            font-size: 1.1em;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .results-table th,
+        .results-table td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        
+        .results-table th {
+            background: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .results-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .hearing-level {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 20px;
+            color: white;
+        }
+        
+        .level-normal { background: #28a745; }
+        .level-mild { background: #ffc107; color: #333; }
+        .level-moderate { background: #fd7e14; }
+        .level-severe { background: #dc3545; }
+        .level-profound { background: #6f42c1; }
+        
+        .assessment {
+            text-align: center;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .assessment-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .assessment-status {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .assessment-recommendation {
+            font-size: 1.1em;
+            line-height: 1.5;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        .chart-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .chart-placeholder {
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            padding: 40px;
+            border-radius: 10px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .disclaimer {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .disclaimer-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 5px;
+        }
+        
+        .disclaimer-text {
+            color: #856404;
+            font-size: 0.9em;
+        }
+        
+        .payment-info {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .payment-info-title {
+            font-weight: bold;
+            color: #155724;
+            margin-bottom: 5px;
+        }
+        
+        .payment-details {
+            color: #155724;
+            font-size: 0.9em;
+        }
+        
+        @media print {
+            .container {
+                padding: 10px;
+            }
+            
+            .section {
+                break-inside: avoid;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">SprawdźSłuch</div>
+            <div class="subtitle">Profesjonalny test słuchu online</div>
+            <div class="report-date">Raport wygenerowany: {{reportDate}}</div>
+        </div>
+        
+        <!-- Informacje o pacjencie -->
+        <div class="section patient-info">
+            <div class="section-title">Informacje o badaniu</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Email pacjenta</div>
+                    <div class="info-value">{{userEmail}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Data badania</div>
+                    <div class="info-value">{{testDate}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">ID badania</div>
+                    <div class="info-value">{{testId}}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Maksymalna słyszalna częstotliwość</div>
+                    <div class="info-value">{{maxAudibleFrequency}} Hz</div>
+                </div>
+            </div>
+            
+            {{#if payment}}
+            <div class="payment-info">
+                <div class="payment-info-title">Informacje o płatności</div>
+                <div class="payment-details">
+                    Metoda płatności: {{payment.method}}<br>
+                    Data opłacenia: {{payment.completedAt}}<br>
+                    ID płatności: {{payment.paymentId}}
+                </div>
+            </div>
+            {{/if}}
+        </div>
+        
+        <!-- Wyniki badania -->
+        <div class="section">
+            <div class="section-title">Wyniki badania słuchu</div>
+            
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Częstotliwość</th>
+                        <th>Opis</th>
+                        <th>Próg słyszenia (dB)</th>
+                        <th>Ocena</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each hearingResults}}
+                    <tr>
+                        <td><strong>{{frequency}} Hz</strong></td>
+                        <td>{{description}}</td>
+                        <td><strong>{{level}} dB</strong></td>
+                        <td>
+                            <span class="hearing-level {{levelClass}}">
+                                {{interpretation}}
+                            </span>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Wykres audiometryczny -->
+        <div class="section">
+            <div class="section-title">Wykres audiometryczny</div>
+            <div class="chart-container">
+                <div class="chart-placeholder">
+                    [Wykres audiometryczny zostanie dodany w przyszłej wersji]<br>
+                    Szczegółowe wyniki dostępne w tabeli powyżej
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ocena ogólna -->
+        <div class="section">
+            <div class="section-title">Ocena ogólna</div>
+            <div class="assessment" style="background-color: {{assessment.color}}20; border: 2px solid {{assessment.color}};">
+                <div class="assessment-title">Stan słuchu</div>
+                <div class="assessment-status" style="color: {{assessment.color}};">
+                    {{assessment.status}}
+                </div>
+                <div class="assessment-recommendation">
+                    {{assessment.recommendation}}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+            <div class="disclaimer-title">Ważne informacje</div>
+            <div class="disclaimer-text">
+                Ten raport jest wynikiem internetowego testu słuchu i ma charakter orientacyjny. 
+                Nie zastępuje profesjonalnej diagnozy audiologicznej. W przypadku problemów ze słuchem 
+                zaleca się skonsultowanie wyników z lekarzem laryngologiem lub audiologiem.
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>SprawdźSłuch</strong> - Profesjonalny test słuchu online</p>
+            <p>www.sprawdzsluch.pl | kontakt@sprawdzsluch.pl</p>
+            <p>Raport wygenerowany automatycznie dnia {{reportDate}}</p>
+        </div>
+    </div>
+</body>
+</html>
