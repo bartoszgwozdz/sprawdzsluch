@@ -1,0 +1,114 @@
+apiVersion: v1
+kind: ServiceMonitor
+metadata:
+  name: backend-payments-monitor
+  namespace: sprawdzsluch
+  labels:
+    app: backend-payments
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: backend-payments
+  endpoints:
+    - port: http
+      path: /actuator/prometheus
+      interval: 30s
+      scrapeTimeout: 10s
+
+---
+apiVersion: v1
+kind: ServiceMonitor
+metadata:
+  name: backend-pdf-monitor
+  namespace: sprawdzsluch
+  labels:
+    app: backend-pdf
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: backend-pdf
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+
+---
+apiVersion: v1
+kind: PrometheusRule
+metadata:
+  name: sprawdzsluch-microservices-alerts
+  namespace: sprawdzsluch
+  labels:
+    app: sprawdzsluch
+    release: prometheus
+spec:
+  groups:
+    - name: backend-payments.rules
+      rules:
+        - alert: BackendPaymentsDown
+          expr: up{job="backend-payments-service"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Backend Payments service is down"
+            description: "Backend Payments service has been down for more than 5 minutes."
+        
+        - alert: BackendPaymentsHighErrorRate
+          expr: rate(http_requests_total{job="backend-payments-service",status=~"5.."}[5m]) > 0.1
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High error rate in Backend Payments"
+            description: "Backend Payments error rate is {{ $value }} errors per second."
+        
+        - alert: BackendPaymentsHighMemoryUsage
+          expr: container_memory_usage_bytes{pod=~"backend-payments-.*"} / container_spec_memory_limit_bytes > 0.9
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High memory usage in Backend Payments"
+            description: "Backend Payments memory usage is above 90%."
+    
+    - name: backend-pdf.rules
+      rules:
+        - alert: BackendPdfDown
+          expr: up{job="backend-pdf-service"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Backend PDF service is down"
+            description: "Backend PDF service has been down for more than 5 minutes."
+        
+        - alert: BackendPdfHighMemoryUsage
+          expr: container_memory_usage_bytes{pod=~"backend-pdf-.*"} / container_spec_memory_limit_bytes > 0.85
+          for: 3m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High memory usage in Backend PDF"
+            description: "Backend PDF memory usage is above 85%. PDF generation is memory-intensive."
+        
+        - alert: BackendPdfLongProcessingTime
+          expr: histogram_quantile(0.95, rate(pdf_generation_duration_seconds_bucket[5m])) > 30
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Slow PDF generation"
+            description: "95th percentile PDF generation time is {{ $value }} seconds."
+        
+        - alert: BackendPdfEmailFailures
+          expr: rate(email_send_failures_total[5m]) > 0.05
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High email failure rate"
+            description: "Email sending failure rate is {{ $value }} failures per second."

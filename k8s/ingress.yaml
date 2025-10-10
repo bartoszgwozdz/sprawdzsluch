@@ -9,13 +9,55 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: PathPrefix(`/api`)
+    - match: PathPrefix(`/api/results`)
       kind: Rule
       services:
         - name: backend-core
           port: 8090
       middlewares:
         - name: add-headers
+        - name: rate-limit-core
+
+---
+# BACKEND-PAYMENTS API
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: sprawdzsluch-backend-payments
+  namespace: sprawdzsluch
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: PathPrefix(`/api/v1/payments`) || PathPrefix(`/api/v1/vouchers`)
+      kind: Rule
+      services:
+        - name: backend-payments
+          port: 8081
+      middlewares:
+        - name: add-headers
+        - name: rate-limit-payments
+
+---
+# BACKEND-PDF API
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: sprawdzsluch-backend-pdf
+  namespace: sprawdzsluch
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: PathPrefix(`/api/v1/pdf`) || PathPrefix(`/api/v1/email`) || Path(`/health`)
+      kind: Rule
+      services:
+        - name: backend-pdf
+          port: 3000
+      middlewares:
+        - name: add-headers
+        - name: rate-limit-pdf
+
 ---
 # FRONTEND
 apiVersion: traefik.io/v1alpha1
@@ -29,6 +71,7 @@ spec:
   routes:
     - match: PathPrefix(`/`)
       kind: Rule
+      priority: 1
       services:
         - name: frontend
           port: 80
@@ -37,6 +80,7 @@ spec:
         - name: add-headers
 
 ---
+# Headers middleware
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
@@ -48,4 +92,56 @@ spec:
       X-Original-URI: "{path}"
       X-Original-Method: "{method}"
     customResponseHeaders:
-      X-Served-By: "traefik"
+      Access-Control-Allow-Origin: "*"
+      Access-Control-Allow-Methods: "GET, POST, PUT, DELETE, OPTIONS"
+      Access-Control-Allow-Headers: "Content-Type, Authorization, X-Requested-With"
+
+---
+# Rate limiting for Core API
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: rate-limit-core
+  namespace: sprawdzsluch
+spec:
+  rateLimit:
+    average: 100
+    burst: 200
+    period: 1m
+
+---
+# Rate limiting for Payments API
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: rate-limit-payments
+  namespace: sprawdzsluch
+spec:
+  rateLimit:
+    average: 50
+    burst: 100
+    period: 1m
+
+---
+# Rate limiting for PDF API
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: rate-limit-pdf
+  namespace: sprawdzsluch
+spec:
+  rateLimit:
+    average: 30
+    burst: 60
+    period: 1m
+
+---
+# Circuit breaker middleware
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: circuit-breaker
+  namespace: sprawdzsluch
+spec:
+  circuitBreaker:
+    expression: "NetworkErrorRatio() > 0.30 || ResponseCodeRatio(500, 600, 0, 600) > 0.25"

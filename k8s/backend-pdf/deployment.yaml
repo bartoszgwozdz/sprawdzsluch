@@ -3,8 +3,11 @@ kind: Deployment
 metadata:
   name: backend-pdf
   namespace: sprawdzsluch
+  labels:
+    app: backend-pdf
+    version: v1
 spec:
-  replicas: 1
+  replicas: 1  # PDF generation is resource-intensive, start with 1
   selector:
     matchLabels:
       app: backend-pdf
@@ -12,10 +15,88 @@ spec:
     metadata:
       labels:
         app: backend-pdf
+        version: v1
     spec:
       containers:
         - name: backend-pdf
           image: localhost:5000/backend-pdf:latest
+          imagePullPolicy: Always
           ports:
-            - containerPort: 3000
+            - name: http
+              containerPort: 3001
+              protocol: TCP
+          
+          # Environment variables from ConfigMap and Secret
+          envFrom:
+            - configMapRef:
+                name: backend-pdf-config
+            - secretRef:
+                name: backend-pdf-secret
+          
+          # Health checks
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 90  # PDF service needs more time to start (Puppeteer)
+            periodSeconds: 30
+            timeoutSeconds: 15
+            failureThreshold: 3
+          
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 10
+            failureThreshold: 3
+          
+          # Resource limits (PDF generation is memory intensive)
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+          
+          # Security context for Puppeteer
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          
+          # Volume mounts
+          volumeMounts:
+            - name: logs-volume
+              mountPath: /app/logs
+            - name: temp-volume
+              mountPath: /app/temp
+            - name: chrome-shm
+              mountPath: /dev/shm
+      
+      # Volumes
+      volumes:
+        - name: logs-volume
+          emptyDir: {}
+        - name: temp-volume
+          emptyDir: {}
+        - name: chrome-shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+      
+      # Restart policy
+      restartPolicy: Always
+      
+      # DNS policy
+      dnsPolicy: ClusterFirst
+      
+      # Node selector for nodes with sufficient memory
+      nodeSelector:
+        node-type: "worker"
 

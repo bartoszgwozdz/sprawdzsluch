@@ -14,7 +14,8 @@ if [ $? -eq 0 ]; then
     kubectl exec -it kafka-0 -n sprawdzsluch -- bash -c "
     cd /opt/kafka/bin && 
     ./kafka-topics.sh --bootstrap-server localhost:9092 --create --topic sprawdzsluch-result-payment-processing --partitions 3 --replication-factor 1 --if-not-exists
-    ./kafka-topics.sh --bootstrap-server localhost:9092 --create --topic sprawdzsluch-result-payment-processed --partitions 3 --replication-factor 1 --if-not-exists
+    ./kafka-topics.sh --bootstrap-server localhost:9092 --create --topic sprawdzsluch-result-payment-completed --partitions 3 --replication-factor 1 --if-not-exists
+    ./kafka-topics.sh --bootstrap-server localhost:9092 --create --topic sprawdzsluch-result-payment-failed --partitions 3 --replication-factor 1 --if-not-exists
     ./kafka-topics.sh --bootstrap-server localhost:9092 --create --topic sprawdzsluch-result-stored --partitions 3 --replication-factor 1 --if-not-exists
     ./kafka-topics.sh --bootstrap-server localhost:9092 --create --topic sprawdzsluch-report-sent --partitions 3 --replication-factor 1 --if-not-exists
     "
