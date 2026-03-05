@@ -92,15 +92,13 @@ public class ResultsController {
         return ResponseEntity.notFound().build();
       }
 
-      // Reset status i wyślij ponownie do Kafka
+      // Reset status
       TestProcessingStatus resetStatus = status.get();
       resetStatus.setStatus("SUBMITTED");
       resetStatus.setMessage("Test przesłany ponownie do przetworzenia");
       resetStatus.setPaymentUrl(null);
       resetStatus.setRedirectUrl(null);
       statusRepository.save(resetStatus);
-
-      // Tutaj moglibyśmy ponownie wysłać do Kafka, ale na razie tylko resetujemy status
 
       return ResponseEntity.ok(Map.of(
           "success", true,

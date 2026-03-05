@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
- * DTO reprezentujące wiadomość z Kafka topic: sprawdzsluch-result-stored
+ * DTO reprezentujące dane nowego wyniku testu przesyłane z backend-core
  */
 public class TestResultStoredEvent {
     

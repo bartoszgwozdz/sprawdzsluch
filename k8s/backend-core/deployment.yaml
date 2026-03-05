@@ -23,6 +23,10 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: "production"
             
+            # Payments service URL (HTTP zamiast Kafka)
+            - name: PAYMENTS_SERVICE_URL
+              value: "http://backend-payments-service:8082"
+            
             # MongoDB - pobierane z ConfigMap
             - name: SPRING_DATA_MONGODB_URI
               valueFrom:

@@ -53,20 +53,26 @@ jobs:
           docker build -t ${LOCAL_REGISTRY}/backend-core:latest ./backend-core
           docker push ${LOCAL_REGISTRY}/backend-core:latest
 
-      # 6️⃣ Setup kubectl
+      # 6️⃣ Build & push backend-payments locally
+      - name: Build & push backend-payments locally
+        run: |
+          docker build -t ${LOCAL_REGISTRY}/backend-payments:latest ./backend-payments
+          docker push ${LOCAL_REGISTRY}/backend-payments:latest
+
+      # 7️⃣ Setup kubectl
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: "v1.30.0"
 
-      # 7️⃣ Configure kubeconfig
+      # 8️⃣ Configure kubeconfig
       - name: Configure kubeconfig
         run: |
           mkdir -p ~/.kube
           echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
           chmod 600 ~/.kube/config
 
-      # 8️⃣ Create MongoDB Secret
+      # 9️⃣ Create MongoDB Secret
       - name: Create MongoDB Secret
         run: |
           kubectl -n $K8S_NAMESPACE create secret generic mongo-secret \
@@ -74,15 +80,17 @@ jobs:
             --from-literal=mongo-root-password=${{ secrets.MONGO_ROOT_PASSWORD }} \
             --dry-run=client -o yaml | kubectl apply -f -
 
-      # 9️⃣ Deploy all manifests
+      # 🔟 Deploy all manifests
       - name: Deploy all manifests
         run: |
           # Najpierw namespace
           kubectl apply -f k8s/namespace.yaml
 
-          # Następnie secrets i configmapy (jeśli istnieją)
+          # Następnie secrets i configmapy
           kubectl apply -f k8s/mongodb/secret.yaml
           kubectl apply -f k8s/mongodb/configmap.yaml
+          kubectl apply -f k8s/backend-payments/configmap.yaml
+          kubectl apply -f k8s/backend-pdf/configmap.yaml
 
           # Potem deployment MongoDB
           kubectl apply -f k8s/mongodb/statefulset.yaml
@@ -91,11 +99,13 @@ jobs:
           kubectl apply -f k8s/mongo-express/service.yaml
           kubectl apply -f k8s/mongo-express/deployment.yaml
 
-          # Na końcu aplikacje
+          # Aplikacje
           kubectl apply -f k8s/frontend/deployment.yaml
           kubectl apply -f k8s/frontend/service.yaml
           kubectl apply -f k8s/backend-core/deployment.yaml
           kubectl apply -f k8s/backend-core/service.yaml
+          kubectl apply -f k8s/backend-payments/deployment.yaml
+          kubectl apply -f k8s/backend-payments/service.yaml
           kubectl apply -f k8s/backend-pdf/deployment.yaml
           kubectl apply -f k8s/backend-pdf/service.yaml
 
@@ -104,8 +114,9 @@ jobs:
 
           kubectl rollout status statefulset/mongodb -n $K8S_NAMESPACE
           kubectl rollout status deployment/frontend -n $K8S_NAMESPACE
-          kubectl rollout status deployment/backend-pdf -n $K8S_NAMESPACE
           kubectl rollout status deployment/backend-core -n $K8S_NAMESPACE
+          kubectl rollout status deployment/backend-payments -n $K8S_NAMESPACE
+          kubectl rollout status deployment/backend-pdf -n $K8S_NAMESPACE
 
       # 🧹 Cleanup
       # - name: Cleanup

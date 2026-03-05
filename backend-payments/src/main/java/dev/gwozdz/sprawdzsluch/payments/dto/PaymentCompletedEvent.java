@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * DTO reprezentujące wiadomość do Kafka topic: sprawdzsluch-payment-completed
+ * DTO reprezentujące event zakończonej płatności wysyłany do backend-pdf
  */
 public class PaymentCompletedEvent {
     

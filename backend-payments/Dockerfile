@@ -1,32 +1,13 @@
-# Dockerfile dla backend-payments mikroserwisu
-FROM openjdk:17-jdk-slim
-
-# Metadane
-LABEL maintainer="sprawdzsluch"
-LABEL description="Mikroserwis do obsługi płatności dla aplikacji sprawdzsluch"
-
-# Tworzenie katalogu roboczego
+# Etap budowania
+FROM maven:3.9-eclipse-temurin-24 AS build
 WORKDIR /app
-
-# Kopiowanie plików Maven
-COPY pom.xml ./
-COPY mvnw ./
-COPY .mvn .mvn
-
-# Nadanie uprawnień do wykonania
-RUN chmod +x mvnw
-
-# Pobieranie zależności (cache layer)
-RUN ./mvnw dependency:resolve
-
-# Kopiowanie kodu źródłowego
+COPY pom.xml .
 COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Budowanie aplikacji
-RUN ./mvnw clean package -DskipTests
-
-# Port na którym działa aplikacja
+# Etap uruchomienia
+FROM eclipse-temurin:24-jre-alpine
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8082
-
-# Uruchomienie aplikacji
-CMD ["java", "-jar", "target/payments-service-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]

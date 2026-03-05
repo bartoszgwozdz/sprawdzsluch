@@ -12,9 +12,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ResultService {
 
-  private final KafkaService kafkaService;
+  private final PaymentNotificationService paymentNotificationService;
   private final TestResultRepository resultRepository;
-  private static final String SUBMITTED_RESULTS_TOPIC = "sprawdzsluch-result-stored";
 
 
   public boolean processResults(TestResultDto testResultDto) throws BadRequestException {
@@ -27,9 +26,8 @@ public class ResultService {
     TestResult testResult = convertToTestResult(testResultDto);
     testResult = resultRepository.save(testResult);
 
-    //send message to kafka, topic: sprawdzsluch-result-stored
-    kafkaService.sendToKafka(SUBMITTED_RESULTS_TOPIC, testResult.getId(),
-        testResult.getPaymentMethod());
+    //notify backend-payments about new test result via HTTP
+    paymentNotificationService.notifyPaymentService(testResult);
     return true;
   }
 

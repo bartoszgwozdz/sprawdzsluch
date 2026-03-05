@@ -1,13 +1,4 @@
 module.exports = {
-  kafka: {
-    brokers: (process.env.KAFKA_BROKERS || 'localhost:9092').split(','),
-    clientId: 'sprawdzsluch-pdf-service',
-    groupId: 'pdf-service-group',
-    topics: {
-      paymentCompleted: 'sprawdzsluch-payment-completed'
-    }
-  },
-  
   mongodb: {
     uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/sprawdzsluch',
     database: 'sprawdzsluch',

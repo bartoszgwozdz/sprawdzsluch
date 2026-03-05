@@ -38,11 +38,11 @@ spec:
         - protocol: TCP
           port: 3001
     
-    # Allow manual PDF generation requests (if needed)
+    # Allow payment-completed requests from backend-payments
     - from:
         - podSelector:
             matchLabels:
-              app: backend-core
+              app: backend-payments
       ports:
         - protocol: TCP
           port: 3001
@@ -56,15 +56,6 @@ spec:
       ports:
         - protocol: TCP
           port: 27017
-    
-    # Allow connection to Kafka
-    - to:
-        - podSelector:
-            matchLabels:
-              app: kafka
-      ports:
-        - protocol: TCP
-          port: 9092
     
     # Allow SMTP connections (Gmail)
     - to: []

@@ -7,9 +7,8 @@ data:
   # Server Configuration
   SERVER_PORT: "8082"
   
-  # Kafka Configuration
-  SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka-service:9092"
-  SPRING_KAFKA_CONSUMER_GROUP_ID: "payment-service-group"
+  # Service URLs (HTTP zamiast Kafka)
+  SERVICES_PDF_URL: "http://backend-pdf-service:3001"
   
   # MongoDB Configuration
   SPRING_DATA_MONGODB_HOST: "mongodb-service"
@@ -20,10 +19,6 @@ data:
   SPRING_PROFILES_ACTIVE: "production"
   LOGGING_LEVEL_ROOT: "INFO"
   LOGGING_LEVEL_DEV_GWOZDZ: "DEBUG"
-  
-  # Kafka Topics
-  KAFKA_TOPIC_RESULT_STORED: "sprawdzsluch-result-stored"
-  KAFKA_TOPIC_PAYMENT_COMPLETED: "sprawdzsluch-payment-completed"
 
 ---
 apiVersion: v1

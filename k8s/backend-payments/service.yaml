@@ -66,14 +66,14 @@ spec:
         - protocol: TCP
           port: 27017
     
-    # Allow connection to Kafka
+    # Allow connection to backend-pdf service
     - to:
         - podSelector:
             matchLabels:
-              app: kafka
+              app: backend-pdf
       ports:
         - protocol: TCP
-          port: 9092
+          port: 3001
     
     # Allow DNS resolution
     - to: []

@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const logger = require('./utils/logger');
-const kafkaService = require('./services/kafkaService');
+const paymentEventHandler = require('./services/paymentEventHandler');
 const pdfService = require('./services/pdfService');
 const emailService = require('./services/emailService');
 
@@ -28,6 +28,35 @@ app.get('/health', (req, res) => {
     service: 'sprawdzsluch-pdf-service',
     timestamp: new Date().toISOString()
   });
+});
+
+// Payment completed endpoint — wywoływany przez backend-payments via HTTP
+// Zastępuje Kafka consumer na topic sprawdzsluch-payment-completed
+app.post('/api/v1/payment-completed', async (req, res) => {
+  try {
+    const eventData = req.body;
+    
+    if (!eventData.testId || !eventData.userEmail) {
+      return res.status(400).json({ 
+        error: 'Brak wymaganych danych: testId i userEmail' 
+      });
+    }
+    
+    const result = await paymentEventHandler.handlePaymentCompleted(eventData);
+    
+    res.json({
+      success: true,
+      message: 'PDF wygenerowany i wysłany',
+      ...result
+    });
+    
+  } catch (error) {
+    logger.error('Błąd podczas przetwarzania payment-completed:', error);
+    res.status(500).json({ 
+      error: 'Błąd podczas generowania PDF',
+      details: error.message 
+    });
+  }
 });
 
 // Manual PDF generation endpoint (for testing)
@@ -76,14 +105,10 @@ app.use((error, req, res, next) => {
 // Start server
 async function startServer() {
   try {
-    // Inicjalizacja Kafka consumer
-    await kafkaService.initializeConsumer();
-    logger.info('Kafka consumer zainicjalizowany');
-    
     // Start HTTP server
     app.listen(PORT, () => {
       logger.info(`Serwis PDF uruchomiony na porcie ${PORT}`);
-      logger.info('Nasłuchiwanie eventów z Kafka topic: sprawdzsluch-payment-completed');
+      logger.info('Oczekiwanie na eventy payment-completed via HTTP POST /api/v1/payment-completed');
     });
     
   } catch (error) {
@@ -95,13 +120,11 @@ async function startServer() {
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   logger.info('Otrzymano SIGTERM, zamykanie serwisu...');
-  await kafkaService.disconnect();
   process.exit(0);
 });
 
 process.on('SIGINT', async () => {
   logger.info('Otrzymano SIGINT, zamykanie serwisu...');
-  await kafkaService.disconnect();
   process.exit(0);
 });
 

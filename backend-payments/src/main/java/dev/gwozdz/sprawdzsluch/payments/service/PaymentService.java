@@ -7,36 +7,43 @@ import dev.gwozdz.sprawdzsluch.payments.handler.PaymentHandlerFactory;
 import dev.gwozdz.sprawdzsluch.payments.model.Payment;
 import dev.gwozdz.sprawdzsluch.payments.model.PaymentStatus;
 import dev.gwozdz.sprawdzsluch.payments.repository.PaymentRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class PaymentService {
     
     private final PaymentRepository paymentRepository;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
     private final PaymentHandlerFactory paymentHandlerFactory;
+    private final WebClient pdfServiceClient;
+
+    public PaymentService(
+            PaymentRepository paymentRepository,
+            PaymentHandlerFactory paymentHandlerFactory,
+            @Value("${services.pdf.url:http://localhost:3001}") String pdfServiceUrl) {
+        this.paymentRepository = paymentRepository;
+        this.paymentHandlerFactory = paymentHandlerFactory;
+        this.pdfServiceClient = WebClient.builder()
+                .baseUrl(pdfServiceUrl)
+                .build();
+    }
 
     
     /**
-     * Nasłuchuje wiadomości z topic: sprawdzsluch-result-stored
-     * Tworzy payment dla każdego nowego testu słuchu
+     * Obsługuje nowy wynik testu — wywoływany przez HTTP POST z backend-core
      */
-    @KafkaListener(topics = "sprawdzsluch-result-stored", groupId = "payment-service-group")
     public void handleTestResultStored(TestResultStoredEvent event) {
-        System.out.println("Otrzymano wiadomość z topic sprawdzsluch-result-stored: " + event);
+        log.info("Otrzymano request przetworzenia płatności dla testu: {}", event.getTestId());
         
         try {
             // Sprawdź czy payment już nie istnieje
             if (paymentRepository.existsByTestId(event.getTestId())) {
-                System.out.println("Payment dla testId " + event.getTestId() + " już istnieje");
+                log.info("Payment dla testId {} już istnieje", event.getTestId());
                 return;
             }
             
@@ -51,11 +58,10 @@ public class PaymentService {
 
             // Zapis do MongoDB
             Payment savedPayment = paymentRepository.save(payment);
-//            System.out.println("Utworzono nowy payment: " + savedPayment);
             processPayment(savedPayment);
             
         } catch (Exception e) {
-            System.err.println("Błąd podczas przetwarzania TestResultStoredEvent: " + e.getMessage());
+            log.error("Błąd podczas przetwarzania TestResultStoredEvent: {}", e.getMessage());
         }
     }
     
@@ -73,22 +79,22 @@ public class PaymentService {
             payment = handler.processPayment(payment.getTestId(), payment);
             PaymentStatus paymentStatus = payment.getPaymentStatus();
             if(paymentStatus == PaymentStatus.COMPLETED) {
-                sendPaymentCompletedEvent(payment);
+                notifyPdfService(payment);
             }
             
         } catch (Exception e) {
-            System.err.println("Błąd podczas przetwarzania płatności: " + e.getMessage());
+            log.error("Błąd podczas przetwarzania płatności: {}", e.getMessage());
             payment.setPaymentStatus(PaymentStatus.FAILED);
             payment.setFailureReason(e.getMessage());
             paymentRepository.save(payment);
-            sendPaymentFailedEvent(payment);
+            log.warn("Płatność nieudana dla testu: {}, powód: {}", payment.getTestId(), e.getMessage());
         }
     }
     
     /**
-     * Wysyła event o zakończonej płatności do topic: sprawdzsluch-payment-completed
+     * Powiadamia backend-pdf o zakończonej płatności przez HTTP POST
      */
-    private void sendPaymentCompletedEvent(Payment payment) {
+    private void notifyPdfService(Payment payment) {
         PaymentCompletedEvent event = new PaymentCompletedEvent(
                 payment.getTestId(),
                 payment.getUserEmail(),
@@ -96,23 +102,17 @@ public class PaymentService {
                 payment.getPaymentMethod()
         );
         
-        kafkaTemplate.send("sprawdzsluch-payment-completed", event.getTestId(), event);
-        System.out.println("Wysłano PaymentCompletedEvent do Kafka: " + event);
-    }
-
-    /**
-     * Wysyła event o zakończonej płatności do topic: sprawdzsluch-payment-completed
-     */
-    private void sendPaymentFailedEvent(Payment payment) {
-        PaymentCompletedEvent event = new PaymentCompletedEvent(
-            payment.getTestId(),
-            payment.getUserEmail(),
-            payment.getId(),
-            payment.getPaymentMethod()
-        );
-
-        kafkaTemplate.send("sprawdzsluch-payment-failed", event.getTestId(), event);
-        System.out.println("Wysłano PaymentCompletedEvent do Kafka: " + event);
+        pdfServiceClient.post()
+                .uri("/api/v1/payment-completed")
+                .bodyValue(event)
+                .retrieve()
+                .bodyToMono(String.class)
+                .subscribe(
+                        response -> log.info("Powiadomiono backend-pdf o płatności dla testu {}: {}", event.getTestId(), response),
+                        error -> log.error("Błąd podczas powiadamiania backend-pdf o teście {}: {}", event.getTestId(), error.getMessage())
+                );
+        
+        log.info("Wysłano PaymentCompletedEvent do backend-pdf: testId={}", event.getTestId());
     }
     
     /**
