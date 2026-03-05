@@ -23,10 +23,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libnss3 \
     libxcomposite1 \
     libxdamage1 \
-    libxkbcomposite0 \
     libxrandr2 \
     xdg-utils \
-    libasound2 && \
+    libasound2t64 && \
     rm -rf /var/lib/apt/lists/*
 
 # Tworzenie użytkownika aplikacji
