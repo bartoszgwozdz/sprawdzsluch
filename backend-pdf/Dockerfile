@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxdamage1 \
     libxrandr2 \
     xdg-utils \
-    libasound2t64 && \
+    libasound2 && \
     rm -rf /var/lib/apt/lists/*
 
 # Tworzenie użytkownika aplikacji
