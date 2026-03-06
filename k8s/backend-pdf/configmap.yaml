@@ -18,7 +18,11 @@ data:
   SMTP_PORT: "587"
   SMTP_SECURE: "false"
   EMAIL_FROM: "noreply@sprawdzsluch.pl"
-  EMAIL_SUBJECT: "Twój raport z testu słuchu - SprawdźSłuch"
+  EMAIL_SUBJECT: "Twoj raport z testu sluchu - SprawdzSluch"
+
+  # SMTP credentials - zastąp właściwymi danymi lub użyj Secretu ręcznie
+  SMTP_USER: ""
+  SMTP_PASSWORD: ""
 
 ---
 apiVersion: v1
