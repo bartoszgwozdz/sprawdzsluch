@@ -10,7 +10,7 @@ data:
   LOG_LEVEL: "info"
   
   # MongoDB Configuration
-  MONGODB_URI: "mongodb://mongodb-service:27017/sprawdzsluch"
+  MONGODB_URI: "mongodb://admin:supersecret@mongodb:27017/sprawdzsluch?authSource=admin"
   MONGODB_DATABASE: "sprawdzsluch"
   
   # Email Configuration (SMTP)

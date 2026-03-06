@@ -64,11 +64,7 @@ spec:
           # Security context for Puppeteer
           securityContext:
             runAsNonRoot: true
-            runAsUser: 1000
             allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
           
           # Volume mounts
           volumeMounts:
