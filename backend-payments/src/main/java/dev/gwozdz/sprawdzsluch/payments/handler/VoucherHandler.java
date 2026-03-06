@@ -19,21 +19,18 @@ public class VoucherHandler implements PaymentHandler {
   private final VoucherService voucherService;
 
   @Override
-  public Payment processPayment(String testId, Payment voucherCode) {
+  public Payment processPayment(String testId, Payment payment) {
     log.info("Przetwarzanie płatności voucherem dla testu: {}", testId);
 
     // Sprawdź czy voucher jest ważny przez voucherService
-    boolean isVoucherValid = voucherService.validateVoucher(voucherCode);
+    boolean isVoucherValid = voucherService.validateVoucher(payment.getVoucherCode());
 
-    Payment payment = new Payment();
-    payment.setTestId(testId);
     payment.setPaymentMethod(PAYMENT_TYPE);
     payment.setPaymentDate(LocalDateTime.now());
-    payment.setAmount(BigDecimal.valueOf(0.0)); // Voucher zazwyczaj oznacza darmową usługę
+    payment.setAmount(BigDecimal.valueOf(0.0));
 
     if (isVoucherValid) {
       payment.setPaymentStatus(PaymentStatus.COMPLETED);
-//      voucherService.useVoucher(voucherCode);
     } else {
       payment.setPaymentStatus(PaymentStatus.FAILED);
     }

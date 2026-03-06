@@ -17,16 +17,12 @@ public class PayuHandler implements PaymentHandler {
   @Override
   public Payment processPayment(String testId, Payment payment) {
     log.info("Przetwarzanie płatności PayU dla testu: {}", testId);
-    // Implementacja integracji z PayU
-
-    Payment payment = new Payment();
-    payment.setTestId(testId);
     payment.setPaymentMethod(PAYMENT_TYPE);
-    payment.setPaymentStatus(PaymentStatus.PENDING); // Zazwyczaj płatności PayU są najpierw w statusie PENDING
+    payment.setPaymentStatus(PaymentStatus.PENDING);
     payment.setPaymentDate(LocalDateTime.now());
-    payment.setAmount(BigDecimal.valueOf(50.0)); // Przykładowa kwota
+    payment.setAmount(BigDecimal.valueOf(50.0));
 
-    // Tutaj byłoby wywołanie API PayU
+    // TODO: wywołanie API PayU
 
     return payment;
   }

@@ -17,13 +17,10 @@ public class CardHandler implements PaymentHandler {
   @Override
   public Payment processPayment(String testId, Payment payment) {
     log.info("Przetwarzanie płatności kartą dla testu: {}", testId);
-    // Logika przetwarzania płatności kartą
-    Payment payment = new Payment();
-    payment.setTestId(testId);
     payment.setPaymentMethod(PAYMENT_TYPE);
     payment.setPaymentStatus(PaymentStatus.COMPLETED);
     payment.setPaymentDate(LocalDateTime.now());
-    payment.setAmount(BigDecimal.valueOf(50.0)); // Przykładowa kwota
+    payment.setAmount(BigDecimal.valueOf(50.0));
 
     return payment;
   }
