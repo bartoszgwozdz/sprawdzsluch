@@ -26,12 +26,23 @@ spec:
               containerPort: 3001
               protocol: TCP
           
-          # Environment variables from ConfigMap and Secret
+          # Environment variables from ConfigMap
           envFrom:
             - configMapRef:
                 name: backend-pdf-config
-            - secretRef:
-                name: backend-pdf-secret
+          env:
+            - name: SMTP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: backend-pdf-secret
+                  key: SMTP_USER
+                  optional: true
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backend-pdf-secret
+                  key: SMTP_PASSWORD
+                  optional: true
           
           # Health checks
           livenessProbe:
@@ -92,7 +103,5 @@ spec:
       # DNS policy
       dnsPolicy: ClusterFirst
       
-      # Node selector for nodes with sufficient memory
-      nodeSelector:
-        node-type: "worker"
+
 
