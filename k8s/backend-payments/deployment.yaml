@@ -30,8 +30,13 @@ spec:
           envFrom:
             - configMapRef:
                 name: backend-payments-config
-            - secretRef:
-                name: backend-payments-secret
+          env:
+            # MongoDB URI - shared with backend-core
+            - name: SPRING_DATA_MONGODB_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: mongodb-config
+                  key: mongodb-uri
           
           # Health checks
           livenessProbe:

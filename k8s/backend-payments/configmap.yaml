@@ -6,15 +6,10 @@ metadata:
 data:
   # Server Configuration
   SERVER_PORT: "8082"
-  
-  # Service URLs (HTTP zamiast Kafka)
+
+  # Service URLs
   SERVICES_PDF_URL: "http://backend-pdf-service:3001"
-  
-  # MongoDB Configuration
-  SPRING_DATA_MONGODB_HOST: "mongodb-service"
-  SPRING_DATA_MONGODB_PORT: "27017"
-  SPRING_DATA_MONGODB_DATABASE: "sprawdzsluch"
-  
+
   # Application Configuration
   SPRING_PROFILES_ACTIVE: "production"
   LOGGING_LEVEL_ROOT: "INFO"
