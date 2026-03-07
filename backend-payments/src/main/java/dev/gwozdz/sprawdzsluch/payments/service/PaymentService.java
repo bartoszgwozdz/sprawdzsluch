@@ -42,8 +42,8 @@ public class PaymentService {
         
         try {
             // Sprawdź czy payment już nie istnieje
-            if (paymentRepository.existsByTestId(event.getTestId())) {
-                log.info("Payment dla testId {} już istnieje", event.getTestId());
+            if (paymentRepository.existsByTestIdAndUserEmail(event.getTestId(), event.getUserEmail())) {
+                log.info("Payment dla testId {} i email {} już istnieje", event.getTestId(), event.getUserEmail());
                 return;
             }
             
@@ -54,6 +54,8 @@ public class PaymentService {
             payment.setAmount(event.getAmount());
             payment.setCurrency("PLN");
             payment.setPaymentStatus(PaymentStatus.PENDING);
+            payment.setPaymentMethod(event.getPaymentMethod());
+            payment.setVoucherCode(event.getVoucherCode());
             payment.setCreatedAt(LocalDateTime.now());
 
             // Zapis do MongoDB
@@ -69,7 +71,7 @@ public class PaymentService {
      * Przetwarza płatność - może być voucher lub PayNow
      */
     private void processPayment(Payment payment) {
-        
+
         if (payment.getPaymentStatus() != PaymentStatus.PENDING) {
             throw new IllegalStateException("Payment nie jest w statusie PENDING");
         }
@@ -77,17 +79,19 @@ public class PaymentService {
         try {
             PaymentHandler handler = paymentHandlerFactory.getHandler(paymentMethod);
             payment = handler.processPayment(payment.getTestId(), payment);
-            PaymentStatus paymentStatus = payment.getPaymentStatus();
-            if(paymentStatus == PaymentStatus.COMPLETED) {
+            payment.setUpdatedAt(LocalDateTime.now());
+            paymentRepository.save(payment);
+
+            if (payment.getPaymentStatus() == PaymentStatus.COMPLETED) {
                 notifyPdfService(payment);
             }
-            
+
         } catch (Exception e) {
             log.error("Błąd podczas przetwarzania płatności: {}", e.getMessage());
             payment.setPaymentStatus(PaymentStatus.FAILED);
             payment.setFailureReason(e.getMessage());
+            payment.setUpdatedAt(LocalDateTime.now());
             paymentRepository.save(payment);
-            log.warn("Płatność nieudana dla testu: {}, powód: {}", payment.getTestId(), e.getMessage());
         }
     }
     
@@ -95,24 +99,36 @@ public class PaymentService {
      * Powiadamia backend-pdf o zakończonej płatności przez HTTP POST
      */
     private void notifyPdfService(Payment payment) {
+        if (payment.isPdfSent()) {
+            log.info("PDF już wysłany dla testu {}, pomijam", payment.getTestId());
+            return;
+        }
+
         PaymentCompletedEvent event = new PaymentCompletedEvent(
                 payment.getTestId(),
                 payment.getUserEmail(),
                 payment.getId(),
                 payment.getPaymentMethod()
         );
-        
-        pdfServiceClient.post()
-                .uri("/api/v1/payment-completed")
-                .bodyValue(event)
-                .retrieve()
-                .bodyToMono(String.class)
-                .subscribe(
-                        response -> log.info("Powiadomiono backend-pdf o płatności dla testu {}: {}", event.getTestId(), response),
-                        error -> log.error("Błąd podczas powiadamiania backend-pdf o teście {}: {}", event.getTestId(), error.getMessage())
-                );
-        
-        log.info("Wysłano PaymentCompletedEvent do backend-pdf: testId={}", event.getTestId());
+
+        try {
+            pdfServiceClient.post()
+                    .uri("/api/v1/payment-completed")
+                    .bodyValue(event)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block(); // synchronicznie — wiemy czy się udało
+
+            payment.setPdfSent(true);
+            payment.setPdfSentAt(LocalDateTime.now());
+            payment.setUpdatedAt(LocalDateTime.now());
+            paymentRepository.save(payment);
+            log.info("PDF wysłany dla testu {}", payment.getTestId());
+
+        } catch (Exception e) {
+            log.error("Błąd podczas powiadamiania backend-pdf o teście {}: {}", payment.getTestId(), e.getMessage());
+            // pdfSent=false — można ponowić ręcznie lub przez mechanizm retry
+        }
     }
     
     /**

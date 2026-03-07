@@ -132,4 +132,26 @@ class DataService {
   }
 }
 
+  /**
+   * Oznacza testId jako przetworzony (idempotentność).
+   * Zwraca true jeśli udało się oznaczyć (czyli jeszcze nie był przetworzony).
+   * Zwraca false jeśli już istnieje (duplikat).
+   */
+  async markEventAsProcessed(testId) {
+    try {
+      await this.connect();
+      const collection = this.db.collection('processed_pdf_events');
+      await collection.createIndex({ testId: 1 }, { unique: true });
+      await collection.insertOne({ testId, processedAt: new Date() });
+      return true;
+    } catch (error) {
+      if (error.code === 11000) {
+        // Duplicate key — już przetworzony
+        return false;
+      }
+      throw error;
+    }
+  }
+}
+
 module.exports = new DataService();

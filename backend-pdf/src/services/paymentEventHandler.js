@@ -20,6 +20,13 @@ class PaymentEventHandler {
         userEmail: eventData.userEmail,
         paymentMethod: eventData.paymentMethod
       });
+
+      // Idempotentność — guard przed przetworzeniem tego samego zdarzenia dwukrotnie
+      const isNew = await dataService.markEventAsProcessed(eventData.testId);
+      if (!isNew) {
+        logger.warn(`Event payment-completed dla testId ${eventData.testId} już przetworzony — pomijam`);
+        return { success: true, skipped: true, testId: eventData.testId };
+      }
       
       // Pobierz dane testu z MongoDB
       const testData = await dataService.getTestResultById(eventData.testId);

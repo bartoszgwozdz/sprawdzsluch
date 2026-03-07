@@ -161,7 +161,6 @@ function showModalStep(step) {
                     // Zapisz dane testu do localStorage
                     if (window.hearingTestInstance) {
                         const testResults = {
-                            testId: "TEST-" + Date.now(),
                             hearingLevels: window.hearingTestInstance.hearingLevels || [],
                             maxAudibleFrequency: window.hearingTestInstance.maxAudibleFrequency || 20000,
                             timestamp: new Date().toISOString()
@@ -229,7 +228,6 @@ function showModalStep(step) {
                                         headers: { 'Content-Type': 'application/json' },
                                         body: JSON.stringify({
                                             userEmail: email,
-                                            testId: "TEST-" + Math.floor(Math.random() * 1000000), 
                                             paymentMethod: method,
                                             testResults: window.hearingTestInstance.hearingLevels 
                                         })

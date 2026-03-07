@@ -174,23 +174,6 @@ class TestProgressTracker {
 // Globalna instancja trackera
 const progressTracker = new TestProgressTracker();
 
-// Funkcja do generowania hash z daty
-function generateTestId() {
-    const now = new Date();
-    const dateString = now.toISOString();
-    
-    // Prosta funkcja hash
-    let hash = 0;
-    for (let i = 0; i < dateString.length; i++) {
-        const char = dateString.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash; // Konwertuj do 32-bitowego integer
-    }
-    
-    // Zwróć dodatni hash jako hex
-    return "TEST-" + Math.abs(hash).toString(16).toUpperCase();
-}
-
 // Funkcja do pobrania parametrów z URL
 function getUrlParams() {
     const params = {};
@@ -395,8 +378,8 @@ function setupPaymentForm() {
             const testResults = JSON.parse(hearingResults) || {};
             
             // Przygotuj payload JSON z pełnymi danymi testu
+            // testId jest generowany deterministycznie po stronie backendu
             const payloadData = {
-                testId: generateTestId(),
                 userEmail: email,
                 hearingLevels: testResults.hearingLevels || [],
                 maxAudibleFrequency: testResults.maxAudibleFrequency || 13000,

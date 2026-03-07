@@ -20,4 +20,6 @@ public interface PaymentRepository extends MongoRepository<Payment, String> {
     Optional<Payment> findByExternalPaymentId(String externalPaymentId);
     
     boolean existsByTestId(String testId);
+
+    boolean existsByTestIdAndUserEmail(String testId, String userEmail);
 }
