@@ -1,35 +1,122 @@
 name: Infrastructure Deployment
 
 on:
-  workflow_dispatch:  # Manual trigger only
+  workflow_dispatch:
     inputs:
       component:
         description: 'Infrastructure component to deploy'
         required: true
-        default: 'monitoring'
+        default: 'all'
         type: choice
         options:
-        - monitoring
-        - all
+          - observability   # Fluent Bit + Grafana datasources (manifesty)
+          - app             # sprawdzsluch k8s manifesty
+          - all             # wszystko powyżej
 
 jobs:
   deploy-infrastructure:
     runs-on: self-hosted
-    if: github.ref == 'refs/heads/main'
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      # -------------------------------------------------------
+      # Checkout
+      # -------------------------------------------------------
+      - name: Checkout sprawdzsluch
+        uses: actions/checkout@v4
+        with:
+          path: sprawdzsluch
 
-    - name: Deploy Monitoring (placeholder)
-      if: inputs.component == 'monitoring' || inputs.component == 'all'
-      run: |
-        echo "Monitoring deployment would go here"
-        # kubectl apply -f k8s/monitoring/
+      - name: Checkout observability-stack
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/observability-stack
+          path: observability-stack
+          # Jeśli repo jest prywatne i runner nie ma dostępu SSH, odkomentuj token:
+          # token: ${{ secrets.GH_PAT }}
 
-    - name: Infrastructure deployment summary
-      run: |
-        echo "## Infrastructure Deployment Summary" >> $GITHUB_STEP_SUMMARY
-        echo "- Component: ${{ inputs.component }}" >> $GITHUB_STEP_SUMMARY
-        echo "- Status: ✅ Deployed successfully" >> $GITHUB_STEP_SUMMARY
-        echo "- Timestamp: $(date)" >> $GITHUB_STEP_SUMMARY
+      # -------------------------------------------------------
+      # Sanity check — czy runner ma kontakt z klastrem
+      # -------------------------------------------------------
+      - name: Verify kubectl connectivity
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
+      # -------------------------------------------------------
+      # Observability stack — Fluent Bit, Grafana datasource
+      # (tylko manifesty — Helm install.sh uruchamiamy raz ręcznie przy bootstrapie)
+      # -------------------------------------------------------
+      - name: Deploy observability manifests
+        if: inputs.component == 'observability' || inputs.component == 'all'
+        run: |
+          set -e
+          cd observability-stack
+
+          kubectl create namespace observability --dry-run=client -o yaml | kubectl apply -f -
+
+          # RBAC dla Fluent Bit (ClusterRole — bez -n)
+          kubectl apply -f manifests/loki/fluentbit-rbac.yaml
+
+          # ConfigMap + DaemonSet w namespace observability
+          kubectl apply -f manifests/loki/fluentbit-configmap.yaml -n observability
+          kubectl apply -f manifests/loki/fluentbit-daemonset.yaml -n observability
+
+          # OTel Collector
+          kubectl apply -f manifests/otel-collector/ -n observability
+
+          # MongoDB Exporter + ServiceMonitors + Alerty
+          kubectl apply -f manifests/mongodb-exporter/ -n observability
+          kubectl apply -f manifests/servicemonitors/ -n observability
+          kubectl apply -f manifests/alerts/ -n observability
+
+          # Grafana — upgrade Helm release z nowym values.yaml (datasource Loki)
+          helm upgrade kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+            -n observability \
+            --values manifests/grafana/values.yaml \
+            --reuse-values \
+            --wait --timeout 120s
+
+          echo "Czekam na Fluent Bit rollout..."
+          kubectl rollout status daemonset/fluentbit -n observability --timeout=120s
+
+      # -------------------------------------------------------
+      # Aplikacja — sprawdzsluch k8s manifesty
+      # -------------------------------------------------------
+      - name: Deploy app manifests
+        if: inputs.component == 'app' || inputs.component == 'all'
+        run: |
+          set -e
+          cd sprawdzsluch
+
+          kubectl create namespace sprawdzsluch --dry-run=client -o yaml | kubectl apply -f -
+
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/backend-core/
+          kubectl apply -f k8s/backend-payments/
+          kubectl apply -f k8s/backend-pdf/
+          kubectl apply -f k8s/frontend/
+          kubectl apply -f k8s/mongodb/
+          kubectl apply -f k8s/ingress.yaml
+          kubectl apply -f k8s/autoscaling.yaml
+
+          echo "Czekam na rollout deploymentów..."
+          kubectl rollout status deployment -n sprawdzsluch --timeout=180s
+
+      # -------------------------------------------------------
+      # Summary — po faktycznym wykonaniu
+      # -------------------------------------------------------
+      - name: Deployment summary
+        if: always()
+        run: |
+          STATUS="${{ job.status }}"
+          ICON="✅"
+          [[ "$STATUS" != "success" ]] && ICON="❌"
+
+          echo "## Infrastructure Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | ${{ inputs.component }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Status | ${ICON} ${STATUS} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Triggered by | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Timestamp | $(date -u '+%Y-%m-%d %H:%M UTC') |" >> $GITHUB_STEP_SUMMARY

@@ -8,6 +8,7 @@ import dev.gwozdz.sprawdzsluch.payments.model.Payment;
 import dev.gwozdz.sprawdzsluch.payments.model.PaymentStatus;
 import dev.gwozdz.sprawdzsluch.payments.repository.PaymentRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -39,7 +40,11 @@ public class PaymentService {
      */
     public void handleTestResultStored(TestResultStoredEvent event) {
         log.info("Otrzymano request przetworzenia płatności dla testu: {}", event.getTestId());
-        
+
+        MDC.put("testId", event.getTestId());
+        MDC.put("userEmail", event.getUserEmail());
+        MDC.put("paymentMethod", event.getPaymentMethod() != null ? event.getPaymentMethod() : "unknown");
+
         try {
             // Sprawdź czy payment już nie istnieje
             if (paymentRepository.existsByTestIdAndUserEmail(event.getTestId(), event.getUserEmail())) {
@@ -114,6 +119,7 @@ public class PaymentService {
         try {
             pdfServiceClient.post()
                     .uri("/api/v1/payment-completed")
+                    .header("X-Correlation-Id", MDC.get("correlationId") != null ? MDC.get("correlationId") : "")
                     .bodyValue(event)
                     .retrieve()
                     .bodyToMono(String.class)

@@ -1,84 +1,46 @@
 const winston = require('winston');
-const path = require('path');
-const config = require('../config/config');
 
-// Definicja formatów logów
-const logFormat = winston.format.combine(
-  winston.format.timestamp({
-    format: 'YYYY-MM-DD HH:mm:ss'
-  }),
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Format JSON produkcyjny — Fluent Bit parsuje to bez konfiguracji regexów
+const jsonFormat = winston.format.combine(
+  winston.format.timestamp(),
   winston.format.errors({ stack: true }),
   winston.format.json()
 );
 
-const consoleFormat = winston.format.combine(
+// Format dev — czytelny, kolorowy
+const devFormat = winston.format.combine(
   winston.format.colorize(),
-  winston.format.timestamp({
-    format: 'YYYY-MM-DD HH:mm:ss'
-  }),
-  winston.format.printf(({ timestamp, level, message, ...meta }) => {
-    let msg = `${timestamp} [${level}] ${message}`;
-    if (Object.keys(meta).length > 0) {
-      msg += `\n${JSON.stringify(meta, null, 2)}`;
+  winston.format.timestamp({ format: 'HH:mm:ss.SSS' }),
+  winston.format.printf(({ timestamp, level, message, testId, correlationId, ...meta }) => {
+    const ctx = [correlationId, testId].filter(Boolean).join(' | ');
+    let msg = `${timestamp} ${level}${ctx ? ` [${ctx}]` : ''} ${message}`;
+    const extra = Object.keys(meta).filter(k => !['service', 'stack'].includes(k));
+    if (extra.length > 0) {
+      msg += ` ${JSON.stringify(Object.fromEntries(extra.map(k => [k, meta[k]])))}`;
     }
     return msg;
   })
 );
 
-// Konfiguracja transportów
-const transports = [
-  // Konsola
-  new winston.transports.Console({
-    format: consoleFormat,
-    level: config.app.logLevel
-  }),
-  
-  // Plik z wszystkimi logami
-  new winston.transports.File({
-    filename: path.join(__dirname, '../../logs/combined.log'),
-    format: logFormat,
-    level: 'info',
-    maxsize: 5242880, // 5MB
-    maxFiles: 5
-  }),
-  
-  // Plik tylko z błędami
-  new winston.transports.File({
-    filename: path.join(__dirname, '../../logs/error.log'),
-    format: logFormat,
-    level: 'error',
-    maxsize: 5242880, // 5MB
-    maxFiles: 5
-  })
-];
+const transports = isProduction
+  ? [new winston.transports.Console({ format: jsonFormat })]
+  : [new winston.transports.Console({ format: devFormat })];
 
-// Utworzenie katalogu logs jeśli nie istnieje
-const fs = require('fs');
-const logsDir = path.join(__dirname, '../../logs');
-if (!fs.existsSync(logsDir)) {
-  fs.mkdirSync(logsDir, { recursive: true });
-}
-
-// Utworzenie loggera
 const logger = winston.createLogger({
-  level: config.app.logLevel,
-  format: logFormat,
+  level: process.env.LOG_LEVEL || (isProduction ? 'info' : 'debug'),
+  defaultMeta: { service: 'backend-pdf' },
   transports,
   exitOnError: false
 });
 
-// Obsługa uncaught exceptions
-logger.exceptions.handle(
-  new winston.transports.File({
-    filename: path.join(__dirname, '../../logs/exceptions.log')
-  })
-);
-
-// Obsługa unhandled rejections
-logger.rejections.handle(
-  new winston.transports.File({
-    filename: path.join(__dirname, '../../logs/rejections.log')
-  })
-);
+/**
+ * Tworzy child logger z kontekstem (testId, correlationId) — pola trafiają do każdego logu.
+ * Użyj w handlerach requesta zamiast globalnego `logger`.
+ *
+ * @param {object} ctx - { testId, correlationId, userEmail }
+ */
+logger.withContext = (ctx) => logger.child(ctx);
 
 module.exports = logger;

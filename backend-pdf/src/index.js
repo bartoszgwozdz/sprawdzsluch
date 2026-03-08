@@ -15,9 +15,14 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
-// Logging middleware
+// Logging middleware — dołącza correlationId do każdego requesta
 app.use((req, res, next) => {
-  logger.info(`${req.method} ${req.originalUrl} - ${req.ip}`);
+  const correlationId = req.headers['x-correlation-id'] || require('crypto').randomUUID();
+  // Przekazujemy correlationId dalej w odpowiedzi
+  res.setHeader('X-Correlation-Id', correlationId);
+  // Tworzymy child logger z kontekstem requesta — dostępny dla handlerów
+  req.log = logger.withContext({ correlationId });
+  req.log.info(`${req.method} ${req.originalUrl}`);
   next();
 });
 
@@ -41,9 +46,13 @@ app.post('/api/v1/payment-completed', async (req, res) => {
         error: 'Brak wymaganych danych: testId i userEmail' 
       });
     }
+
+    const log = req.log.child({ testId: eventData.testId, userEmail: eventData.userEmail });
+    log.info('Otrzymano zdarzenie payment-completed');
     
     const result = await paymentEventHandler.handlePaymentCompleted(eventData);
     
+    log.info('PDF wygenerowany i wysłany pomyślnie');
     res.json({
       success: true,
       message: 'PDF wygenerowany i wysłany',
@@ -51,7 +60,7 @@ app.post('/api/v1/payment-completed', async (req, res) => {
     });
     
   } catch (error) {
-    logger.error('Błąd podczas przetwarzania payment-completed:', error);
+    req.log.error('Błąd podczas przetwarzania payment-completed', { error: error.message, stack: error.stack });
     res.status(500).json({ 
       error: 'Błąd podczas generowania PDF',
       details: error.message 

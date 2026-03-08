@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.coyote.BadRequestException;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,10 +31,12 @@ public class ResultService {
 
   public boolean processResults(TestResultDto testResultDto) throws BadRequestException {
     validateEmail(testResultDto.getUserEmail());
+    MDC.put("userEmail", testResultDto.getUserEmail());
 
     // testId generowany deterministycznie po stronie serwera
     String testId = generateTestId(testResultDto);
     testResultDto.setTestId(testId);
+    MDC.put("testId", testId);
 
     // Sprawdź cache (brak zapytania do DB dla znanych duplikatów)
     Instant cachedUntil = processedCache.get(testId);

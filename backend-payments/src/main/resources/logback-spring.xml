@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- ===== DEV: czytelny format kolorowy ===== -->
+    <springProfile name="default,!production">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %cyan([%X{correlationId:-}]) %yellow([%X{testId:-}]) %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+        <logger name="dev.gwozdz.sprawdzsluch" level="DEBUG"/>
+    </springProfile>
+
+    <!-- ===== PRODUCTION: JSON na stdout → Fluent Bit → Loki ===== -->
+    <springProfile name="production">
+        <appender name="JSON_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <customFields>{"service":"backend-payments"}</customFields>
+                <includeMdcKeyName>testId</includeMdcKeyName>
+                <includeMdcKeyName>correlationId</includeMdcKeyName>
+                <includeMdcKeyName>userEmail</includeMdcKeyName>
+                <includeMdcKeyName>paymentMethod</includeMdcKeyName>
+                <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                    <maxDepthPerCause>10</maxDepthPerCause>
+                    <exclude>sun\.reflect\..*</exclude>
+                    <exclude>java\.lang\.reflect\..*</exclude>
+                    <rootCauseFirst>true</rootCauseFirst>
+                </throwableConverter>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="JSON_STDOUT"/>
+        </root>
+        <logger name="dev.gwozdz.sprawdzsluch" level="INFO"/>
+
+        <logger name="org.springframework.data.mongodb" level="WARN"/>
+        <logger name="org.mongodb.driver" level="WARN"/>
+    </springProfile>
+
+</configuration>
