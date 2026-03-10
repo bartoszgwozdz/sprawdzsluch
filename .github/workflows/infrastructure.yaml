@@ -69,12 +69,15 @@ jobs:
           kubectl apply -f manifests/servicemonitors/ -n observability
           kubectl apply -f manifests/alerts/ -n observability
 
-          # Grafana — upgrade Helm release z nowym values.yaml (datasource Loki)
+          # Grafana — upgrade Helm release z nowym values.yaml (datasource Loki + subpath)
           helm upgrade kube-prometheus-stack prometheus-community/kube-prometheus-stack \
             -n observability \
             --values manifests/grafana/values.yaml \
             --reuse-values \
             --wait --timeout 120s
+
+          # Grafana IngressRoute (Traefik) — dostęp przez /grafana
+          kubectl apply -f manifests/grafana/ingress.yaml -n observability
 
           echo "Czekam na Fluent Bit rollout..."
           kubectl rollout status daemonset/fluentbit -n observability --timeout=120s
