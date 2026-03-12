@@ -16,6 +16,7 @@ spec:
       containers:
         - name: frontend
           image: localhost:5000/frontend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80   # 🔹 musi się zgadzać z tym co masz w Dockerfile
           resources:

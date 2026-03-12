@@ -16,6 +16,7 @@ spec:
       containers:
         - name: backend-core
           image: localhost:5000/backend-core:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8090
           env:
