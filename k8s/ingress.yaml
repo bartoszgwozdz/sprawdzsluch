@@ -1,5 +1,5 @@
 ---
-# BACKEND-CORE API
+# BACKEND-CORE API — ścieżka natywna /api/results
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -19,7 +19,41 @@ spec:
         - name: rate-limit-core
 
 ---
-# BACKEND-PAYMENTS API
+# BACKEND-CORE API — alias /api/hearing-test (używany przez frontend)
+# Przepisuje /api/hearing-test/* → /api/results/*
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: sprawdzsluch-backend-core-alias
+  namespace: sprawdzsluch
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: PathPrefix(`/api/hearing-test`)
+      kind: Rule
+      services:
+        - name: backend-core
+          port: 8090
+      middlewares:
+        - name: rewrite-hearing-test-path
+        - name: add-headers
+        - name: rate-limit-core
+
+---
+# Middleware — przepisuje /api/hearing-test → /api/results
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: rewrite-hearing-test-path
+  namespace: sprawdzsluch
+spec:
+  replacePathRegex:
+    regex: ^/api/hearing-test(.*)
+    replacement: /api/results${1}
+
+---
+# BACKEND-PAYMENTS API — ścieżka natywna /api/v1/payments i /api/v1/vouchers
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -37,6 +71,40 @@ spec:
       middlewares:
         - name: add-headers
         - name: rate-limit-payments
+
+---
+# BACKEND-PAYMENTS API — alias /api/payments (używany przez frontend)
+# Przepisuje /api/payments/* → /api/v1/payments/*
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: sprawdzsluch-backend-payments-alias
+  namespace: sprawdzsluch
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: PathPrefix(`/api/payments`)
+      kind: Rule
+      services:
+        - name: backend-payments
+          port: 8081
+      middlewares:
+        - name: rewrite-payments-path
+        - name: add-headers
+        - name: rate-limit-payments
+
+---
+# Middleware — przepisuje /api/payments → /api/v1/payments
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: rewrite-payments-path
+  namespace: sprawdzsluch
+spec:
+  replacePathRegex:
+    regex: ^/api/payments(.*)
+    replacement: /api/v1/payments${1}
 
 ---
 # BACKEND-PDF API
