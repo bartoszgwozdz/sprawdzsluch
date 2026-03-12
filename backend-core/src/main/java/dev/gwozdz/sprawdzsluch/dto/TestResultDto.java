@@ -1,5 +1,6 @@
 package dev.gwozdz.sprawdzsluch.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.time.LocalDateTime;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,8 @@ public class TestResultDto {
   private String testId;
   private String userEmail;
   private int maxAudibleFrequency;
+
+  @JsonDeserialize(using = HearingLevelsDeserializer.class)
   private Map<Integer, Double> hearingLevels;
 
   private String status; // NEW, PAID, SENT
