@@ -379,9 +379,20 @@ function setupPaymentForm() {
             
             // Przygotuj payload JSON z pełnymi danymi testu
             // testId jest generowany deterministycznie po stronie backendu
+
+            // hearingLevels z sessionStorage to tablica [{frequency, gain}, ...]
+            // backend-core oczekuje Map<Integer, Double> czyli {1000: 0.5, ...}
+            const rawLevels = testResults.hearingLevels || [];
+            const hearingLevelsMap = rawLevels.reduce((acc, item) => {
+                if (item && item.frequency != null && item.gain != null) {
+                    acc[item.frequency] = item.gain;
+                }
+                return acc;
+            }, {});
+
             const payloadData = {
                 userEmail: email,
-                hearingLevels: testResults.hearingLevels || [],
+                hearingLevels: hearingLevelsMap,
                 maxAudibleFrequency: testResults.maxAudibleFrequency || 13000,
                 executed: testResults.timestamp || new Date().toISOString(),
                 paymentMethod: method,
