@@ -13,6 +13,7 @@ jobs:
     env:
       K8S_NAMESPACE: sprawdzsluch
       LOCAL_REGISTRY: localhost:5000
+      IMAGE_TAG: ${{ github.sha }}
 
     steps:
       # 1️⃣ Checkout repo
@@ -26,8 +27,8 @@ jobs:
           docker stop registry || true
           # Usuń kontener jeśli istnieje
           docker rm registry || true
-          # Usuń powiązane wolumeny
-          docker volume rm $(docker volume ls -q -f dangling=true) || true
+          # Usuń wyłącznie wolumen rejestru, nie czyść globalnie innych wolumenów runnera
+          docker volume rm registry-data || true
           # Uruchom nowy kontener rejestru z nazwanymi wolumenami
           docker run -d \
             -p 5000:5000 \
@@ -38,25 +39,29 @@ jobs:
       # 3️⃣ Build & push frontend locally
       - name: Build & push frontend locally
         run: |
-          docker build -t ${LOCAL_REGISTRY}/frontend:latest ./frontend
+          docker build -t ${LOCAL_REGISTRY}/frontend:${IMAGE_TAG} -t ${LOCAL_REGISTRY}/frontend:latest ./frontend
+          docker push ${LOCAL_REGISTRY}/frontend:${IMAGE_TAG}
           docker push ${LOCAL_REGISTRY}/frontend:latest
 
       # 4️⃣ Build & push backend-pdf locally
       - name: Build & push backend-pdf locally
         run: |
-          docker build -t ${LOCAL_REGISTRY}/backend-pdf:latest ./backend-pdf
+          docker build -t ${LOCAL_REGISTRY}/backend-pdf:${IMAGE_TAG} -t ${LOCAL_REGISTRY}/backend-pdf:latest ./backend-pdf
+          docker push ${LOCAL_REGISTRY}/backend-pdf:${IMAGE_TAG}
           docker push ${LOCAL_REGISTRY}/backend-pdf:latest
 
       # 5️⃣ Build & push backend-core locally
       - name: Build & push backend-core locally
         run: |
-          docker build -t ${LOCAL_REGISTRY}/backend-core:latest ./backend-core
+          docker build -t ${LOCAL_REGISTRY}/backend-core:${IMAGE_TAG} -t ${LOCAL_REGISTRY}/backend-core:latest ./backend-core
+          docker push ${LOCAL_REGISTRY}/backend-core:${IMAGE_TAG}
           docker push ${LOCAL_REGISTRY}/backend-core:latest
 
       # 6️⃣ Build & push backend-payments locally
       - name: Build & push backend-payments locally
         run: |
-          docker build -t ${LOCAL_REGISTRY}/backend-payments:latest ./backend-payments
+          docker build -t ${LOCAL_REGISTRY}/backend-payments:${IMAGE_TAG} -t ${LOCAL_REGISTRY}/backend-payments:latest ./backend-payments
+          docker push ${LOCAL_REGISTRY}/backend-payments:${IMAGE_TAG}
           docker push ${LOCAL_REGISTRY}/backend-payments:latest
 
       # 7️⃣ Setup kubectl
@@ -112,11 +117,11 @@ jobs:
           # Na samym końcu ingress
           kubectl apply -f k8s/ingress.yaml
 
-          # Wymuś pobranie nowego obrazu latest — bez restart K8s nie wie że obraz się zmienił
-          kubectl rollout restart deployment/frontend -n $K8S_NAMESPACE
-          kubectl rollout restart deployment/backend-core -n $K8S_NAMESPACE
-          kubectl rollout restart deployment/backend-payments -n $K8S_NAMESPACE
-          kubectl rollout restart deployment/backend-pdf -n $K8S_NAMESPACE
+          # Ustaw obrazy po tagu SHA commitu, aby rollout był deterministyczny i odtwarzalny
+          kubectl -n $K8S_NAMESPACE set image deployment/frontend frontend=${LOCAL_REGISTRY}/frontend:${IMAGE_TAG}
+          kubectl -n $K8S_NAMESPACE set image deployment/backend-core backend-core=${LOCAL_REGISTRY}/backend-core:${IMAGE_TAG}
+          kubectl -n $K8S_NAMESPACE set image deployment/backend-payments backend-payments=${LOCAL_REGISTRY}/backend-payments:${IMAGE_TAG}
+          kubectl -n $K8S_NAMESPACE set image deployment/backend-pdf backend-pdf=${LOCAL_REGISTRY}/backend-pdf:${IMAGE_TAG}
 
           kubectl rollout status statefulset/mongodb -n $K8S_NAMESPACE
           kubectl rollout status deployment/frontend -n $K8S_NAMESPACE
