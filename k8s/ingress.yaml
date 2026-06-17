@@ -66,8 +66,8 @@ spec:
     - match: PathPrefix(`/api/v1/payments`) || PathPrefix(`/api/v1/vouchers`)
       kind: Rule
       services:
-        - name: backend-payments
-          port: 8081
+        - name: backend-payments-service
+          port: 8082
       middlewares:
         - name: add-headers
         - name: rate-limit-payments
@@ -87,8 +87,8 @@ spec:
     - match: PathPrefix(`/api/payments`)
       kind: Rule
       services:
-        - name: backend-payments
-          port: 8081
+        - name: backend-payments-service
+          port: 8082
       middlewares:
         - name: rewrite-payments-path
         - name: add-headers
@@ -120,8 +120,8 @@ spec:
     - match: PathPrefix(`/api/v1/pdf`) || PathPrefix(`/api/v1/email`) || Path(`/health`)
       kind: Rule
       services:
-        - name: backend-pdf
-          port: 3000
+        - name: backend-pdf-service
+          port: 3001
       middlewares:
         - name: add-headers
         - name: rate-limit-pdf
