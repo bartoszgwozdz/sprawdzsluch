@@ -1,396 +1,160 @@
-# SprawdźSłuch - Mikroarchitektura Kubernetes
+# SprawdzSluch - Przewodnik Aplikacji i Uruchomienia
 
-Kompletny system audiometryczny oparty na mikroserwisach z deployment w Kubernetes.
+Ten dokument opisuje jak rozumiec architekture, jak uruchomic projekt lokalnie i jak wykonac checkliste przed commitem.
 
-## 🏗️ Architektura
+## Cel projektu
+
+SprawdzSluch to system do obslugi testow sluchu z podzialem na mikroserwisy. Frontend jest wystawiony przez Traefik, backendy zapisują dane w MongoDB, a elementy platnosci i raportowania sa rozdzielone na osobne uslugi.
+
+## Architektura
 
 ### Mikroserwisy
 
-1. **backend-core** (Java/Spring Boot)
-   - Zarządzanie wynikami testów audiometrycznych
-   - Autentykacja i autoryzacja
-   - Integracja z MongoDB
-   - Publikowanie eventów do Kafka
-
-2. **backend-payments** (Java/Spring Boot)
-   - Obsługa płatności i voucherów
-   - Integracja z PayNow
-   - Konsumowanie eventów z Kafka
-   - Logika biznesowa płatności
-
-3. **backend-pdf** (Node.js/Express)
-   - Generowanie raportów PDF (Puppeteer)
-   - Wysyłka emaili (Nodemailer)
-   - Konsumowanie eventów Kafka
-   - Template engine (Handlebars)
+1. `frontend` (Nginx + statyczny build)
+2. `backend-core` (Spring Boot)
+3. `backend-payments` (Spring Boot)
+4. `backend-pdf` (Node.js/Express)
 
 ### Infrastruktura
 
-- **MongoDB** - Baza danych dokumentowa
-- **Kafka** - Message broker do komunikacji między serwisami
-- **Traefik** - Ingress controller i load balancer
-- **Prometheus** - Monitoring i metryki
-- **Grafana** - Wizualizacja metryk
+1. `mongodb` (StatefulSet)
+2. `kafka` (StatefulSet)
+3. `traefik` (Ingress Controller)
+4. `mongo-express`, `kafka-ui` (narzedzia pomocnicze)
 
-## 🚀 Quick Start
+### Przeplyw ruchu
+
+```mermaid
+flowchart LR
+  User[Uzytkownik] --> T[Traefik Ingress]
+  T --> FE[frontend]
+  T --> CORE[backend-core]
+  T --> PAY[backend-payments]
+  T --> PDF[backend-pdf]
+  CORE --> MDB[(MongoDB)]
+  PAY --> MDB
+  PDF --> MDB
+  PAY --> PDF
+  CORE --> K[(Kafka)]
+  PAY --> K
+```
+
+## Routing HTTP (istotne)
+
+1. Frontend: `/`
+2. Core natywnie: `/api/results`
+3. Core alias: `/api/hearing-test` -> rewrite do `/api/results`
+4. Payments natywnie: `/api/payments`
+5. Payments alias: `/api/v1/payments` -> rewrite do `/api/payments`
+6. PDF: `/api/v1/pdf`, `/api/v1/email`, `/health`
+
+Uwaga: `backend-payments` ma kontroler pod `/api/payments`, dlatego alias v1 jest obslugiwany przez middleware w Traefiku.
+
+## Szybki start lokalny
 
 ### Wymagania
 
-- Kubernetes cluster (minikube, kind, GKE, EKS, AKS)
-- kubectl
-- Docker
-- Helm (opcjonalnie)
+1. `docker`
+2. `kubectl`
+3. `kind`
+4. `helm`
 
-### 1. Clone repository
-
-```bash
-git clone <repository-url>
-cd sprawdzsluch
-```
-
-### 2. Deploy całego systemu
+### One-command start
 
 ```bash
-# Nadaj uprawnienia wykonywania
-chmod +x scripts/deploy-microservices.sh
-
-# Deploy wszystkich mikroserwisów
-./scripts/deploy-microservices.sh
+./scripts/local-up.sh
 ```
 
-### 3. Sprawdź status deployment
+Skrypt:
+1. tworzy (lub uzywa) klastra `kind-sprawdzsluch-local`,
+2. instaluje Traefika,
+3. buduje obrazy (chyba ze `--skip-build`),
+4. laduje obrazy do kind,
+5. aplikuje manifesty K8s,
+6. czeka na rollout,
+7. uruchamia smoke test (chyba ze `--skip-smoke`).
+
+### Przydatne warianty
 
 ```bash
-# Nadaj uprawnienia wykonywania
-chmod +x scripts/health-check.sh
+# bez rebuildu obrazow
+./scripts/local-up.sh --skip-build
 
-# Sprawdź zdrowie systemu
-./scripts/health-check.sh --logs
+# bez smoke testu
+./scripts/local-up.sh --skip-smoke
+
+# sam smoke test
+./scripts/local-smoke.sh
 ```
 
-## 📋 Deployment Manual
+## Checklista przed commitem
 
-### Krok po kroku
+Wykonaj po kazdej zmianie funkcjonalnej lub infrastrukturalnej.
 
-#### 1. Utwórz namespace
+1. Start środowiska lokalnego
+  - `./scripts/local-up.sh --skip-build`
+2. Stan podow
+  - `kubectl get pods -n sprawdzsluch`
+  - oczekiwane: wszystkie `Running` i `READY 1/1`
+3. Smoke test automatyczny
+  - `./scripts/local-smoke.sh`
+4. Manual API sanity
+  - `curl -i http://127.0.0.1:8080/`
+  - `curl -i http://127.0.0.1:8080/health`
+  - `curl -i -X POST http://127.0.0.1:8080/api/payments/process -H 'Content-Type: application/json' -d '{"testId":"manual-check","paymentMethod":"VOUCHER","voucherCode":"TEST123"}'`
+5. Brak krytycznych bledow runtime
+  - `kubectl logs -n sprawdzsluch deployment/backend-core --tail=120`
+  - `kubectl logs -n sprawdzsluch deployment/backend-payments --tail=120`
+  - `kubectl logs -n sprawdzsluch deployment/backend-pdf --tail=120`
+6. Weryfikacja zmian git
+  - `git status --short`
+  - sprawdz czy commit nie zawiera przypadkowych plikow tymczasowych
+
+## Operacyjny flow pracy (zalecany)
+
+1. Zmien kod/manifests.
+2. Uruchom `./scripts/local-up.sh --skip-build`.
+3. Jesli zmieniales backend/frontend obraz, odpal bez `--skip-build`.
+4. Uruchom `./scripts/local-smoke.sh`.
+5. Dopiero po zielonej walidacji rob commit i push.
+
+## Typowe problemy i szybkie fixy
+
+### 1. `CrashLoopBackOff` na `backend-pdf`
+
+1. Sprawdz logi: `kubectl logs -n sprawdzsluch deployment/backend-pdf --tail=200`
+2. Przebuduj obraz: `docker build -t localhost:5000/backend-pdf:latest ./backend-pdf`
+3. Zaladuj do kind: `kind load docker-image localhost:5000/backend-pdf:latest --name sprawdzsluch-local`
+4. Restart deploy: `kubectl rollout restart deployment/backend-pdf -n sprawdzsluch`
+
+### 2. Kafka `Pending` przez PVC
+
+1. Upewnij sie, ze `storageClassName` to `standard` w `k8s/kafka/kafka-statefulset.yaml`.
+2. Usun stary PVC i pozwol K8s utworzyc nowy:
 
 ```bash
-kubectl apply -f k8s/namespace.yaml
+kubectl delete pvc kafka-data-kafka-0 -n sprawdzsluch --ignore-not-found=true
 ```
 
-#### 2. Deploy infrastruktury
+### 3. 504/503 przez Ingress
+
+1. Sprawdz czy Traefik dziala: `kubectl get pods -n traefik`
+2. Sprawdz NetworkPolicy dla `backend-payments` i `backend-pdf` (namespace `traefik` musi byc dopuszczony).
+3. Sprawdz endpointy przez port-forward Traefika:
 
 ```bash
-# MongoDB
-kubectl apply -f k8s/mongodb/
-
-# Kafka
-kubectl apply -f k8s/kafka/
-
-# Traefik (jeśli nie jest zainstalowany)
-kubectl apply -f k8s/traefik/
+kubectl port-forward -n traefik svc/traefik 8080:80
 ```
 
-#### 3. Deploy mikroserwisów
+## Pliki kluczowe
 
-```bash
-# Backend Core
-kubectl apply -f k8s/backend-core/
+1. Start lokalny: `scripts/local-up.sh`
+2. Smoke test: `scripts/local-smoke.sh`
+3. Routing ingress: `k8s/ingress.yaml`
+4. NetworkPolicy payments: `k8s/backend-payments/service.yaml`
+5. NetworkPolicy pdf: `k8s/backend-pdf/service.yaml`
+6. Kafka storage class: `k8s/kafka/kafka-statefulset.yaml`
 
-# Backend Payments
-kubectl apply -f k8s/backend-payments/
+## Uwaga o commitach
 
-# Backend PDF
-kubectl apply -f k8s/backend-pdf/
-
-# Frontend
-kubectl apply -f k8s/frontend/
-```
-
-#### 4. Deploy Ingress i monitoring
-
-```bash
-# Ingress rules
-kubectl apply -f k8s/ingress.yaml
-
-# Monitoring
-kubectl apply -f k8s/monitoring.yaml
-
-# Autoscaling
-kubectl apply -f k8s/autoscaling.yaml
-```
-
-## 🔧 Konfiguracja
-
-### Environment Variables
-
-Wszystkie zmienne środowiskowe są zarządzane przez ConfigMaps i Secrets:
-
-- `backend-core-config` - Konfiguracja MongoDB, Kafka dla backend-core
-- `backend-payments-config` - Konfiguracja PayNow, Kafka dla backend-payments
-- `backend-pdf-config` - Konfiguracja SMTP, Puppeteer dla backend-pdf
-
-### Secrets
-
-- `mongodb-secret` - Kredencjały MongoDB
-- `kafka-secret` - Kredencjały Kafka
-- `smtp-secret` - Kredencjały SMTP
-- `paynow-secret` - Klucze API PayNow
-
-## 📊 Monitoring
-
-### Prometheus Metrics
-
-System eksportuje metryki dla:
-
-- JVM (backend-core, backend-payments)
-- Node.js (backend-pdf)
-- MongoDB
-- Kafka
-- Kubernetes resources
-
-### Grafana Dashboards
-
-Dostępne dashboardy:
-
-- **Overview** - Ogólny stan systemu
-- **Java Microservices** - Metryki Spring Boot
-- **MongoDB** - Stan bazy danych
-- **Kafka** - Message broker metrics
-
-### Alerty
-
-Skonfigurowane alerty dla:
-
-- High error rate (>5%)
-- High response time (>2s)
-- Pod restart loops
-- Resource exhaustion
-
-## 🔍 Health Checks
-
-### Automatyczne sprawdzenie
-
-```bash
-./scripts/health-check.sh
-```
-
-### Ręczne sprawdzenie
-
-```bash
-# Status wszystkich podów
-kubectl get pods -n sprawdzsluch
-
-# Logi mikroserwisu
-kubectl logs -f deployment/backend-core -n sprawdzsluch
-
-# Health endpoints
-kubectl port-forward service/backend-core 8080:8080 -n sprawdzsluch
-curl http://localhost:8080/actuator/health
-```
-
-## 🌐 Dostęp do serwisów
-
-### Lokalne środowisko
-
-```bash
-# Frontend
-kubectl port-forward service/frontend 3000:80 -n sprawdzsluch
-# http://localhost:3000
-
-# Backend Core API
-kubectl port-forward service/backend-core 8080:8080 -n sprawdzsluch
-# http://localhost:8080/api/v1
-
-# Backend Payments API
-kubectl port-forward service/backend-payments 8081:8081 -n sprawdzsluch
-# http://localhost:8081/api/v1
-
-# Backend PDF API
-kubectl port-forward service/backend-pdf 3001:3000 -n sprawdzsluch
-# http://localhost:3001/api/v1
-```
-
-### Przez Ingress
-
-Po skonfigurowaniu Ingress (localhost lub custom domain):
-
-- Frontend: `http://localhost/`
-- API: `http://localhost/api/v1/`
-
-## 📈 Scaling
-
-### Horizontal Pod Autoscaler
-
-HPA jest skonfigurowany dla wszystkich mikroserwisów:
-
-```bash
-# Sprawdź status HPA
-kubectl get hpa -n sprawdzsluch
-
-# Szczegóły scaling
-kubectl describe hpa backend-core -n sprawdzsluch
-```
-
-### Manual scaling
-
-```bash
-# Scale up backend-core
-kubectl scale deployment backend-core --replicas=3 -n sprawdzsluch
-
-# Scale down backend-pdf
-kubectl scale deployment backend-pdf --replicas=1 -n sprawdzsluch
-```
-
-## 🐛 Troubleshooting
-
-### Częste problemy
-
-#### 1. Pod w stanie CrashLoopBackOff
-
-```bash
-# Sprawdź logi
-kubectl logs pod-name -n sprawdzsluch --previous
-
-# Sprawdź events
-kubectl describe pod pod-name -n sprawdzsluch
-```
-
-#### 2. Problemy z połączeniem do MongoDB
-
-```bash
-# Sprawdź czy MongoDB pod działa
-kubectl get pods -l app=mongodb -n sprawdzsluch
-
-# Test połączenia
-kubectl exec -it mongodb-pod -n sprawdzsluch -- mongosh
-```
-
-#### 3. Problemy z Kafka
-
-```bash
-# Sprawdź czy Kafka działa
-kubectl get pods -l app=kafka -n sprawdzsluch
-
-# Lista topików
-kubectl exec kafka-pod -n sprawdzsluch -- kafka-topics.sh --list --bootstrap-server localhost:9092
-```
-
-#### 4. Ingress nie działa
-
-```bash
-# Sprawdź status Ingress
-kubectl get ingress -n sprawdzsluch
-
-# Sprawdź czy Traefik działa
-kubectl get pods -n kube-system -l app=traefik
-```
-
-### Debug commands
-
-```bash
-# Complete system status
-./scripts/health-check.sh --logs
-
-# Resource usage
-kubectl top pods -n sprawdzsluch
-
-# Events
-kubectl get events -n sprawdzsluch --sort-by=.metadata.creationTimestamp
-
-# Network connectivity test
-kubectl run test-pod --image=busybox -n sprawdzsluch --rm -it -- sh
-```
-
-## 🔐 Security
-
-### Network Policies
-
-System używa NetworkPolicies do ograniczenia komunikacji między podami:
-
-- Mikroserwisy mogą komunikować się tylko z MongoDB i Kafka
-- Frontend może komunikować się tylko z backend APIs
-- Ingress Controller ma dostęp tylko do wymaganych serwisów
-
-### Secrets Management
-
-- Wszystkie sensitive data w Kubernetes Secrets
-- Secrets są base64 encoded
-- Automatyczne rotation secrets (gdy dostępne)
-
-## 📚 API Documentation
-
-### Backend Core API
-
-- `GET /api/v1/test-results` - Lista wyników testów
-- `POST /api/v1/test-results` - Dodaj nowy wynik
-- `GET /api/v1/audiograms/{id}` - Pobierz audiogram
-- `POST /api/v1/auth/login` - Logowanie
-
-### Backend Payments API
-
-- `POST /api/v1/payments` - Utwórz płatność
-- `GET /api/v1/payments/{id}` - Status płatności
-- `POST /api/v1/vouchers/validate` - Waliduj voucher
-
-### Backend PDF API
-
-- `POST /api/v1/pdf/generate` - Generuj PDF
-- `POST /api/v1/email/send` - Wyślij email
-- `GET /health` - Health check
-
-## 🔄 CI/CD Integration
-
-### GitLab CI
-
-```yaml
-deploy:
-  stage: deploy
-  script:
-    - ./scripts/deploy-microservices.sh
-  only:
-    - main
-```
-
-### GitHub Actions
-
-```yaml
-- name: Deploy to Kubernetes
-  run: ./scripts/deploy-microservices.sh
-```
-
-## 📝 Development
-
-### Local development
-
-```bash
-# Start tylko infrastrukturę w k8s
-kubectl apply -f k8s/mongodb/
-kubectl apply -f k8s/kafka/
-
-# Run mikroserwisy lokalnie
-cd backend-core && mvn spring-boot:run
-cd backend-payments && mvn spring-boot:run
-cd backend-pdf && npm start
-```
-
-### Testing
-
-```bash
-# Unit tests
-cd backend-core && mvn test
-cd backend-payments && mvn test
-cd backend-pdf && npm test
-
-# Integration tests
-./scripts/health-check.sh
-```
-
-## 📞 Support
-
-W przypadku problemów:
-
-1. Sprawdź logi: `./scripts/health-check.sh --logs`
-2. Sprawdź dokumentację troubleshooting powyżej
-3. Sprawdź GitHub issues
-4. Utwórz nowy issue z logami i opisem problemu
+Aktualny zalecany proces w tym repo: najpierw lokalna walidacja (`local-up` + `local-smoke`), dopiero potem commit i push.

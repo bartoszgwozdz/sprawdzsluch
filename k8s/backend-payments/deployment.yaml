@@ -20,7 +20,7 @@ spec:
       containers:
         - name: backend-payments
           image: localhost:5000/backend-payments:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 8082

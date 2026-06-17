@@ -53,32 +53,11 @@ spec:
     replacement: /api/results${1}
 
 ---
-# BACKEND-PAYMENTS API — ścieżka natywna /api/v1/payments i /api/v1/vouchers
+# BACKEND-PAYMENTS API — ścieżka natywna /api/payments
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: sprawdzsluch-backend-payments
-  namespace: sprawdzsluch
-spec:
-  entryPoints:
-    - web
-  routes:
-    - match: PathPrefix(`/api/v1/payments`) || PathPrefix(`/api/v1/vouchers`)
-      kind: Rule
-      services:
-        - name: backend-payments-service
-          port: 8082
-      middlewares:
-        - name: add-headers
-        - name: rate-limit-payments
-
----
-# BACKEND-PAYMENTS API — alias /api/payments (używany przez frontend)
-# Przepisuje /api/payments/* → /api/v1/payments/*
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
-metadata:
-  name: sprawdzsluch-backend-payments-alias
   namespace: sprawdzsluch
 spec:
   entryPoints:
@@ -90,12 +69,33 @@ spec:
         - name: backend-payments-service
           port: 8082
       middlewares:
+        - name: add-headers
+        - name: rate-limit-payments
+
+---
+# BACKEND-PAYMENTS API — alias /api/v1/payments
+# Przepisuje /api/v1/payments/* → /api/payments/*
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: sprawdzsluch-backend-payments-alias
+  namespace: sprawdzsluch
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: PathPrefix(`/api/v1/payments`)
+      kind: Rule
+      services:
+        - name: backend-payments-service
+          port: 8082
+      middlewares:
         - name: rewrite-payments-path
         - name: add-headers
         - name: rate-limit-payments
 
 ---
-# Middleware — przepisuje /api/payments → /api/v1/payments
+# Middleware — przepisuje /api/v1/payments → /api/payments
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
@@ -103,8 +103,8 @@ metadata:
   namespace: sprawdzsluch
 spec:
   replacePathRegex:
-    regex: ^/api/payments(.*)
-    replacement: /api/v1/payments${1}
+    regex: ^/api/v1/payments(.*)
+    replacement: /api/payments${1}
 
 ---
 # BACKEND-PDF API

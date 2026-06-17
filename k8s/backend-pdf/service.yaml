@@ -33,7 +33,7 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              name: traefik-system
+              kubernetes.io/metadata.name: traefik
       ports:
         - protocol: TCP
           port: 3001

@@ -130,7 +130,6 @@ class DataService {
       };
     }
   }
-}
 
   /**
    * Oznacza testId jako przetworzony (idempotentność).
