@@ -5,7 +5,6 @@ import dev.gwozdz.sprawdzsluch.entity.TestProcessingStatus;
 import dev.gwozdz.sprawdzsluch.repository.TestProcessingStatusRepository;
 import dev.gwozdz.sprawdzsluch.service.ResultService;
 import java.util.Map;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +36,7 @@ public class ResultsController {
       return ResponseEntity.ok(Map.of(
           "success", true,
           "testId", testData.getTestId(),
-          "statusUrl", "/api/results/status/" + testData.getTestId()
+          "statusUrl", "/api/hearing-test/status/" + testData.getTestId()
       ));
     } catch (Exception e) {
       log.error(e.getMessage(), e);
@@ -113,10 +112,4 @@ public class ResultsController {
     }
   }
 
-  /**
-   * Generuje unikalny ID testu
-   */
-  private String generateTestId() {
-    return "TEST-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-  }
 }

@@ -16,17 +16,18 @@ public class CardHandler implements PaymentHandler {
 
   @Override
   public Payment processPayment(String testId, Payment payment) {
-    log.info("Przetwarzanie płatności kartą dla testu: {}", testId);
+    log.info("Przetwarzanie płatności kartą (sandbox) dla testu: {}", testId);
     payment.setPaymentMethod(PAYMENT_TYPE);
     payment.setPaymentStatus(PaymentStatus.COMPLETED);
     payment.setPaymentDate(LocalDateTime.now());
     payment.setAmount(BigDecimal.valueOf(50.0));
+    payment.setExternalPaymentId("SANDBOX-" + testId);
 
     return payment;
   }
 
   @Override
   public boolean supports(String paymentType) {
-    return PAYMENT_TYPE.equals(paymentType);
+    return PAYMENT_TYPE.equals(paymentType) || "CARD_SANDBOX".equals(paymentType);
   }
 }

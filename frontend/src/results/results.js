@@ -1,5 +1,19 @@
 // Skrypt do obsługi strony wyników
 
+function toBackendPaymentMethod(method) {
+    const normalized = (method || '').toLowerCase();
+    if (normalized === 'voucher') return 'VOUCHER';
+    if (normalized === 'card') return 'CARD_SANDBOX';
+    return 'UNSUPPORTED';
+}
+
+function buildCorrelationId() {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+    }
+    return `corr-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 // Klasa do obsługi polling statusu testu
 class TestProgressTracker {
     constructor() {
@@ -17,7 +31,10 @@ class TestProgressTracker {
             // Wyślij test do backend
             const response = await fetch('/api/hearing-test/submit', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Correlation-Id': buildCorrelationId()
+                },
                 body: JSON.stringify(testData)
             });
 
@@ -352,6 +369,15 @@ function setupPaymentForm() {
         }
         
         const method = document.querySelector('input[name="method"]:checked').value;
+        const backendPaymentMethod = toBackendPaymentMethod(method);
+        const statusMessage = document.getElementById('statusMessage');
+
+        if (backendPaymentMethod === 'UNSUPPORTED') {
+            statusMessage.textContent = 'Wybrana metoda płatności jest chwilowo niedostępna.';
+            statusMessage.style.display = 'block';
+            statusMessage.className = 'status-message error';
+            return;
+        }
         
         // Walidacja voucher - jeśli wybrano voucher, pole musi być wypełnione
         if (method === 'voucher') {
@@ -367,7 +393,6 @@ function setupPaymentForm() {
         }
         
         const buyBtn = document.getElementById('buyBtn');
-        const statusMessage = document.getElementById('statusMessage');
         
         try {
             buyBtn.disabled = true;
@@ -395,7 +420,7 @@ function setupPaymentForm() {
                 hearingLevels: hearingLevelsMap,
                 maxAudibleFrequency: testResults.maxAudibleFrequency || 13000,
                 executed: testResults.timestamp || new Date().toISOString(),
-                paymentMethod: method,
+                paymentMethod: backendPaymentMethod,
                 status: "NEW"
             };
             

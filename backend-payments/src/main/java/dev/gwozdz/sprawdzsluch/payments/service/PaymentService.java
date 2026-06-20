@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -30,7 +32,7 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
         this.paymentHandlerFactory = paymentHandlerFactory;
         this.pdfServiceClient = WebClient.builder()
-                .baseUrl(pdfServiceUrl)
+            .baseUrl(Objects.requireNonNull(pdfServiceUrl))
                 .build();
     }
 
@@ -41,9 +43,16 @@ public class PaymentService {
     public void handleTestResultStored(TestResultStoredEvent event) {
         log.info("Otrzymano request przetworzenia płatności dla testu: {}", event.getTestId());
 
+        String normalizedPaymentMethod = event.getPaymentMethod() == null
+                ? ""
+                : event.getPaymentMethod().trim().toUpperCase(Locale.ROOT);
+        if ("CARD".equals(normalizedPaymentMethod)) {
+            normalizedPaymentMethod = "CARD_SANDBOX";
+        }
+
         MDC.put("testId", event.getTestId());
         MDC.put("userEmail", event.getUserEmail());
-        MDC.put("paymentMethod", event.getPaymentMethod() != null ? event.getPaymentMethod() : "unknown");
+        MDC.put("paymentMethod", !normalizedPaymentMethod.isEmpty() ? normalizedPaymentMethod : "unknown");
 
         try {
             // Sprawdź czy payment już nie istnieje
@@ -59,7 +68,7 @@ public class PaymentService {
             payment.setAmount(event.getAmount());
             payment.setCurrency("PLN");
             payment.setPaymentStatus(PaymentStatus.PENDING);
-            payment.setPaymentMethod(event.getPaymentMethod());
+            payment.setPaymentMethod(normalizedPaymentMethod);
             payment.setVoucherCode(event.getVoucherCode());
             payment.setCreatedAt(LocalDateTime.now());
 
