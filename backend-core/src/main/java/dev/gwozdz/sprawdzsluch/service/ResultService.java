@@ -79,7 +79,13 @@ public class ResultService {
 
     updateStatus(testId, "PROCESSING", "Wynik zapisany, trwa przetwarzanie płatności", null, null);
 
-    paymentNotificationService.notifyPaymentService(testResult);
+    try {
+      paymentNotificationService.notifyPaymentService(testResult);
+      updateStatus(testId, "COMPLETED", "Raport przygotowany i wysłany", null, null);
+    } catch (Exception e) {
+      updateStatus(testId, "ERROR", e.getMessage(), null, null);
+      throw new RuntimeException(e.getMessage(), e);
+    }
     return true;
   }
 

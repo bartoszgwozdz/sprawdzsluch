@@ -94,7 +94,13 @@ if ! grep -qi '"success"\s*:\s*true' /tmp/sprawdzsluch-smoke-body.txt; then
 fi
 echo "[OK] POST /api/payments/process -> 200"
 
-# Payments status for unknown id should be 404 (known expected behavior)
-assert_http_code "http://127.0.0.1:${PORT}/api/payments/status/non-existent-id" "404"
+# Payments status for created payment should be 200
+assert_http_code "http://127.0.0.1:${PORT}/api/payments/status/$(echo "$PAYLOAD" | sed -n 's/.*"testId":"\([^"]*\)".*/\1/p')" "200"
+if ! grep -qi '"paymentStatus"\s*:\s*"' /tmp/sprawdzsluch-smoke-body.txt; then
+  echo "[ERROR] Payments status response does not contain paymentStatus"
+  cat /tmp/sprawdzsluch-smoke-body.txt
+  echo
+  exit 1
+fi
 
 echo "[SUCCESS] Local smoke test passed"

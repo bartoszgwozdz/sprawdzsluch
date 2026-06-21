@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Serwis do powiadamiania backend-payments o nowych wynikach testów
@@ -22,14 +23,14 @@ public class PaymentNotificationService {
     public PaymentNotificationService(
             @Value("${services.payments.url:http://localhost:8091}") String paymentsBaseUrl) {
         this.webClient = WebClient.builder()
-                .baseUrl(paymentsBaseUrl)
+            .baseUrl(Objects.requireNonNull(paymentsBaseUrl))
                 .build();
     }
 
     /**
      * Wysyła informację o zapisanym wyniku testu do backend-payments
      */
-    public void notifyPaymentService(TestResult testResult) {
+    public String notifyPaymentService(TestResult testResult) {
         try {
             Map<String, Object> payload = Map.of(
                     "testId", testResult.getTestId(),
@@ -42,19 +43,16 @@ public class PaymentNotificationService {
 
             // Przechwytujemy correlationId przed subscribe() — MDC nie jest dostępne przez granicę wątku
             String correlationId = MDC.get("correlationId");
-
-            webClient.post()
+                String response = webClient.post()
                     .uri("/api/payments/process")
                     .header("X-Correlation-Id", correlationId != null ? correlationId : "")
-                    .bodyValue(payload)
+                        .bodyValue(Objects.requireNonNull(payload))
                     .retrieve()
                     .bodyToMono(String.class)
-                    .subscribe(
-                            response -> log.info("Powiadomiono backend-payments o teście {}: {}", testResult.getTestId(), response),
-                            error -> log.error("Błąd podczas powiadamiania backend-payments o teście {}: {}", testResult.getTestId(), error.getMessage())
-                    );
+                    .block();
 
-            log.info("Wysłano powiadomienie o teście {} do backend-payments", testResult.getTestId());
+            log.info("Powiadomiono backend-payments o teście {}: {}", testResult.getTestId(), response);
+            return response;
         } catch (Exception e) {
             log.error("Błąd podczas wysyłania powiadomienia do backend-payments", e);
             throw new RuntimeException("Błąd podczas powiadamiania serwisu płatności", e);

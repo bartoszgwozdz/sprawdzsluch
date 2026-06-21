@@ -30,11 +30,12 @@ print_error() {
 NAMESPACE="sprawdzsluch"
 TIMEOUT=30
 
-# Funkcja do sprawdzania health endpoint
+# Funkcja do sprawdzania endpointu HTTP z oczekiwanym kodem
 check_health_endpoint() {
     local service_name=$1
     local port=$2
     local path=$3
+    local expected_code=${4:-200}
     
     print_status "Sprawdzanie health endpoint dla $service_name"
     
@@ -52,11 +53,11 @@ check_health_endpoint() {
     # Zabij port forward
     kill $port_forward_pid 2>/dev/null || true
     
-    if [ "$response_code" = "200" ]; then
-        print_success "$service_name health endpoint odpowiada poprawnie (200)"
+    if [ "$response_code" = "$expected_code" ]; then
+        print_success "$service_name endpoint odpowiada poprawnie ($expected_code)"
         return 0
     else
-        print_error "$service_name health endpoint nie odpowiada poprawnie (code: $response_code)"
+        print_error "$service_name endpoint nie odpowiada poprawnie (code: $response_code, expected: $expected_code)"
         return 1
     fi
 }
@@ -116,21 +117,19 @@ check_kafka_connectivity() {
     
     if [ -z "$kafka_pod" ]; then
         print_warning "Pod Kafka nie znaleziony w namespace $NAMESPACE"
-        return 1
+        return 0
     fi
-    
+
     # Sprawdź czy Kafka jest gotowa
-    kubectl exec $kafka_pod -n $NAMESPACE -- kafka-topics.sh --list --bootstrap-server localhost:9092 &>/dev/null
-    
-    if [ $? -eq 0 ]; then
+    if kubectl exec $kafka_pod -n $NAMESPACE -- kafka-topics.sh --list --bootstrap-server localhost:9092 &>/dev/null; then
         print_success "Kafka jest dostępna i odpowiada"
-        
+
         # Lista topików
         print_status "Lista topików Kafka:"
         kubectl exec $kafka_pod -n $NAMESPACE -- kafka-topics.sh --list --bootstrap-server localhost:9092
     else
-        print_error "Kafka nie odpowiada poprawnie"
-        return 1
+        print_warning "Kafka nie odpowiada poprawnie"
+        return 0
     fi
 }
 
@@ -151,10 +150,6 @@ check_mongodb_connectivity() {
     
     if [ $? -eq 0 ]; then
         print_success "MongoDB jest dostępna i odpowiada"
-        
-        # Sprawdź bazy danych
-        print_status "Bazy danych w MongoDB:"
-        kubectl exec $mongo_pod -n $NAMESPACE -- mongosh --eval "db.adminCommand('listDatabases')" --quiet
     else
         print_error "MongoDB nie odpowiada poprawnie"
         return 1
@@ -205,18 +200,18 @@ main() {
     
     echo -e "\n"
     
-    # Sprawdź health endpoints mikroserwisów
+    # Sprawdź endpointy mikroserwisów
     declare -a HEALTH_CHECKS=(
-        "backend-core:8080:/actuator/health"
-        "backend-payments:8081:/actuator/health"
-        "backend-pdf:3000:/health"
+        "backend-core:8090:/api/results/status/non-existent:404"
+        "backend-payments-service:8082:/actuator/health:200"
+        "backend-pdf-service:3001:/health:200"
     )
     
-    print_status "🔍 Sprawdzanie health endpoints"
+    print_status "🔍 Sprawdzanie endpointów usług"
     
     for health_config in "${HEALTH_CHECKS[@]}"; do
-        IFS=':' read -r service_name port path <<< "$health_config"
-        check_health_endpoint "$service_name" "$port" "$path" || true
+        IFS=':' read -r service_name port path expected_code <<< "$health_config"
+        check_health_endpoint "$service_name" "$port" "$path" "$expected_code" || true
     done
     
     echo -e "\n"

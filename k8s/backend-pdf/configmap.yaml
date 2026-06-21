@@ -8,9 +8,6 @@ data:
   PORT: "3001"
   NODE_ENV: "production"
   LOG_LEVEL: "info"
-  
-  # MongoDB Configuration
-  MONGODB_URI: "mongodb://admin:supersecret@mongodb:27017/sprawdzsluch?authSource=admin"
   MONGODB_DATABASE: "sprawdzsluch"
   
   # Email Configuration (SMTP)
@@ -20,10 +17,6 @@ data:
   EMAIL_FROM: "noreply@sprawdzsluch.pl"
   EMAIL_SUBJECT: "Twoj raport z testu sluchu - SprawdzSluch"
 
-  # SMTP credentials - zastąp właściwymi danymi lub użyj Secretu ręcznie
-  SMTP_USER: ""
-  SMTP_PASSWORD: ""
-
 ---
 apiVersion: v1
 kind: Secret
@@ -31,12 +24,7 @@ metadata:
   name: backend-pdf-secret
   namespace: sprawdzsluch
 type: Opaque
-data:
-  # Email credentials (base64 encoded)
-  # Należy zastąpić właściwymi danymi
-  SMTP_USER: eW91ci1lbWFpbEBnbWFpbC5jb20=           # your-email@gmail.com
-  SMTP_PASSWORD: eW91ci1hcHAtcGFzc3dvcmQ=            # your-app-password
-  
-  # MongoDB credentials (if needed)
-  MONGODB_USERNAME: c3ByYXdkemVzbHVjaA==             # sprawdzesprach
-  MONGODB_PASSWORD: c2VjdXJlUGFzcw==                # securePass
+stringData:
+  MONGODB_URI: mongodb://admin:supersecret@mongodb:27017/sprawdzsluch?authSource=admin
+  SMTP_USER: replace-with-smtp-user
+  SMTP_PASSWORD: replace-with-smtp-password

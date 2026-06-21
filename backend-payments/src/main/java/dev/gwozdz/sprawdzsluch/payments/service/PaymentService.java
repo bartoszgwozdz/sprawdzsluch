@@ -54,31 +54,26 @@ public class PaymentService {
         MDC.put("userEmail", event.getUserEmail());
         MDC.put("paymentMethod", !normalizedPaymentMethod.isEmpty() ? normalizedPaymentMethod : "unknown");
 
-        try {
-            // Sprawdź czy payment już nie istnieje
-            if (paymentRepository.existsByTestIdAndUserEmail(event.getTestId(), event.getUserEmail())) {
-                log.info("Payment dla testId {} i email {} już istnieje", event.getTestId(), event.getUserEmail());
-                return;
-            }
-            
-            // Tworzenie nowego payment
-            Payment payment = new Payment();
-            payment.setTestId(event.getTestId());
-            payment.setUserEmail(event.getUserEmail());
-            payment.setAmount(event.getAmount());
-            payment.setCurrency("PLN");
-            payment.setPaymentStatus(PaymentStatus.PENDING);
-            payment.setPaymentMethod(normalizedPaymentMethod);
-            payment.setVoucherCode(event.getVoucherCode());
-            payment.setCreatedAt(LocalDateTime.now());
-
-            // Zapis do MongoDB
-            Payment savedPayment = paymentRepository.save(payment);
-            processPayment(savedPayment);
-            
-        } catch (Exception e) {
-            log.error("Błąd podczas przetwarzania TestResultStoredEvent: {}", e.getMessage());
+        // Sprawdź czy payment już nie istnieje
+        if (paymentRepository.existsByTestIdAndUserEmail(event.getTestId(), event.getUserEmail())) {
+            log.info("Payment dla testId {} i email {} już istnieje", event.getTestId(), event.getUserEmail());
+            return;
         }
+
+        // Tworzenie nowego payment
+        Payment payment = new Payment();
+        payment.setTestId(event.getTestId());
+        payment.setUserEmail(event.getUserEmail());
+        payment.setAmount(event.getAmount());
+        payment.setCurrency("PLN");
+        payment.setPaymentStatus(PaymentStatus.PENDING);
+        payment.setPaymentMethod(normalizedPaymentMethod);
+        payment.setVoucherCode(event.getVoucherCode());
+        payment.setCreatedAt(LocalDateTime.now());
+
+        // Zapis do MongoDB
+        Payment savedPayment = paymentRepository.save(payment);
+        processPayment(savedPayment);
     }
     
     /**
@@ -106,6 +101,7 @@ public class PaymentService {
             payment.setFailureReason(e.getMessage());
             payment.setUpdatedAt(LocalDateTime.now());
             paymentRepository.save(payment);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
     
@@ -143,6 +139,7 @@ public class PaymentService {
         } catch (Exception e) {
             log.error("Błąd podczas powiadamiania backend-pdf o teście {}: {}", payment.getTestId(), e.getMessage());
             // pdfSent=false — można ponowić ręcznie lub przez mechanizm retry
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
     

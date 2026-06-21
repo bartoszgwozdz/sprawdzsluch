@@ -151,6 +151,18 @@ class DataService {
       throw error;
     }
   }
+
+  async deleteProcessedEvent(testId) {
+    try {
+      await this.connect();
+      const collection = this.db.collection('processed_pdf_events');
+      await collection.deleteOne({ testId });
+      logger.info(`Usunięto marker przetworzenia dla testId: ${testId}`);
+    } catch (error) {
+      logger.error(`Błąd podczas usuwania markera przetworzenia dla testId ${testId}:`, error);
+      throw error;
+    }
+  }
 }
 
 module.exports = new DataService();

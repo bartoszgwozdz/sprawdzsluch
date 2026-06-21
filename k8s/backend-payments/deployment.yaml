@@ -34,7 +34,7 @@ spec:
             # MongoDB URI - shared with backend-core
             - name: SPRING_DATA_MONGODB_URI
               valueFrom:
-                configMapKeyRef:
+                secretKeyRef:
                   name: mongodb-config
                   key: mongodb-uri
           

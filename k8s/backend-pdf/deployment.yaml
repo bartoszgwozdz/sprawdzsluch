@@ -30,6 +30,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: backend-pdf-config
+            - secretRef:
+                name: backend-pdf-secret
           
           # Health checks
           livenessProbe:

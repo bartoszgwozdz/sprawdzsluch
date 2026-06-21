@@ -14,6 +14,7 @@ class PaymentEventHandler {
    * Zastępuje Kafka consumer na topic sprawdzsluch-payment-completed
    */
   async handlePaymentCompleted(eventData) {
+    let eventReserved = false;
     try {
       logger.info('Otrzymano event payment-completed:', {
         testId: eventData.testId,
@@ -22,8 +23,8 @@ class PaymentEventHandler {
       });
 
       // Idempotentność — guard przed przetworzeniem tego samego zdarzenia dwukrotnie
-      const isNew = await dataService.markEventAsProcessed(eventData.testId);
-      if (!isNew) {
+      eventReserved = await dataService.markEventAsProcessed(eventData.testId);
+      if (!eventReserved) {
         logger.warn(`Event payment-completed dla testId ${eventData.testId} już przetworzony — pomijam`);
         return { success: true, skipped: true, testId: eventData.testId };
       }
@@ -71,6 +72,13 @@ class PaymentEventHandler {
       };
       
     } catch (error) {
+      if (eventReserved) {
+        try {
+          await dataService.deleteProcessedEvent(eventData.testId);
+        } catch (cleanupError) {
+          logger.error(`Nie udało się wyczyścić markera po błędzie dla testId ${eventData.testId}:`, cleanupError);
+        }
+      }
       logger.error('Błąd podczas przetwarzania payment completed event:', error);
       throw error;
     }
