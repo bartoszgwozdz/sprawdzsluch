@@ -375,7 +375,7 @@
         <!-- Wyniki badania -->
         <div class="section">
             <div class="section-title">Wyniki badania słuchu</div>
-            
+
             <table class="results-table">
                 <thead>
                     <tr>
@@ -387,7 +387,7 @@
                 </thead>
                 <tbody>
                     {{#each hearingResults}}
-                    <tr>
+                    <tr class="result-row {{levelClass}}">
                         <td><strong>{{frequency}} Hz</strong></td>
                         <td>{{description}}</td>
                         <td><strong>{{level}} dB</strong></td>
@@ -406,10 +406,14 @@
         <div class="section">
             <div class="section-title">Wykres audiometryczny</div>
             <div class="chart-container">
-                <div class="chart-placeholder">
-                    [Wykres audiometryczny zostanie dodany w przyszłej wersji]<br>
-                    Szczegółowe wyniki dostępne w tabeli powyżej
-                </div>
+                {{#if audiogram}}
+                    {{{audiogram}}}
+                {{else}}
+                    <div class="chart-placeholder">
+                        Brak danych do wyświetlenia wykresu<br>
+                        Szczegółowe wyniki dostępne w tabeli powyżej
+                    </div>
+                {{/if}}
             </div>
         </div>
         

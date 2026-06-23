@@ -15,7 +15,6 @@ async function testComponents() {
     const config = require('../src/config/config');
     console.log('✅ Konfiguracja załadowana poprawnie');
     console.log(`   - Port: ${config.app.port}`);
-    console.log(`   - Kafka brokers: ${config.kafka.brokers.join(', ')}`);
     console.log(`   - MongoDB: ${config.mongodb.uri}\n`);
     
     // Test 2: Logger

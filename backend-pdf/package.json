@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
+    "test:components": "node scripts/test-components.js",
+    "test:e2e": "bash test/e2e/run-e2e.sh",
     "legacy": "node pdf-service.js"
   },
   "dependencies": {

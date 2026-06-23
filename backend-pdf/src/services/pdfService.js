@@ -5,6 +5,7 @@ const path = require('path');
 const config = require('../config/config');
 const logger = require('../utils/logger');
 const dataService = require('./dataService');
+const audiogramChart = require('../utils/audiogramChart');
 
 class PDFService {
   constructor() {
@@ -119,21 +120,25 @@ class PDFService {
     
     // Ogólna ocena słuchu
     const assessment = dataService.getOverallHearingAssessment(testData.hearingLevels);
-    
+
+    // Generowanie wykresu audiometrycznego
+    const audiogram = testData.hearingLevels ? audiogramChart.generate(testData.hearingLevels) : null;
+
     return {
       // Podstawowe informacje
       testId: testData.testId,
       userEmail: testData.userEmail,
       maxAudibleFrequency: testData.maxAudibleFrequency || 'Nie określono',
-      
+
       // Daty
       reportDate: this.formatDate(now),
       testDate: this.formatDate(testDate),
-      
+
       // Wyniki
       hearingResults: hearingResults,
       assessment: assessment,
-      
+      audiogram: audiogram,
+
       // Informacje o płatności
       payment: testData.payment ? {
         method: testData.payment.method === 'VOUCHER' ? 'Voucher' : 'PayNow',

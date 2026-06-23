@@ -10,15 +10,22 @@ class EmailService {
   async initializeTransporter() {
     if (!this.transporter) {
       try {
-        this.transporter = nodemailer.createTransporter({
+        const transportOptions = {
           host: config.email.smtp.host,
           port: config.email.smtp.port,
-          secure: config.email.smtp.secure,
-          auth: {
+          secure: config.email.smtp.secure
+        };
+
+        // Dołącz auth tylko gdy podano poświadczenia — pozwala korzystać z lokalnego
+        // serwera SMTP bez uwierzytelniania (np. Mailpit w środowisku e2e).
+        if (config.email.smtp.auth.user) {
+          transportOptions.auth = {
             user: config.email.smtp.auth.user,
             pass: config.email.smtp.auth.pass
-          }
-        });
+          };
+        }
+
+        this.transporter = nodemailer.createTransport(transportOptions);
         
         // Weryfikacja połączenia
         await this.transporter.verify();
