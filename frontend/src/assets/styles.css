@@ -4,8 +4,9 @@
     --secondary-blue: #003d91;
     --light-blue: #E6F0FF;
     --accent-green: #00C853;
-    --text-dark: #212529;
-    --text-light: #6C757D;
+    --text-dark: #1F2937;
+    --text-light: #4B5563;
+    --text-secondary: #6B7280;
     --bg-light: #F8F9FA;
     --gray-500: #6B7280;
     --gray-600: #4B5563;
@@ -55,8 +56,8 @@ body {
 
 .btn-primary:hover {
     background-color: var(--secondary-blue);
-    /* transform: translateY(-2px); lekkie przesunięcie w górę przy najechaniu */
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 74, 173, 0.3);
     /* mocniejszy cień przy najechaniu */
 }
 
@@ -119,7 +120,11 @@ header {
     align-items: center;
     padding: 1.5rem 0;
     border-bottom: 1px solid #E5E7EB;
-    position: relative;
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     /* Potrzebne do pozycjonowania menu mobilnego */
 }
 
