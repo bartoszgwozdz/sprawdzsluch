@@ -3,450 +3,699 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raport z badania słuchu - SprawdźSłuch</title>
+    <title>Raport z badania słuchu — SprawdźSłuch</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0066CC;
-            --primary-light: #E6F2FF;
-            --primary-dark: #003D99;
+            --primary: #004AAD;
+            --primary-dark: #003D91;
+            --primary-light: #E6F0FF;
+            --accent: #00C853;
+            --accent-dark: #00A846;
 
-            --status-normal: #1F7F1F;
-            --status-mild: #D39E00;
-            --status-moderate: #C65911;
-            --status-severe: #AE2A19;
-            --status-profound: #3B2667;
+            --text: #1F2937;
+            --text-soft: #4B5563;
+            --text-muted: #6B7280;
+            --line: #E5E7EB;
+            --bg: #F8F9FA;
 
-            --text-primary: #0F172A;
-            --text-secondary: #475569;
-            --text-muted: #64748B;
-            --border: #CBD5E1;
-            --bg-subtle: #F1F5F9;
+            --normal: #1F7F1F;
+            --mild: #8A6100;
+            --moderate: #B4470F;
+            --severe: #9F2417;
+            --profound: #5B3A78;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            line-height: 1.6;
-            color: var(--text-primary);
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--text);
             background: #fff;
-            font-size: 16px;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+            font-size: 13px;
+            line-height: 1.6;
         }
 
-        .header {
-            text-align: center;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 40px 20px;
-            border-radius: 12px;
-            margin-bottom: 40px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
+        .sheet { padding: 0 14mm; }
 
-        .logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 3em;
-            font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: -1px;
+        /* ---------- Letterhead ---------- */
+        .letterhead {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 9px;
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(90deg, var(--primary) 0%, var(--primary) 55%, var(--accent) 100%) 1;
         }
+        .brand .logo {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--primary);
+        }
+        .brand .logo .g { color: var(--accent); }
+        .brand .tagline {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.3px;
+            margin-top: 2px;
+        }
+        .doc-meta { text-align: right; }
+        .doc-meta .doc-kind {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        .doc-meta .doc-row {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+        .doc-meta .doc-row b { color: var(--text); font-weight: 700; }
 
-        .subtitle {
-            font-size: 1.1em;
-            opacity: 0.95;
-            margin-bottom: 8px;
-            font-weight: 500;
+        /* ---------- Sections ---------- */
+        .section { margin-top: 18px; break-inside: avoid; }
+        .section-head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
         }
-
-        .report-date {
-            font-size: 0.9em;
-            opacity: 0.85;
+        .section-head .ico {
+            width: 26px; height: 26px;
+            flex: 0 0 26px;
+            border-radius: 7px;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex; align-items: center; justify-content: center;
         }
-        
-        .section {
-            margin-bottom: 30px;
-            padding: 24px;
-            background: white;
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
+        .section-head .ico svg { width: 15px; height: 15px; }
         .section-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.8em;
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.2px;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 18px 20px;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+            break-inside: avoid;
+        }
+
+        /* ---------- Result summary hero ---------- */
+        .summary {
+            margin-top: 14px;
+            border-radius: 16px;
+            padding: 16px 24px 18px;
+            border: 1px solid var(--line);
+            border-left: 6px solid var(--primary);
+            background: linear-gradient(180deg, #F4F8FE 0%, #fff 100%);
+            break-inside: avoid;
+        }
+        .summary.level-normal   { border-left-color: var(--normal);   background: linear-gradient(180deg, #F1FBF4 0%, #fff 70%); }
+        .summary.level-mild     { border-left-color: var(--mild);     background: linear-gradient(180deg, #FCF6E9 0%, #fff 70%); }
+        .summary.level-moderate { border-left-color: var(--moderate); background: linear-gradient(180deg, #FCEFE6 0%, #fff 70%); }
+        .summary.level-severe   { border-left-color: var(--severe);   background: linear-gradient(180deg, #FBEAE6 0%, #fff 70%); }
+        .summary.level-profound { border-left-color: var(--profound); background: linear-gradient(180deg, #F3ECF6 0%, #fff 70%); }
+
+        .summary-label {
+            font-size: 11px;
             font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--bg-subtle);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+        .summary-status {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin: 4px 0 6px;
+        }
+        .level-normal   .summary-status { color: var(--normal); }
+        .level-mild     .summary-status { color: var(--mild); }
+        .level-moderate .summary-status { color: var(--moderate); }
+        .level-severe   .summary-status { color: var(--severe); }
+        .level-profound .summary-status { color: var(--profound); }
+
+        .summary-meaning {
+            font-size: 12.5px;
+            color: var(--text-soft);
+            max-width: 95%;
+        }
+
+        /* severity meter */
+        .meter-wrap { margin-top: 12px; }
+        .meter-scalelabels {
+            display: flex; justify-content: space-between;
+            font-size: 9px; color: var(--text-muted); font-weight: 600;
+            margin-bottom: 4px; padding: 0 1px;
+        }
+        .meter {
             position: relative;
-            padding-left: 12px;
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(90deg,
+                var(--normal) 0%, var(--normal) 20%,
+                #C99700 20%, #C99700 40%,
+                var(--moderate) 40%, var(--moderate) 70%,
+                #C0392B 70%, #C0392B 100%);
         }
-
-        .section-title::before {
-            content: '';
+        .meter-marker {
             position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 24px;
-            background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+            top: -5px;
+            width: 4px; height: 22px;
+            background: #0F172A;
             border-radius: 2px;
+            transform: translateX(-50%);
+            box-shadow: 0 0 0 2px #fff;
         }
+        .meter-caption {
+            font-size: 10.5px; color: var(--text-muted);
+            margin-top: 8px; font-weight: 600;
+        }
+        .meter-caption b { color: var(--text); }
 
-        .patient-info {
-            background: var(--bg-subtle);
+        /* stat chips */
+        .stats { display: flex; gap: 10px; margin-top: 12px; }
+        .stat {
+            flex: 1;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 11px;
+            padding: 9px 14px;
         }
-        
+        .stat .k { font-size: 9.5px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; color: var(--text-muted); }
+        .stat .v { font-size: 16px; font-weight: 800; color: var(--primary-dark); margin-top: 3px; }
+
+        /* ---------- Info grid ---------- */
         .info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 15px;
+            gap: 10px;
         }
-
         .info-item {
-            padding: 12px;
-            background: white;
-            border-radius: 8px;
-            border-left: 4px solid var(--primary);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-
-        .info-label {
-            font-weight: 600;
-            color: var(--text-secondary);
-            font-size: 0.85em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .info-value {
-            color: var(--text-primary);
-            font-size: 1em;
-            margin-top: 4px;
-            font-weight: 600;
-        }
-        
-        .results-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        .results-table th,
-        .results-table td {
-            padding: 14px 12px;
-            text-align: center;
-            border: 1px solid var(--border);
-        }
-
-        .results-table th {
-            background: var(--primary);
-            color: white;
-            font-weight: 600;
-            font-size: 0.9em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .results-table tbody tr:nth-child(odd) {
-            background: white;
-        }
-
-        .results-table tbody tr:nth-child(even) {
-            background: var(--bg-subtle);
-        }
-
-        .results-table strong {
-            font-weight: 600;
-        }
-
-        .hearing-level {
-            font-weight: 600;
-            padding: 6px 12px;
-            border-radius: 20px;
-            color: white;
-            display: inline-block;
-            font-size: 0.9em;
-        }
-
-        .level-normal { background: var(--status-normal); }
-        .level-mild { background: var(--status-mild); color: var(--text-primary); }
-        .level-moderate { background: var(--status-moderate); }
-        .level-severe { background: var(--status-severe); }
-        .level-profound { background: var(--status-profound); color: white; }
-        
-        .assessment {
-            text-align: center;
-            padding: 30px;
-            border-radius: 12px;
-            margin-top: 20px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        }
-
-        .assessment-title {
-            font-size: 1.1em;
-            font-weight: 600;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            opacity: 0.85;
-        }
-
-        .assessment-status {
-            font-family: 'Playfair Display', serif;
-            font-size: 2em;
-            font-weight: 700;
-            margin-bottom: 16px;
-        }
-
-        .assessment-recommendation {
-            font-size: 1em;
-            line-height: 1.6;
-            background: rgba(255, 255, 255, 0.4);
-            padding: 16px;
-            border-radius: 8px;
-        }
-        
-        .chart-container {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .chart-placeholder {
-            background: var(--bg-subtle);
-            border: 2px dashed var(--border);
-            padding: 40px;
+            padding: 11px 14px;
+            background: var(--bg);
             border-radius: 10px;
+            border-left: 3px solid var(--primary);
+        }
+        .info-label { font-size: 9.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-muted); }
+        .info-value { font-size: 13px; font-weight: 700; color: var(--text); margin-top: 3px; }
+
+        .receipt {
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #F1FBF4;
+            border: 1px solid #BDEBCB;
+            border-radius: 11px;
+            padding: 12px 16px;
+        }
+        .receipt .check {
+            width: 30px; height: 30px; flex: 0 0 30px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .receipt .check svg { width: 17px; height: 17px; color: #fff; }
+        .receipt-title { font-size: 12.5px; font-weight: 800; color: #166534; }
+        .receipt-detail { font-size: 10.5px; color: #166534; margin-top: 1px; }
+
+        /* compact identification card (Dane badania) */
+        .id-card { padding: 12px 18px; }
+        .id-grid { display: flex; align-items: stretch; flex-wrap: wrap; }
+        .id-item { flex: 1; min-width: 130px; padding: 2px 16px; border-left: 1px solid var(--line); }
+        .id-item:first-child { padding-left: 0; border-left: none; }
+        .id-k { display: block; font-size: 9px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-muted); }
+        .id-v { display: block; font-size: 12px; font-weight: 700; color: var(--text); margin-top: 2px; word-break: break-word; }
+        .id-pay { display: flex; align-items: center; gap: 8px; }
+        .id-pay .chk { width: 22px; height: 22px; flex: 0 0 22px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; }
+        .id-pay .chk svg { width: 13px; height: 13px; color: #fff; }
+        .id-pay .pay-title { font-size: 11px; font-weight: 800; color: #166534; }
+        .id-pay .pay-sub { font-size: 9px; color: #166534; margin-top: 1px; }
+
+        /* ---------- Audiogram ---------- */
+        .audiogram-card { text-align: center; padding: 12px 20px 14px; }
+        .audiogram-svg { max-width: 520px; margin: 0 auto; }
+        .audiogram-hint {
+            font-size: 10px; color: var(--text-muted); line-height: 1.45;
+            margin-top: 6px; max-width: 470px; margin-left: auto; margin-right: auto;
+        }
+
+        /* frequency-range (max audible frequency) result + spectrum bar */
+        .fr-head { display: flex; justify-content: space-between; align-items: center; }
+        .fr-value { font-size: 24px; font-weight: 800; color: var(--primary-dark); letter-spacing: -0.5px; }
+        .fr-sub { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); margin-left: 8px; }
+
+        .fr-bar-wrap { position: relative; margin: 32px 6px 6px; }
+        .fr-bar-pill {
+            position: absolute; top: -19px;
+            background: var(--accent-dark); color: #fff; font-size: 9px; font-weight: 800;
+            padding: 2px 7px; border-radius: 5px; white-space: nowrap;
+        }
+        .fr-bar {
+            position: relative; height: 15px; border-radius: 8px;
+            background: #EDF1F5; border: 1px solid var(--line); overflow: hidden;
+        }
+        .fr-bar-fill {
+            position: absolute; left: 0; top: 0; bottom: 0;
+            background: linear-gradient(90deg, #BFEACE 0%, var(--accent) 100%);
+        }
+        .fr-bar-needle {
+            position: absolute; top: -2px; height: 19px; width: 0;
+            border-left: 2px dashed #0F172A;
+        }
+        .fr-axis { position: relative; height: 12px; margin-top: 7px; }
+        .fr-axis span {
+            position: absolute; font-size: 9px; font-weight: 600; color: var(--text-muted);
+            transform: translateX(-50%); white-space: nowrap;
+        }
+        .fr-text { font-size: 12px; color: var(--text-soft); margin-top: 16px; }
+
+        /* ---------- Results table ---------- */
+        .rtable { width: 100%; border-collapse: collapse; }
+        .rtable th {
+            font-size: 9.5px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase;
             color: var(--text-muted);
-            font-style: italic;
+            text-align: left;
+            padding: 0 10px 10px;
+            border-bottom: 2px solid var(--line);
         }
-
-        .footer {
-            margin-top: 40px;
-            padding: 20px;
-            background: var(--bg-subtle);
-            border-radius: 12px;
-            text-align: center;
-            font-size: 0.85em;
-            color: var(--text-secondary);
-            border-top: 1px solid var(--border);
+        .rtable td {
+            padding: 11px 10px;
+            border-bottom: 1px solid var(--line);
+            font-size: 12.5px;
+            vertical-align: middle;
         }
+        .rtable tr:last-child td { border-bottom: none; }
+        .rtable .freq { font-weight: 800; color: var(--text); white-space: nowrap; }
+        .rtable .desc { color: var(--text-soft); }
+        .rtable .db { font-weight: 800; color: var(--text); white-space: nowrap; }
 
-        .footer p {
-            margin: 4px 0;
+        .bar-cell { width: 130px; }
+        .bar-track { height: 7px; border-radius: 4px; background: #EEF1F4; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 4px; }
+        .level-normal .bar-fill,   .bar-fill.level-normal   { background: var(--normal); }
+        .level-mild .bar-fill,     .bar-fill.level-mild     { background: #C99700; }
+        .level-moderate .bar-fill, .bar-fill.level-moderate { background: var(--moderate); }
+        .level-severe .bar-fill,   .bar-fill.level-severe   { background: var(--severe); }
+        .level-profound .bar-fill, .bar-fill.level-profound { background: var(--profound); }
+
+        .badge {
+            display: inline-block;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 4px 11px;
+            border-radius: 999px;
+            color: #fff;
+            white-space: nowrap;
         }
+        .badge.level-normal   { background: var(--normal); }
+        .badge.level-mild     { background: #8A6100; }
+        .badge.level-moderate { background: var(--moderate); }
+        .badge.level-severe   { background: var(--severe); }
+        .badge.level-profound { background: var(--profound); }
 
+        .legend {
+            display: flex; flex-wrap: wrap; gap: 14px;
+            margin-top: 14px; padding-top: 12px;
+            border-top: 1px dashed var(--line);
+        }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text-soft); font-weight: 600; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+        /* ---------- Interpretation ---------- */
+        .interp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .interp-block h4 {
+            font-size: 12px; font-weight: 800; color: var(--text);
+            margin-bottom: 8px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .interp-block h4 svg { width: 15px; height: 15px; color: var(--primary); }
+        .interp-block p { font-size: 12px; color: var(--text-soft); }
+        .steps { list-style: none; }
+        .steps li {
+            display: flex; align-items: flex-start; gap: 8px;
+            font-size: 12px; color: var(--text-soft);
+            margin-bottom: 8px;
+        }
+        .steps li .tick {
+            flex: 0 0 17px; width: 17px; height: 17px; margin-top: 1px;
+            border-radius: 50%; background: var(--accent);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .steps li .tick svg { width: 11px; height: 11px; color: #fff; }
+
+        /* ---------- Classification reference ---------- */
+        .ref-table { width: 100%; border-collapse: collapse; }
+        .ref-table th {
+            font-size: 9.5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+            color: var(--text-muted); text-align: left;
+            padding: 0 10px 9px; border-bottom: 2px solid var(--line);
+        }
+        .ref-table td { padding: 9px 10px; border-bottom: 1px solid var(--line); font-size: 11.5px; vertical-align: middle; }
+        .ref-table tr:last-child td { border-bottom: none; }
+        .ref-table .range { font-weight: 800; color: var(--text); white-space: nowrap; }
+        .ref-table .cls { white-space: nowrap; }
+        .ref-table .meaning { color: var(--text-soft); }
+        .ref-row-active td { background: #F3F8FF; }
+        .ref-tag { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+
+        /* ---------- Disclaimer + methodology ---------- */
         .disclaimer {
+            margin-top: 22px;
+            display: flex; gap: 12px;
             background: #FFFBEB;
-            border: 1px solid #FCD34D;
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 20px;
+            border: 1px solid #FDE68A;
+            border-radius: 12px;
+            padding: 14px 16px;
+            break-inside: avoid;
         }
+        .disclaimer .ico { flex: 0 0 20px; width: 20px; height: 20px; color: #B45309; margin-top: 1px; }
+        .disclaimer-title { font-size: 12px; font-weight: 800; color: #92400E; margin-bottom: 3px; }
+        .disclaimer-text { font-size: 10.8px; color: #92400E; line-height: 1.55; }
 
-        .disclaimer-title {
-            font-weight: 600;
-            color: #92400E;
-            margin-bottom: 6px;
-            font-size: 0.95em;
+        .methodology {
+            margin-top: 16px;
+            display: flex; justify-content: space-between; align-items: center; gap: 16px;
+            padding-top: 14px;
+            border-top: 1px solid var(--line);
         }
-
-        .disclaimer-text {
-            color: #92400E;
-            font-size: 0.9em;
-            line-height: 1.5;
-        }
-
-        .payment-info {
-            background: #ECFDF5;
-            border: 1px solid #BBEF63;
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 15px;
-        }
-
-        .payment-info-title {
-            font-weight: 600;
-            color: #166534;
-            margin-bottom: 6px;
-            font-size: 0.95em;
-        }
-
-        .payment-details {
-            color: #166534;
-            font-size: 0.9em;
-            line-height: 1.5;
-        }
-
-        .payment-details br {
-            margin: 2px 0;
-        }
-        
-        @media (max-width: 640px) {
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .results-table th,
-            .results-table td {
-                padding: 10px 8px;
-                font-size: 0.9em;
-            }
-        }
-
-        @media print {
-            .container {
-                padding: 10px;
-            }
-
-            .section {
-                break-inside: avoid;
-                margin-bottom: 20px;
-                box-shadow: none;
-                border: 1px solid var(--border);
-            }
-
-            .header {
-                box-shadow: none;
-            }
-        }
+        .methodology .note { font-size: 10px; color: var(--text-muted); max-width: 62%; }
+        .methodology .sign { text-align: right; }
+        .methodology .sign .name { font-size: 11px; font-weight: 800; color: var(--text); }
+        .methodology .sign .role { font-size: 9.5px; color: var(--text-muted); }
+        .methodology .sign .org  { font-size: 9.5px; color: var(--primary); font-weight: 700; margin-top: 2px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="logo">SprawdźSłuch</div>
-            <div class="subtitle">Profesjonalny test słuchu online</div>
-            <div class="report-date">Raport wygenerowany: {{reportDate}}</div>
-        </div>
-        
-        <!-- Informacje o pacjencie -->
-        <div class="section patient-info">
-            <div class="section-title">Informacje o badaniu</div>
-            <div class="info-grid">
-                <div class="info-item">
-                    <div class="info-label">Email pacjenta</div>
-                    <div class="info-value">{{userEmail}}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Data badania</div>
-                    <div class="info-value">{{testDate}}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">ID badania</div>
-                    <div class="info-value">{{testId}}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Maksymalna słyszalna częstotliwość</div>
-                    <div class="info-value">{{maxAudibleFrequency}} Hz</div>
-                </div>
-            </div>
-            
-            {{#if payment}}
-            <div class="payment-info">
-                <div class="payment-info-title">Informacje o płatności</div>
-                <div class="payment-details">
-                    Metoda płatności: {{payment.method}}<br>
-                    Data opłacenia: {{payment.completedAt}}<br>
-                    ID płatności: {{payment.paymentId}}
-                </div>
-            </div>
-            {{/if}}
-        </div>
-        
-        <!-- Wyniki badania -->
-        <div class="section">
-            <div class="section-title">Wyniki badania słuchu</div>
+    <div class="sheet">
 
-            <table class="results-table">
-                <thead>
-                    <tr>
-                        <th>Częstotliwość</th>
-                        <th>Opis</th>
-                        <th>Próg słyszenia (dB)</th>
-                        <th>Ocena</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#each hearingResults}}
-                    <tr class="result-row {{levelClass}}">
-                        <td><strong>{{frequency}} Hz</strong></td>
-                        <td>{{description}}</td>
-                        <td><strong>{{level}} dB</strong></td>
-                        <td>
-                            <span class="hearing-level {{levelClass}}">
-                                {{interpretation}}
-                            </span>
-                        </td>
-                    </tr>
-                    {{/each}}
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- Wykres audiometryczny -->
-        <div class="section">
-            <div class="section-title">Wykres audiometryczny</div>
-            <div class="chart-container">
-                {{#if audiogram}}
-                    {{{audiogram}}}
-                {{else}}
-                    <div class="chart-placeholder">
-                        Brak danych do wyświetlenia wykresu<br>
-                        Szczegółowe wyniki dostępne w tabeli powyżej
+        <!-- ============ LETTERHEAD ============ -->
+        <header class="letterhead">
+            <div class="brand">
+                <div class="logo">Sprawdź<span class="g">Słuch</span><span style="color:var(--primary)">.pl</span></div>
+                <div class="tagline">Profesjonalny test słuchu online</div>
+            </div>
+            <div class="doc-meta">
+                <div class="doc-kind">Raport z badania słuchu</div>
+                <div class="doc-row">Nr raportu: <b>{{testId}}</b></div>
+                <div class="doc-row">Data wystawienia: <b>{{reportDate}}</b></div>
+            </div>
+        </header>
+
+        <!-- ============ EXAM DATA (identification) ============ -->
+        <section class="section" style="margin-top:14px;">
+            <div class="section-head">
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16l3.5-2 3.5 2 3.5-2L19 21z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/></svg></span>
+                <h2 class="section-title">Dane badania</h2>
+            </div>
+            <div class="card id-card">
+                <div class="id-grid">
+                    <div class="id-item">
+                        <span class="id-k">Pacjent (e-mail)</span>
+                        <span class="id-v">{{userEmail}}</span>
                     </div>
+                    <div class="id-item">
+                        <span class="id-k">Identyfikator badania</span>
+                        <span class="id-v">{{testId}}</span>
+                    </div>
+                    <div class="id-item">
+                        <span class="id-k">Data badania</span>
+                        <span class="id-v">{{testDate}}</span>
+                    </div>
+                    {{#if payment}}
+                    <div class="id-item id-pay">
+                        <span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+                        <span>
+                            <span class="pay-title">Opłacono</span>
+                            <span class="pay-sub">{{payment.method}} · {{payment.paymentId}}</span>
+                        </span>
+                    </div>
+                    {{/if}}
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ RESULT SUMMARY (HERO) ============ -->
+        <section class="summary {{summary.levelClass}}">
+            <div class="summary-label">Wynik badania</div>
+            <div class="summary-status">{{summary.status}}</div>
+            <p class="summary-meaning">{{summary.meaning}}</p>
+
+            <div class="meter-wrap">
+                <div class="meter-scalelabels">
+                    <span>0 dB · norma</span>
+                    <span>40</span>
+                    <span>70</span>
+                    <span>100 dB · głęboki</span>
+                </div>
+                <div class="meter">
+                    <div class="meter-marker" style="left: {{summary.meterPercent}}%;"></div>
+                </div>
+                <div class="meter-caption">Znacznik wskazuje Twój średni próg słyszenia (PTA). Im bliżej lewej strony skali, tym lepszy słuch.</div>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="k">Średni próg słyszenia (PTA)</div>
+                    <div class="v">{{summary.averageLevel}} dB</div>
+                </div>
+                <div class="stat">
+                    <div class="k">Maks. słyszalna częstotliwość</div>
+                    <div class="v">{{maxAudibleFrequency}}</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ AUDIOGRAM ============ -->
+        <section class="section">
+            <div class="section-head">
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h3l3-7 4 14 3-7h5"/></svg></span>
+                <h2 class="section-title">Audiogram</h2>
+            </div>
+            <div class="card audiogram-card">
+                {{#if audiogram}}
+                    <div class="audiogram-svg">{{{audiogram}}}</div>
+                    <p class="audiogram-hint">Niebieska krzywa to Twój próg słyszenia dla każdej częstotliwości — im niżej leży punkt, tym słabsza słyszalność danego tonu. Zielona linia wyznacza najwyższą słyszalną przez Ciebie częstotliwość. Tło oznacza strefy ubytku słuchu.</p>
+                {{else}}
+                    <p class="audiogram-hint">Brak danych do wygenerowania wykresu. Szczegółowe wyniki znajdują się w tabeli poniżej.</p>
                 {{/if}}
             </div>
-        </div>
-        
-        <!-- Ocena ogólna -->
-        <div class="section">
-            <div class="section-title">Ocena ogólna</div>
-            <div class="assessment" style="background-color: {{assessment.color}}20; border: 2px solid {{assessment.color}};">
-                <div class="assessment-title">Stan słuchu</div>
-                <div class="assessment-status" style="color: {{assessment.color}};">
-                    {{assessment.status}}
+        </section>
+
+        <!-- ============ FREQUENCY RANGE (max audible frequency) ============ -->
+        {{#if frequencyRange}}
+        <section class="section">
+            <div class="section-head">
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 10v3"/><path d="M6 6v11"/><path d="M10 3v18"/><path d="M14 8v7"/><path d="M18 5v13"/><path d="M22 10v3"/></svg></span>
+                <h2 class="section-title">Zakres słyszanych częstotliwości</h2>
+            </div>
+            <div class="card">
+                <div class="fr-head">
+                    <div><span class="fr-value">{{frequencyRange.valueLabel}}</span><span class="fr-sub">maks. słyszalna częstotliwość</span></div>
+                    <span class="badge {{frequencyRange.levelClass}}">{{frequencyRange.rating}}</span>
                 </div>
-                <div class="assessment-recommendation">
-                    {{assessment.recommendation}}
+
+                <div class="fr-bar-wrap">
+                    <div class="fr-bar-pill" style="left: {{frequencyRange.barPercent}}%; transform: translateX({{frequencyRange.pillShift}});">Twój zakres: {{frequencyRange.valueLabel}}</div>
+                    <div class="fr-bar">
+                        <div class="fr-bar-fill" style="width: {{frequencyRange.barPercent}}%;"></div>
+                    </div>
+                    <div class="fr-bar-needle" style="left: {{frequencyRange.barPercent}}%;"></div>
+                    <div class="fr-axis">
+                        <span style="left:0%; transform:translateX(0);">3 kHz</span>
+                        <span style="left:26.9%;">5</span>
+                        <span style="left:51.7%;">8</span>
+                        <span style="left:73.1%;">12</span>
+                        <span style="left:100%; transform:translateX(-100%);">20 kHz</span>
+                    </div>
+                </div>
+
+                <p class="fr-text">{{frequencyRange.text}} Zielony pasek pokazuje zakres słyszanych przez Ciebie częstotliwości na tle pełnego pasma słuchu człowieka (do 20 kHz).</p>
+            </div>
+        </section>
+        {{/if}}
+
+        <!-- ============ DETAILED RESULTS ============ -->
+        <section class="section">
+            <div class="section-head">
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span>
+                <h2 class="section-title">Szczegółowe wyniki</h2>
+            </div>
+            <div class="card">
+                <table class="rtable">
+                    <thead>
+                        <tr>
+                            <th style="width:78px;">Częstotl.</th>
+                            <th>Zakres tonów</th>
+                            <th style="width:62px;">Próg</th>
+                            <th class="bar-cell">Poziom</th>
+                            <th style="width:130px;">Ocena</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each hearingResults}}
+                        <tr>
+                            <td class="freq">{{frequencyLabel}}</td>
+                            <td class="desc">{{description}}</td>
+                            <td class="db">{{level}} dB</td>
+                            <td class="bar-cell">
+                                <div class="bar-track"><div class="bar-fill {{levelClass}}" style="width: {{barWidth}}%;"></div></div>
+                            </td>
+                            <td><span class="badge {{levelClass}}">{{interpretation}}</span></td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+
+                <div class="legend">
+                    <div class="legend-item"><span class="legend-dot" style="background:var(--normal)"></span>Norma (0–20 dB)</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:#C99700"></span>Lekki (21–40 dB)</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:var(--moderate)"></span>Umiarkowany (41–70 dB)</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:var(--severe)"></span>Znaczny (71–90 dB)</div>
+                    <div class="legend-item"><span class="legend-dot" style="background:var(--profound)"></span>Głęboki (&gt;90 dB)</div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Disclaimer -->
+        </section>
+
+        <!-- ============ INTERPRETATION + NEXT STEPS ============ -->
+        <section class="section">
+            <div class="section-head">
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
+                <h2 class="section-title">Interpretacja i zalecenia</h2>
+            </div>
+            <div class="card">
+                <div class="interp-grid">
+                    <div class="interp-block">
+                        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Co oznacza Twój wynik</h4>
+                        <p>{{summary.meaning}}</p>
+                    </div>
+                    <div class="interp-block">
+                        <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Zalecane kroki</h4>
+                        <ul class="steps">
+                            {{#each summary.nextSteps}}
+                            <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span>{{this}}</span></li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============ CLASSIFICATION REFERENCE ============ -->
+        <section class="section">
+            <div class="section-head">
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+                <h2 class="section-title">Jak czytać wynik — klasyfikacja ubytku słuchu</h2>
+            </div>
+            <div class="card">
+                <table class="ref-table">
+                    <thead>
+                        <tr>
+                            <th style="width:110px;">Próg (dB)</th>
+                            <th style="width:150px;">Klasyfikacja</th>
+                            <th>Co to oznacza w praktyce</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="{{#if (eq summary.levelClass 'level-normal')}}ref-row-active{{/if}}">
+                            <td class="range">0–20</td>
+                            <td class="cls"><span class="ref-tag" style="background:var(--normal)"></span>Norma</td>
+                            <td class="meaning">Słuch prawidłowy — bez trudności w codziennym słyszeniu.</td>
+                        </tr>
+                        <tr class="{{#if (eq summary.levelClass 'level-mild')}}ref-row-active{{/if}}">
+                            <td class="range">21–40</td>
+                            <td class="cls"><span class="ref-tag" style="background:#C99700"></span>Lekki ubytek</td>
+                            <td class="meaning">Możliwe trudności z cichą mową oraz rozmową w hałasie.</td>
+                        </tr>
+                        <tr class="{{#if (eq summary.levelClass 'level-moderate')}}ref-row-active{{/if}}">
+                            <td class="range">41–70</td>
+                            <td class="cls"><span class="ref-tag" style="background:var(--moderate)"></span>Umiarkowany</td>
+                            <td class="meaning">Trudności w typowej rozmowie; często wskazana diagnostyka.</td>
+                        </tr>
+                        <tr class="{{#if (eq summary.levelClass 'level-severe')}}ref-row-active{{/if}}">
+                            <td class="range">71–90</td>
+                            <td class="cls"><span class="ref-tag" style="background:var(--severe)"></span>Znaczny</td>
+                            <td class="meaning">Rozumienie mowy mocno ograniczone bez aparatu słuchowego.</td>
+                        </tr>
+                        <tr class="{{#if (eq summary.levelClass 'level-profound')}}ref-row-active{{/if}}">
+                            <td class="range">&gt; 90</td>
+                            <td class="cls"><span class="ref-tag" style="background:var(--profound)"></span>Głęboki</td>
+                            <td class="meaning">Mowa praktycznie niesłyszalna bez wsparcia aparatem/implantem.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ============ FREQUENCY GUIDE ============ -->
+        <section class="section">
+            <div class="section-head">
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span>
+                <h2 class="section-title">Co oznaczają badane częstotliwości</h2>
+            </div>
+            <div class="card">
+                <table class="ref-table">
+                    <thead>
+                        <tr>
+                            <th style="width:150px;">Zakres</th>
+                            <th style="width:210px;">Przykładowe dźwięki</th>
+                            <th>Dlaczego jest ważny</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="range">Niskie<br><span style="font-weight:600;color:var(--text-muted);font-size:10px;">250–500 Hz</span></td>
+                            <td class="meaning">Samogłoski, niski męski głos, buczenie urządzeń.</td>
+                            <td class="meaning">Odpowiadają za odczuwaną głośność i „pełnię” mowy.</td>
+                        </tr>
+                        <tr>
+                            <td class="range">Średnie<br><span style="font-weight:600;color:var(--text-muted);font-size:10px;">1–2 kHz</span></td>
+                            <td class="meaning">Większość mowy, rozmowa telefoniczna.</td>
+                            <td class="meaning">Kluczowe dla rozumienia, o czym mówi rozmówca.</td>
+                        </tr>
+                        <tr>
+                            <td class="range">Wysokie<br><span style="font-weight:600;color:var(--text-muted);font-size:10px;">4–8 kHz</span></td>
+                            <td class="meaning">Spółgłoski (s, f, t), ptaki, dzwonek, „sz”.</td>
+                            <td class="meaning">Decydują o wyrazistości mowy — tu ubytek pojawia się najczęściej.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ============ DISCLAIMER ============ -->
         <div class="disclaimer">
-            <div class="disclaimer-title">Ważne informacje</div>
-            <div class="disclaimer-text">
-                Ten raport jest wynikiem internetowego testu słuchu i ma charakter orientacyjny. 
-                Nie zastępuje profesjonalnej diagnozy audiologicznej. W przypadku problemów ze słuchem 
-                zaleca się skonsultowanie wyników z lekarzem laryngologiem lub audiologiem.
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div>
+                <div class="disclaimer-title">Ważne — charakter orientacyjny</div>
+                <div class="disclaimer-text">Niniejszy raport jest wynikiem przesiewowego testu słuchu wykonanego online i ma charakter orientacyjny. Nie stanowi diagnozy medycznej i nie zastępuje badania audiologicznego w gabinecie. W razie wątpliwości lub niepokojących wyników skonsultuj się z lekarzem laryngologiem albo audiologiem.</div>
             </div>
         </div>
-        
-        <!-- Footer -->
-        <div class="footer">
-            <p><strong>SprawdźSłuch</strong> - Profesjonalny test słuchu online</p>
-            <p>www.sprawdzsluch.pl | kontakt@sprawdzsluch.pl</p>
-            <p>Raport wygenerowany automatycznie dnia {{reportDate}}</p>
+
+        <!-- ============ METHODOLOGY / SIGNATURE ============ -->
+        <div class="methodology">
+            <div class="note">Metodologia oparta na uznanych standardach audiometrii tonalnej (próg słyszenia dla częstotliwości 250–8000 Hz) oraz na pomiarze maksymalnej słyszalnej częstotliwości. Wynik ma charakter przesiewowy i wygenerowano go automatycznie na podstawie odpowiedzi udzielonych podczas testu.</div>
+            <div class="sign">
+                <div class="name">Zespół SprawdźSłuch</div>
+                <div class="role">Nadzór merytoryczny: specjalista audiolog</div>
+                <div class="org">www.sprawdzsluch.pl · kontakt@sprawdzsluch.pl</div>
+            </div>
         </div>
+
     </div>
 </body>
 </html>
