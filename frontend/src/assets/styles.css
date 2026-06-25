@@ -1465,3 +1465,44 @@ ul.features li .material-icons {
     .contact-wrapper { padding: 1.25rem; }
     .contact-methods { max-width: 100%; }
 }
+
+/* ── Consent checkboxes (RODO) ── */
+.consent-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--color-surface, #f8f9fa);
+    border-radius: 8px;
+    border: 1px solid var(--color-border, #e2e8f0);
+    margin-bottom: 1rem;
+}
+
+.consent-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.consent-item label {
+    display: flex;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    cursor: pointer;
+    color: var(--color-text, #1e293b);
+}
+
+.consent-item input[type="checkbox"] {
+    flex-shrink: 0;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-top: 0.15rem;
+    accent-color: var(--color-primary, #0d9488);
+    cursor: pointer;
+}
+
+.consent-item label a {
+    color: var(--color-primary, #0d9488);
+    text-decoration: underline;
+}

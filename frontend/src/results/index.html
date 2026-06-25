@@ -102,6 +102,37 @@
             <p id="voucherError" class="status-message error" style="display:none;">Kod voucher jest wymagany.</p>
           </div>
 
+          <div class="consent-section">
+            <!-- Zgoda na dane zdrowotne — art. 9 RODO -->
+            <div class="consent-item">
+              <label for="consentHealth">
+                <input type="checkbox" id="consentHealth" name="consentHealth">
+                <span>* Wyrażam <strong>wyraźną zgodę</strong> na przetwarzanie moich danych dotyczących zdrowia (wyniki testu słuchu) przez AQ Bartosz Gwóźdź w celu wygenerowania raportu PDF. Wiem, że mogę tę zgodę wycofać w każdej chwili pisząc na <a href="mailto:kontakt@sprawdzsluch.pl">kontakt@sprawdzsluch.pl</a>, co będzie skutkować brakiem możliwości realizacji usługi.</span>
+              </label>
+              <p id="consentHealthError" class="status-message error" style="display:none;">Zgoda na przetwarzanie danych zdrowotnych jest wymagana do realizacji usługi.</p>
+            </div>
+
+            <!-- Akceptacja regulaminu i polityki prywatności -->
+            <div class="consent-item">
+              <label for="consentTerms">
+                <input type="checkbox" id="consentTerms" name="consentTerms">
+                <span>* Zapoznałem/am się z <a href="/regulamin" target="_blank">Regulaminem</a> oraz <a href="/polityka-prywatnosci" target="_blank">Polityką prywatności</a> i akceptuję ich postanowienia.</span>
+              </label>
+              <p id="consentTermsError" class="status-message error" style="display:none;">Akceptacja regulaminu jest wymagana.</p>
+            </div>
+
+            <!-- Zgoda na natychmiastowe wykonanie usługi cyfrowej — art. 38 pkt 13 UPK -->
+            <div class="consent-item">
+              <label for="consentDigital">
+                <input type="checkbox" id="consentDigital" name="consentDigital">
+                <span>* Żądam natychmiastowego wykonania usługi cyfrowej i przyjmuję do wiadomości, że po dostarczeniu raportu PDF na mój adres e-mail <strong>tracę prawo do odstąpienia od umowy</strong> zawartej na odległość, zgodnie z art. 38 pkt 13 ustawy o prawach konsumenta.</span>
+              </label>
+              <p id="consentDigitalError" class="status-message error" style="display:none;">Zgoda na natychmiastowe wykonanie usługi jest wymagana.</p>
+            </div>
+
+            <p style="font-size:0.8rem; color: var(--color-text-muted);">* Pola obowiązkowe</p>
+          </div>
+
           <div>
             <button id="buyBtn" type="submit" class="btn-submit">
               Kup raport PDF za 24,99 zł

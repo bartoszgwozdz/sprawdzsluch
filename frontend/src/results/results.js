@@ -360,7 +360,26 @@ function setupPaymentForm() {
     
     paymentForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
+
+        // Walidacja zgód RODO
+        const consentChecks = [
+            { id: 'consentHealth',  errorId: 'consentHealthError' },
+            { id: 'consentTerms',   errorId: 'consentTermsError' },
+            { id: 'consentDigital', errorId: 'consentDigitalError' },
+        ];
+        let consentValid = true;
+        consentChecks.forEach(({ id, errorId }) => {
+            const cb = document.getElementById(id);
+            const err = document.getElementById(errorId);
+            if (cb && !cb.checked) {
+                if (err) err.style.display = 'block';
+                consentValid = false;
+            } else if (err) {
+                err.style.display = 'none';
+            }
+        });
+        if (!consentValid) return;
+
         // Walidacja email
         const email = document.getElementById('email').value;
         const emailError = document.getElementById('emailError');
