@@ -83,7 +83,7 @@ class PDFService {
       const footerTemplate = `
         <div style="width:100%; font-family:'Montserrat', Arial, sans-serif; font-size:8px; color:#94A3B8;
                     padding:0 14mm; display:flex; justify-content:space-between; align-items:center;">
-          <span style="color:#004AAD; font-weight:700;">Sprawdź<span style="color:#00C853;">Słuch</span></span>
+          <span style="color:#0E7490; font-weight:700;">Sprawdź<span style="color:#16A34A;">Słuch</span></span>
           <span>Raport nr ${reportId}</span>
           <span>Strona <span class="pageNumber"></span> z <span class="totalPages"></span></span>
         </div>`;

@@ -4,71 +4,70 @@
 <head>
   <meta charset="UTF-8" />
   <title>Kontakt | Sprawdź Słuch</title>
-  
+
   <!-- Favicon -->
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon_io/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon_io/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon_io/favicon-16x16.png">
   <link rel="manifest" href="/assets/favicon_io/site.webmanifest">
   <link rel="shortcut icon" href="/assets/favicon_io/favicon.ico">
-  
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="/assets/styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 
 <body>
   <div class="container" style="min-height: 100vh; display: flex; flex-direction: column;">
     <div id="main-header"></div>
     <main style="flex: 1;">
-      <section class="section-header">
-        <h2>Skontaktuj się z nami</h2>
+      <section class="page-header">
+        <h1 class="page-title">Skontaktuj się z nami</h1>
+        <p class="page-lead">Masz pytania lub potrzebujesz pomocy? Napisz do nas, a my z przyjemnością Ci pomożemy.</p>
       </section>
       <div class="contact-wrapper">
-        <p class="modal-description">
-          Masz pytania lub potrzebujesz pomocy? Skontaktuj się z nami, a my z przyjemnością Ci pomożemy.
-        </p>
-        <form class="contact-form">
-          <label class="form-label">
+        <form class="contact-form" id="contactForm" novalidate>
+          <label class="form-label" for="contact-name">
             Imię i nazwisko
-            <input type="text" placeholder="Wpisz swoje imię i nazwisko" class="form-input" />
+            <input id="contact-name" name="name" type="text" placeholder="Wpisz swoje imię i nazwisko" class="form-input" required />
           </label>
-          <label class="form-label">
+          <label class="form-label" for="contact-email">
             Adres e-mail
-            <input type="email" placeholder="Wpisz swój adres e-mail" class="form-input" />
+            <input id="contact-email" name="email" type="email" placeholder="Wpisz swój adres e-mail" class="form-input" required />
           </label>
-          <label class="form-label">
+          <label class="form-label" for="contact-topic">
             Temat
-            <input type="text" placeholder="Wybierz temat" class="form-input" />
+            <select id="contact-topic" name="topic" class="form-select" required>
+              <option value="" selected disabled>Wybierz temat</option>
+              <option value="Płatność i raport PDF">Płatność i raport PDF</option>
+              <option value="Wynik testu">Wynik testu</option>
+              <option value="Problem techniczny">Problem techniczny</option>
+              <option value="Inne">Inne</option>
+            </select>
           </label>
-          <label class="form-label">
+          <label class="form-label" for="contact-message">
             Wiadomość
-            <textarea placeholder="Wpisz swoją wiadomość" class="form-textarea"></textarea>
+            <textarea id="contact-message" name="message" placeholder="Wpisz swoją wiadomość" class="form-textarea" required></textarea>
           </label>
-          <div class="modal-button-container" style="justify-content: flex-start;">
+          <div>
             <button type="submit" class="btn-primary">
               <span class="button-text">Wyślij</span>
             </button>
           </div>
+          <p id="contactStatus" class="status-message" role="status" style="display:none;"></p>
         </form>
-        <h3 class="modal-title" style="font-size:1.25rem; margin-top:2rem;">Inne sposoby kontaktu</h3>
-        <p class="modal-description">
-          Możesz również skontaktować się z nami bezpośrednio przez e-mail lub telefon.
-        </p>
+
+        <h2 class="results-subtitle" style="margin-top:2rem;">Inne sposoby kontaktu</h2>
+        <p class="results-lead">Możesz również skontaktować się z nami bezpośrednio przez e-mail.</p>
         <div class="contact-methods">
           <div class="contact-method">
             <div class="contact-icon">
-              <!-- Ikona e-mail -->
-              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor"
-                viewBox="0 0 256 256">
-                <path
-                  d="M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48Zm-96,85.15L52.57,64H203.43ZM98.71,128,40,181.81V74.19Zm11.84,10.85,12,11.05a8,8,0,0,0,10.82,0l12-11.05,58,53.15H52.57ZM157.29,128,216,74.18V181.82Z">
-                </path>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256" aria-hidden="true">
+                <path d="M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48Zm-96,85.15L52.57,64H203.43ZM98.71,128,40,181.81V74.19Zm11.84,10.85,12,11.05a8,8,0,0,0,10.82,0l12-11.05,58,53.15H52.57ZM157.29,128,216,74.18V181.82Z"></path>
               </svg>
             </div>
             <div>
               <p class="contact-info-title">E-mail</p>
-              <p class="contact-info-text">kontakt@sprawdzsluch.pl</p>
+              <p class="contact-info-text"><a href="mailto:kontakt@sprawdzsluch.pl">kontakt@sprawdzsluch.pl</a></p>
             </div>
           </div>
         </div>
@@ -76,7 +75,6 @@
     </main>
     <div id="main-footer"></div>
   </div>
-
 
   <!-- MODALE (pozostają bez zmian) -->
   <div id="hearing-modal" class="modal">
@@ -98,6 +96,39 @@
     </div>
   </div>
   <script src="/assets/js/main.js"></script>
+  <script>
+    // Formularz kontaktowy — fallback przez mailto (brak dedykowanego API kontaktu)
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.getElementById('contactForm');
+      const status = document.getElementById('contactStatus');
+      if (!form) return;
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const name = document.getElementById('contact-name').value.trim();
+        const email = document.getElementById('contact-email').value.trim();
+        const topic = document.getElementById('contact-topic').value;
+        const message = document.getElementById('contact-message').value.trim();
+
+        if (!name || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) || !topic || !message) {
+          status.textContent = 'Uzupełnij wszystkie pola i podaj poprawny adres e-mail.';
+          status.className = 'status-message error';
+          status.style.display = 'block';
+          return;
+        }
+
+        const subject = encodeURIComponent('[Kontakt] ' + topic);
+        const body = encodeURIComponent(
+          'Imię i nazwisko: ' + name + '\nE-mail: ' + email + '\n\n' + message
+        );
+        window.location.href = 'mailto:kontakt@sprawdzsluch.pl?subject=' + subject + '&body=' + body;
+
+        status.textContent = 'Otwieramy Twój program pocztowy, aby dokończyć wysyłkę wiadomości.';
+        status.className = 'status-message success';
+        status.style.display = 'block';
+      });
+    });
+  </script>
 </body>
 
 </html>

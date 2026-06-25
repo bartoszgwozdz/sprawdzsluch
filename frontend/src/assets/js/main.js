@@ -6,8 +6,7 @@ const modalSteps = [
     // "/assets/partials/modal-test-2-intro.html",
     "/assets/partials/modal-test-2.html",           // Test maksymalnej częstotliwości
     // "/assets/partials/modal-test-3-intro.html",
-    "/assets/partials/modal-test-3.html",           // Test losowych częstotliwości
-    "/assets/partials/modal-results.html"           // Wyniki
+    "/assets/partials/modal-test-3.html"            // Test losowych częstotliwości (po nim następuje przekierowanie na /results/)
 ];
 let currentStep = 0;
 
@@ -181,96 +180,6 @@ function showModalStep(step) {
                 document.getElementById('hear-button').onclick = () => {
                     window.hearingTestInstance.recordHearing();
                 };
-            } else if (step === 5) { // Wyniki
-                fetch('/assets/partials/modal-results-part.html')
-                    .then(res => res.text())
-                    .then(html => {
-                        // Wyciągnij zawartość body z pobranego pliku
-                        const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-                        const resultsContent = bodyMatch ? bodyMatch[1] : html;
-                        
-                        // Wyciągnij style z pobranego pliku
-                        const styleMatch = html.match(/<style>([\s\S]*?)<\/style>/i);
-                        const resultStyles = styleMatch ? styleMatch[1] : '';
-                        
-                        // Wstaw style do modal-content
-                        if (resultStyles) {
-                            const styleElement = document.createElement('style');
-                            styleElement.textContent = resultStyles;
-                            modalContent.appendChild(styleElement);
-                        }
-                        
-                        // Wstaw zawartość do modal-content
-                        modalContent.innerHTML += resultsContent;
-                        
-                        // Dodaj obsługę przycisku kończącego test
-                        const finishBtn = document.getElementById('finish-button');
-                        if (finishBtn) {
-                            finishBtn.onclick = () => modal.classList.remove('show');
-                        }
-                        
-                        // Obsługa formularza płatności
-                        const paymentForm = document.getElementById('paymentForm');
-                        if (paymentForm) {
-                            paymentForm.addEventListener('submit', async (e) => {
-                                e.preventDefault();
-                                
-                                const email = document.getElementById('email').value;
-                                const method = document.querySelector('input[name="method"]:checked').value;
-                                
-                                try {
-                                    const buyBtn = document.getElementById('buyBtn');
-                                    buyBtn.disabled = true;
-                                    buyBtn.textContent = "Przetwarzanie...";
-                                    
-                                    const response = await fetch('/api/payments/create', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({
-                                            userEmail: email,
-                                            paymentMethod: method,
-                                            testResults: window.hearingTestInstance.hearingLevels 
-                                        })
-                                    });
-                                    
-                                    if (!response.ok) {
-                                        throw new Error(`Błąd HTTP: ${response.status}`);
-                                    }
-                                    
-                                    const payment = await response.json();
-                                    
-                                    if (payment.redirectUrl) {
-                                        window.location.href = payment.redirectUrl;
-                                    } else {
-                                        throw new Error('Brak URL przekierowania w odpowiedzi.');
-                                    }
-                                } catch (error) {
-                                    console.error('Błąd podczas przetwarzania płatności:', error);
-                                    const statusMessage = document.getElementById('statusMessage');
-                                    statusMessage.textContent = 'Wystąpił błąd podczas przetwarzania płatności. Spróbuj ponownie.';
-                                    statusMessage.style.display = 'block';
-                                    statusMessage.className = 'status error';
-                                    
-                                    const buyBtn = document.getElementById('buyBtn');
-                                    buyBtn.disabled = false;
-                                    buyBtn.textContent = "Kup raport PDF za 24,99 zł";
-                                }
-                            });
-                        }
-                        
-                        // Usunięcie istniejących skryptów wykresu
-                        setTimeout(() => {
-                            // Scrolluj na górę modalu po załadowaniu zawartości
-                            modalDialog.scrollTop = 0;
-                            
-                            // Aktualizuj wykres z wynikami testu
-                            updateHearingRangeChart();
-                        }, 100);
-                    })
-                    .catch(error => {
-                        console.error('Error loading results part:', error);
-                        modalContent.innerHTML = '<p class="p-4 text-red-500">Wystąpił błąd podczas ładowania wyników. Spróbuj ponownie.</p>';
-                    });
             }
         })
         .catch(error => {
@@ -509,6 +418,8 @@ function updateHearingRangeChart() {
                             },
                             options: {
                                 responsive: true,
+                                maintainAspectRatio: false,
+                                layout: { padding: { top: 26, left: 8, right: 8 } },
                                 scales: {
                                     x: {
                                         type: 'logarithmic',
@@ -546,10 +457,10 @@ function updateHearingRangeChart() {
                                                 borderDash: [4, 4],
                                                 label: {
                                                     display: true,
-                                                    content: 'Twój maksymalny zakres słyszalny',
+                                                    content: 'Maks. zakres',
                                                     position: 'start',
-                                                    yAdjust: -20,
-                                                    backgroundColor: 'rgba(34,197,94,0.9)',
+                                                    yAdjust: -14,
+                                                    backgroundColor: 'rgba(21,128,61,0.92)',
                                                     color: '#fff',
                                                     font: {
                                                         size: 12,
@@ -583,7 +494,7 @@ function updateHearingRangeChart() {
                         // Aktualizuj tekst etykiety z dokładnością do 0.1 kHz
                         const maxKHz = (maxFreq / 1000).toFixed(1);
                         chart.options.plugins.annotation.annotations.maxLine.label.content = 
-                            `Twój maksymalny zakres słyszalny: ${maxKHz} kHz`;
+                            `Maks. ${maxKHz} kHz`;
                     }
 
                     // Aktualizuj skalę X, aby pokazać odpowiedni zakres częstotliwości
