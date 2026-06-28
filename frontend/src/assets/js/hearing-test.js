@@ -25,69 +25,153 @@ class HearingTest {
     this._isPaused = false; // Dodane: Flaga wstrzymania
     this._savedFrequency = null; // Dodane: Zapamiętana częstotliwość
     this._savedGain = null; // Dodane: Zapamiętana głośność
+
+    // Pojedynczy cykl życia: stan fazy testu + parametry zejścia częstotliwości
+    this.testPhase = 'idle'; // 'idle' | 'adjusting1kHz' | 'maxFrequency' | 'randomFrequency' | 'complete'
+    this._pausedByVisibility = false; // czy pauza pochodzi ze zmiany widoczności karty
+    this._descentDecrement = 500;
+    this._descentGain = this.referenceLevel * 1.414;
+
+    // Referencje do związanych handlerów (do rejestracji i usunięcia w destroy)
+    this._onVisibilityChange = this._handleVisibilityChange.bind(this);
+    this._onPageHide = this._handlePageHide.bind(this);
+    this._onPageShow = this._handlePageShow.bind(this);
+    this._lifecycleBound = false;
+  }
+
+  // Minimalne logowanie diagnostyczne (włącz przez window.HEARING_DEBUG = true)
+  _log(...args) {
+    if (typeof window !== 'undefined' && window.HEARING_DEBUG) {
+      console.log('[hearing-test]', ...args);
+    }
+  }
+
+  // Upewnij się, że AudioContext nie jest „suspended" (Safari/mobile po nawigacji)
+  ensureRunning() {
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume()
+        .then(() => this._log('AudioContext resumed (ensureRunning), state:', this.audioContext.state))
+        .catch(e => this._log('ensureRunning resume error:', e));
+    }
+  }
+
+  // Rejestracja handlerów cyklu życia strony (idempotentna)
+  _bindLifecycle() {
+    if (this._lifecycleBound) return;
+    document.addEventListener('visibilitychange', this._onVisibilityChange);
+    window.addEventListener('pagehide', this._onPageHide);
+    window.addEventListener('pageshow', this._onPageShow);
+    this._lifecycleBound = true;
+  }
+
+  _handleVisibilityChange() {
+    if (document.hidden) {
+      // Wstrzymaj odtwarzanie, gdy karta przechodzi w tło (tylko aktywny test)
+      if (this.testRunning && !this._isPaused) {
+        this._log('visibilitychange -> hidden: pauseAudio');
+        this._pausedByVisibility = true;
+        this.pauseAudio();
+      }
+    } else {
+      // Powrót do karty: wznów TYLKO jeśli to my wstrzymaliśmy przez ukrycie karty
+      // (nie nadpisuj pauzy wywołanej modalem potwierdzenia wyjścia).
+      if (this._pausedByVisibility && this._isPaused &&
+          this.testPhase !== 'idle' && this.testPhase !== 'complete') {
+        this._log('visibilitychange -> visible: resumeAudio');
+        this._pausedByVisibility = false;
+        this.ensureRunning();
+        this.resumeAudio();
+      }
+    }
+  }
+
+  _handlePageHide() {
+    // Nawigacja/zamknięcie: wycisz i wyczyść interwały, by nic nie grało w tle
+    this._log('pagehide: stopCurrentTest');
+    this.stopCurrentTest();
+  }
+
+  _handlePageShow(event) {
+    // Przywrócenie z bfcache: zresetuj do bezpiecznego stanu zatrzymanego
+    if (event && event.persisted) {
+      this._log('pageshow (bfcache): reset to stopped state');
+      this.testRunning = false;
+      this._isPaused = false;
+      clearInterval(this.increaseGainInterval);
+      clearInterval(this.frequencyDescentInterval);
+    }
   }
 
   // *** NOWA METODA DO ODBLOKOWANIA AUDIO NA URZĄDZENIACH MOBILNYCH ***
   unlockAudio() {
     if (!this.audioContext) {
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        console.log('AudioContext created on user gesture.');
+        this._log('AudioContext created on user gesture.');
     }
-    if (this.audioContext.state === 'suspended') {
-        this.audioContext.resume().then(() => {
-            console.log('AudioContext resumed successfully!');
-        }).catch(e => console.error('Error resuming AudioContext:', e));
-    }
+    this.ensureRunning();
   }
 
   initialize(hearButtonId, instructionId) {
     this.hearButton = document.getElementById(hearButtonId);
     this.testInstruction = document.getElementById(instructionId);
 
+    // Zarejestruj handlery cyklu życia strony (idempotentnie)
+    this._bindLifecycle();
+
     // Jeśli AudioContext nie istnieje, utwórz go.
     // Na mobile zostanie on w pełni aktywowany przez unlockAudio().
     if (!this.audioContext) {
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        console.log('AudioContext initialized. State:', this.audioContext.state);
+        this._log('AudioContext initialized. State:', this.audioContext.state);
     }
-    
-    // Jeśli węzły już istnieją, nie twórz ich ponownie
+    this.ensureRunning();
+
+    // Jeden, długożyjący oscylator: jeśli już istnieje, nie twórz go ponownie.
     if (this.oscillator) return;
 
     // Przypisz węzły bezpośrednio do właściwości klasy
     this.oscillator = this.audioContext.createOscillator();
+    this.oscillator.type = 'sine';
     this.gainNode = this.audioContext.createGain();
 
     this.oscillator.connect(this.gainNode);
     this.gainNode.connect(this.audioContext.destination);
     this.gainNode.gain.setValueAtTime(0, this.audioContext.currentTime); // Zacznij od zera głośności
     this.oscillator.start();
-
-    // Usunięto blok try-catch z resume(), ponieważ jest to teraz obsługiwane przez unlockAudio()
   }
 
   // Metody dla poszczególnych etapów testu
   startAdjusting1kHz() {
+    this.testPhase = 'adjusting1kHz';
+    this.ensureRunning();
     this.testInstruction.textContent = "Najpierw musimy ustawić poziom referencyjny 0 dB. Ton o częstotliwości 1kHz zacznie bardzo cicho i będzie stopniowo zwiększał głośność. Kliknij 'Słyszę!' gdy tylko usłyszysz dźwięk.";
     this.currentFrequency = 1000;
     this.currentGain = 0.00001;
     this.playTone(this.currentFrequency, this.currentGain);
     this.testRunning = true;
     this.hearButton.disabled = false;
-    console.log("startAdjusting1kHz - currentFrequency:", this.currentFrequency, "currentGain:", this.currentGain); // ADDED LOG
+    this._log("startAdjusting1kHz - currentFrequency:", this.currentFrequency, "currentGain:", this.currentGain);
     this.startIncreasingGain();
   }
 
   findMaxFrequency() {
+    this.testPhase = 'maxFrequency';
+    this.ensureRunning();
     this.testInstruction.textContent = "Świetnie! Teraz znajdziemy Twoją najwyższą słyszalną częstotliwość. Ton rozpocznie się od 20kHz (bardzo wysoki) i będzie stopniowo obniżany. Kliknij 'Słyszę!' w MOMENCIE gdy usłyszysz dźwięk.";
     this.currentFrequency = 20000;
-    const decrement = 500;
-    const initialGain = this.referenceLevel * 1.414; // ~+3dB
-    this.playTone(this.currentFrequency, initialGain);
+    this._descentDecrement = 500;
+    this._descentGain = this.referenceLevel * 1.414; // ~+3dB
+    this.currentGain = this._descentGain;
+    this.playTone(this.currentFrequency, this._descentGain);
     this.hearButton.disabled = false;
     this.testRunning = true;
+    this.startFrequencyDescent(this._descentDecrement, this._descentGain);
+  }
 
+  // Zejście częstotliwości — wyodrębnione, aby resumeAudio mogło je wznowić
+  startFrequencyDescent(decrement, gain) {
     clearInterval(this.frequencyDescentInterval);
+    this._log("startFrequencyDescent - from:", this.currentFrequency, "decrement:", decrement);
 
     this.frequencyDescentInterval = setInterval(() => {
       if (!this.testRunning) {
@@ -106,11 +190,14 @@ class HearingTest {
         return;
       }
 
-      this.playTone(this.currentFrequency, initialGain);
+      this.currentGain = gain;
+      this.playTone(this.currentFrequency, gain);
     }, 1000);
   }
 
   startRandomFrequencyTest() {
+    this.testPhase = 'randomFrequency';
+    this.ensureRunning();
     this.prepareFrequenciesArray();
     this.playNextFrequency();
   }
@@ -122,7 +209,7 @@ class HearingTest {
     // Zakładając, że shuffleArray to globalna funkcja pomocnicza
     this.frequencyOrder = this.shuffleArray(filteredFrequencies);
     this.currentFrequencyIndex = 0;
-    console.log("prepareFrequenciesArray - frequencyOrder:", this.frequencyOrder); // ADDED LOG
+    this._log("prepareFrequenciesArray - frequencyOrder:", this.frequencyOrder);
   }
 
 
@@ -141,7 +228,7 @@ class HearingTest {
       // Ustaw bardzo niską początkową głośność
       this.currentGain = 0.00001;
 
-      console.log("playNextFrequency - frequency:", this.currentFrequency, "currentGain:", this.currentGain, "currentFrequencyIndex:", this.currentFrequencyIndex);
+      this._log("playNextFrequency - frequency:", this.currentFrequency, "currentGain:", this.currentGain, "currentFrequencyIndex:", this.currentFrequencyIndex);
 
       // Odtwórz ton z początkową (cichą) głośnością
       this.playTone(this.currentFrequency, this.currentGain);
@@ -162,9 +249,10 @@ class HearingTest {
         counterElement.textContent = "Test zakończony!";
       }
 
-      console.log("Test complete. Final results:", this.hearingLevels);
+      this._log("Test complete. Final results:", this.hearingLevels);
       this.testRunning = false;
-      
+      this.testPhase = 'complete';
+
       // Wywołaj event informujący o zakończeniu testu losowych częstotliwości
       window.dispatchEvent(new CustomEvent('randomTestCompleted'));
     }
@@ -172,18 +260,18 @@ class HearingTest {
 
   startIncreasingGain() {
     clearInterval(this.increaseGainInterval);
-    console.log("startIncreasingGain - currentFrequency:", this.currentFrequency); // ADDED LOG
+    this._log("startIncreasingGain - currentFrequency:", this.currentFrequency);
 
     this.increaseGainInterval = setInterval(() => {
       if (this.testRunning && this.currentGain < 0.1) {
         // POPRAWKA: Użyj this.gainNode zamiast this.audioContext.gainNode
-        const gainNode = this.gainNode; 
+        const gainNode = this.gainNode;
+        if (!gainNode) { clearInterval(this.increaseGainInterval); return; }
         this.currentGain *= 1.62; // Small increment
         gainNode.gain.setValueAtTime(this.currentGain, this.audioContext.currentTime);
-        // console.log("increaseGainInterval - currentGain:", this.currentGain); // Opcjonalny log
       } else {
         clearInterval(this.increaseGainInterval); // Stop if button is clicked or test is stopped
-        console.log("clearInterval - currentFrequency:", this.currentFrequency, "testRunning:", this.testRunning, "currentGain >= 0.1:", this.currentGain >= 0.1); // ADDED LOG
+        this._log("increaseGain stopped - currentFrequency:", this.currentFrequency, "testRunning:", this.testRunning, "currentGain>=0.1:", this.currentGain >= 0.1);
       }
     }, 666); // Zmniejszono interwał dla płynniejszego podgłaśniania
   }
@@ -201,16 +289,16 @@ class HearingTest {
   }
 
   stopCurrentTest() {
-    console.log("Executing stopCurrentTest...");
+    this._log("Executing stopCurrentTest...");
     this.testRunning = false; // Zatrzymaj pętle testowe
 
     // Zatrzymaj interwały
-    if (this.increaseGainInterval) clearInterval(this.increaseGainInterval);
-    if (this.frequencyDescentInterval) clearInterval(this.frequencyDescentInterval);
-    
+    clearInterval(this.increaseGainInterval);
+    clearInterval(this.frequencyDescentInterval);
+
     // Wycisz dźwięk
     this.stopTone();
-    console.log("Test sound stopped and intervals cleared.");
+    this._log("Test sound stopped and intervals cleared.");
   }
 
   shuffleArray(array) {
@@ -242,8 +330,7 @@ class HearingTest {
     if (this.testStage === 0) {
       this.referenceLevel = this.currentGain;
       this.hearingLevels.push({ frequency: this.currentFrequency, gain: this.currentGain });
-      console.log(this.hearingLevels);
-      console.log("recordHearing - referenceLevel set to:", this.referenceLevel, "currentFrequency:", this.currentFrequency); // ADDED LOG
+      this._log("recordHearing - referenceLevel set to:", this.referenceLevel, "currentFrequency:", this.currentFrequency, this.hearingLevels);
       this.testStage = 1;
     } else if (this.testStage === 1) {
       this.maxAudibleFrequency = this.currentFrequency;
@@ -256,7 +343,8 @@ class HearingTest {
       if (!this.isTestComplete()) {
         this.playNextFrequency();
       } else {
-        console.log("Random frequency test completed.");
+        this._log("Random frequency test completed.");
+        this.testPhase = 'complete';
         window.dispatchEvent(new CustomEvent('randomTestCompleted'));
       }
     }
@@ -322,82 +410,97 @@ class HearingTest {
     return closestCorrection;
   }
 
-  // Dodaj te metody do obiektu hearingTestInstance w pliku hearing-test.js
-
-  // Zatrzymanie odtwarzania dźwięku, zachowując stan testu
+  // Wstrzymanie testu: wyciszenie + zatrzymanie pętli, BEZ niszczenia oscylatora.
+  // Oscylator żyje przez cały cykl (jeden, długożyjący) — zatrzymany OscillatorNode
+  // nie da się wznowić, więc tylko wyciszamy i czyścimy interwały.
   pauseAudio() {
-      if (this.audioContext && this.oscillator) {
-          // Zapamiętaj aktualne parametry dźwięku
-          this._savedFrequency = this.currentFrequency;
-          this._savedGain = this.currentGain;
-          this._isPaused = true;
-          
-          // Zatrzymaj odtwarzanie
-          this.oscillator.stop();
+      if (this._isPaused) return;
+      // Zapamiętaj aktualne parametry dźwięku do wznowienia
+      this._savedFrequency = this.currentFrequency;
+      this._savedGain = this.currentGain;
+      this._isPaused = true;
+      this.testRunning = false; // wstrzymaj pętle (interwały i tak czyścimy)
+
+      clearInterval(this.increaseGainInterval);
+      clearInterval(this.frequencyDescentInterval);
+      this.stopTone();
+      this._log('pauseAudio - phase:', this.testPhase, 'freq:', this._savedFrequency, 'gain:', this._savedGain);
+  }
+
+  // Wznowienie testu: przywróć ton z zapisanych parametrów i wejdź ponownie
+  // w pętlę bieżącej fazy (faza-świadome wznowienie).
+  resumeAudio() {
+      if (!this._isPaused) return;
+      this._isPaused = false;
+      this._pausedByVisibility = false;
+      this.ensureRunning();
+
+      // Przywróć parametry tonu
+      this.currentFrequency = this._savedFrequency || this.currentFrequency || 1000;
+      this.currentGain = this._savedGain || this.currentGain || 0.00001;
+      this.testRunning = true;
+      this.playTone(this.currentFrequency, this.currentGain);
+
+      this._log('resumeAudio - phase:', this.testPhase, 'freq:', this.currentFrequency, 'gain:', this.currentGain);
+
+      // Wejdź ponownie w pętlę odpowiedniej fazy
+      if (this.testPhase === 'adjusting1kHz' || this.testPhase === 'randomFrequency') {
+          this.startIncreasingGain();
+      } else if (this.testPhase === 'maxFrequency') {
+          this.startFrequencyDescent(this._descentDecrement, this._descentGain);
+      }
+  }
+
+  // Całkowite zatrzymanie testu audio (np. po potwierdzeniu wyjścia)
+  stopAudio() {
+      this.testRunning = false;
+      this._isPaused = false;
+      clearInterval(this.increaseGainInterval);
+      clearInterval(this.frequencyDescentInterval);
+      this.stopTone();
+      this._savedFrequency = null;
+      this._savedGain = null;
+      this.testPhase = 'idle';
+      this._log('stopAudio - test stopped, intervals cleared');
+  }
+
+  // Jawny cykl życia: pełne sprzątanie instancji (interwały, węzły, handlery)
+  destroy() {
+      clearInterval(this.increaseGainInterval);
+      clearInterval(this.frequencyDescentInterval);
+      this.testRunning = false;
+      this._isPaused = false;
+      this.testPhase = 'idle';
+
+      if (this.oscillator) {
+          try { this.oscillator.stop(); } catch (e) { /* już zatrzymany */ }
+          try { this.oscillator.disconnect(); } catch (e) { /* noop */ }
           this.oscillator = null;
       }
-  }
-
-  // Wznowienie odtwarzania dźwięku z zachowanymi parametrami
-  resumeAudio() {
-      if (this.audioContext && this._isPaused) {
-          // Odtwórz dźwięk z zapamiętanymi parametrami
-          this._isPaused = false;
-          this.oscillator = this.audioContext.createOscillator();
-          this.oscillator.type = 'sine';
-          this.oscillator.frequency.value = this._savedFrequency || 1000;
-          
-          this.gainNode = this.audioContext.createGain();
-          this.gainNode.gain.value = this._savedGain || 0;
-          
-          this.oscillator.connect(this.gainNode);
-          this.gainNode.connect(this.audioContext.destination);
-          
-          this.oscillator.start();
-          
-          // Wznów odpowiedni test w zależności od kroku
-          if (this.testPhase === 'adjusting1kHz') {
-              this.continueAdjusting1kHz();
-          } else if (this.testPhase === 'maxFrequency') {
-              this.continueMaxFrequencyTest();
-          } else if (this.testPhase === 'randomFrequency') {
-              this.continueRandomFrequencyTest();
-          }
+      if (this.gainNode) {
+          try { this.gainNode.disconnect(); } catch (e) { /* noop */ }
+          this.gainNode = null;
       }
-  }
 
-  // Całkowite zatrzymanie testu audio
-  stopAudio() {
-      if (this.audioContext) {
-          if (this.oscillator) {
-              this.oscillator.stop();
-              this.oscillator = null;
-          }
-          this._isPaused = false;
-          this._savedFrequency = null;
-          this._savedGain = null;
+      // Usuń handlery cyklu życia strony
+      if (this._lifecycleBound) {
+          document.removeEventListener('visibilitychange', this._onVisibilityChange);
+          window.removeEventListener('pagehide', this._onPageHide);
+          window.removeEventListener('pageshow', this._onPageShow);
+          this._lifecycleBound = false;
       }
-  }
-
-  // Metody do kontynuowania poszczególnych testów
-  continueAdjusting1kHz() {
-      // Kod do kontynuowania testu 1kHz od miejsca zatrzymania
-      if (this._savedFrequency && this._savedGain) {
-          // Kontynuuj od zapamiętanych parametrów
-      }
-  }
-
-  continueMaxFrequencyTest() {
-      // Kod do kontynuowania testu maksymalnej częstotliwości
-  }
-
-  continueRandomFrequencyTest() {
-      // Kod do kontynuowania testu losowych częstotliwości
+      // Nie zamykamy audioContext — jeden kontekst reużywamy (zamykanie kosztowne na Safari)
+      this._log('destroy - instance cleaned up');
   }
 }
 
 
 // Ukrywamy globalny zasięg w IIFE (Immediately Invoked Function Expression)
 (() => {
+  // Pojedynczy cykl życia: zniszcz starą instancję przed utworzeniem nowej
+  // (defensywnie wobec ponownego wstrzyknięcia skryptu).
+  if (window.hearingTestInstance && typeof window.hearingTestInstance.destroy === 'function') {
+    window.hearingTestInstance.destroy();
+  }
   window.hearingTestInstance = new HearingTest();
 })();

@@ -32,20 +32,50 @@ if (mainTestBtn) {
     mainTestBtn.addEventListener('click', openModal);
 }
 
-// Zamknięcie modalu
-btnClose.onclick = () => {
-    // Jeśli jesteśmy na kroku przygotowania lub dalej, pokaż potwierdzenie wyjścia
+// Wiąże przyciski w modalu potwierdzenia wyjścia. Wywoływane przy KAŻDYM otwarciu
+// potwierdzenia (X, klik poza modalem, Escape), aby pauza/wznowienie było
+// deterministyczne niezależnie od ścieżki wyjścia.
+function wireConfirmExitButtons() {
+    const confirmExitModal = document.getElementById('confirm-exit-modal');
+    const confirmExitYes = document.getElementById('confirm-exit-yes');
+    const confirmExitNo = document.getElementById('confirm-exit-no');
+
+    if (confirmExitYes) {
+        confirmExitYes.onclick = () => {
+            // Potwierdzono wyjście: zatrzymaj test na stałe
+            if (window.hearingTestInstance) {
+                window.hearingTestInstance.stopAudio();
+                console.log('Test audio stopped permanently');
+            }
+            confirmExitModal.classList.remove('show');
+            modal.classList.remove('show');
+        };
+    }
+    if (confirmExitNo) {
+        confirmExitNo.onclick = () => {
+            confirmExitModal.classList.remove('show');
+            // Wznów test po anulowaniu wyjścia
+            toggleTestPause(false);
+        };
+    }
+}
+
+// Otwiera potwierdzenie wyjścia (z pauzą testu) lub zamyka modal na wprowadzeniu.
+function requestExit() {
     if (currentStep >= 1) {
         const confirmExitModal = document.getElementById('confirm-exit-modal');
         confirmExitModal.classList.add('show');
-
         // Zatrzymaj test audio, gdy pokazujemy potwierdzenie
         toggleTestPause(true);
+        wireConfirmExitButtons();
     } else {
         // Jeśli jesteśmy na wprowadzeniu, po prostu zamknij modal
         modal.classList.remove('show');
     }
-};
+}
+
+// Zamknięcie modalu (przycisk X)
+btnClose.onclick = requestExit;
 
 // Dodaj style dla scrollowania modalu - umieść tę funkcję na początku pliku
 function addModalScrollStyles() {
@@ -136,24 +166,24 @@ function showModalStep(step) {
                     };
                 }
             } else if (step === 2) { // Test 1kHz
-                window.hearingTestInstance.initialize('hear-button', 'test-instruction', 'sound-wave-canvas');
+                window.hearingTestInstance.initialize('hear-button', 'test-instruction');
                 window.hearingTestInstance.startAdjusting1kHz();
                 document.getElementById('hear-button').onclick = () => {
                     window.hearingTestInstance.recordHearing();
                     setTimeout(() => { currentStep++; showModalStep(currentStep); }, 500);
                 };
             } else if (step === 3) { // Test max częstotliwości
-                window.hearingTestInstance.initialize('hear-button', 'test-instruction', 'sound-wave-canvas');
+                window.hearingTestInstance.initialize('hear-button', 'test-instruction');
                 window.hearingTestInstance.findMaxFrequency();
                 document.getElementById('hear-button').onclick = () => {
                     window.hearingTestInstance.recordHearing();
                     setTimeout(() => { currentStep++; showModalStep(currentStep); }, 500);
                 };
             } else if (step === 4) { // Test losowych częstotliwości
-                window.hearingTestInstance.initialize('hear-button', 'test-instruction', 'sound-wave-canvas');
-                window.hearingTestInstance.startRandomFrequencyTest();
+                window.hearingTestInstance.initialize('hear-button', 'test-instruction');
 
-                // Nasłuchuj na niestandardowy event, który zasygnalizuje koniec tego etapu
+                // WAŻNE: dodaj listener PRZED startem testu, aby uniknąć wyścigu zakończenia
+                // (event randomTestCompleted może wystąpić natychmiast, np. przy pustej liście).
                 window.addEventListener('randomTestCompleted', () => {
                     console.log('Event "randomTestCompleted" received. Advancing to results page.');
                     
@@ -176,6 +206,9 @@ function showModalStep(step) {
                     // Przekieruj do strony z wynikami
                     window.location.href = '/results/';
                 }, { once: true }); // { once: true } sprawi, że listener usunie się sam po jednym wywołaniu
+
+                // Start testu DOPIERO po zarejestrowaniu listenera zakończenia
+                window.hearingTestInstance.startRandomFrequencyTest();
 
                 document.getElementById('hear-button').onclick = () => {
                     window.hearingTestInstance.recordHearing();
@@ -207,43 +240,7 @@ function toggleTestPause(shouldPause) {
 // Zamknięcie modalu po kliknięciu poza oknem
 modal.addEventListener('mousedown', e => {
     if (e.target === modal) {
-        // Jeśli jesteśmy na kroku przygotowania lub dalej, pokaż potwierdzenie wyjścia
-        if (currentStep >= 1) {
-            const confirmExitModal = document.getElementById('confirm-exit-modal');
-            confirmExitModal.classList.add('show');
-
-            // Zatrzymaj test audio, gdy pokazujemy potwierdzenie
-            toggleTestPause(true);
-
-            // Dodaj event listenery do przycisków w modalu potwierdzającym
-            const confirmExitYes = document.getElementById('confirm-exit-yes');
-            const confirmExitNo = document.getElementById('confirm-exit-no');
-
-            if (confirmExitYes) {
-                confirmExitYes.onclick = function () {
-                    // Jeśli użytkownik potwierdził wyjście, zatrzymaj test na stałe
-                    if (window.hearingTestInstance) {
-                        window.hearingTestInstance.stopAudio();
-                        console.log('Test audio stopped permanently');
-                    }
-
-                    confirmExitModal.classList.remove('show');
-                    modal.classList.remove('show'); // Zamknij główny modal
-                }
-            }
-
-            if (confirmExitNo) {
-                confirmExitNo.onclick = function () {
-                    confirmExitModal.classList.remove('show'); // Tylko zamknij modal potwierdzający
-
-                    // Wznów test audio po anulowaniu wyjścia
-                    toggleTestPause(false);
-                }
-            }
-        } else {
-            // Jeśli jesteśmy na wprowadzeniu, po prostu zamknij modal
-            modal.classList.remove('show');
-        }
+        requestExit();
     }
 });
 
@@ -268,24 +265,24 @@ document.addEventListener('keydown', e => {
             toggleTestPause(false);
         }
         // W przeciwnym razie, zachowaj się jak przy kliknięciu przycisku zamknięcia
-        else if (currentStep >= 1) {
-            confirmExitModal.classList.add('show');
-            toggleTestPause(true);
-        } else {
-            modal.classList.remove('show');
+        else {
+            requestExit();
         }
     }
 });
 
-// Kod główny na stronie
-fetch('/assets/js/hearing-test.js')
-    .then(response => response.text())
-    .then(code => {
-        // Wykonanie kodu dopiero po pobraniu
-        const script = document.createElement('script');
-        script.textContent = code;
-        document.head.appendChild(script);
-    });
+// Kod główny na stronie — wstrzyknięcie hearing-test.js (idempotentne).
+// Jeśli instancja już istnieje (np. po przywróceniu z bfcache), nie wstrzykuj ponownie.
+if (!window.hearingTestInstance) {
+    fetch('/assets/js/hearing-test.js')
+        .then(response => response.text())
+        .then(code => {
+            // Wykonanie kodu dopiero po pobraniu
+            const script = document.createElement('script');
+            script.textContent = code;
+            document.head.appendChild(script);
+        });
+}
 
 // Wstrzykiwanie headera z pliku header.html
 fetch('/assets/partials/header.html')
