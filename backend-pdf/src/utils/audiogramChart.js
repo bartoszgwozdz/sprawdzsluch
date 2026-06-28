@@ -10,7 +10,7 @@
  *  - tło podzielone na strefy ubytku słuchu wg klasyfikacji BIAP
  *    (norma ≤20 / lekki 21–40 / umiarkowany 41–70 / znaczny 71–90 / głęboki >90).
  *
- * Kolorystyka spójna z frontendem SprawdźSłuch (#004AAD, zieleń #00C853, Montserrat).
+ * Kolorystyka spójna z frontendem SprawdźSłuch (turkus #0E7490, zieleń #16A34A, Montserrat).
  */
 class AudiogramChart {
   constructor() {
@@ -102,7 +102,7 @@ class AudiogramChart {
               stroke="#FFFFFF" stroke-width="0.8" opacity="0.7"/>
         <text x="${x.toFixed(1)}" y="${(bottom + 22).toFixed(1)}" text-anchor="middle"
               font-size="10.5" font-weight="600" font-family="Montserrat, sans-serif"
-              fill="${isMax ? '#00A846' : '#475569'}">${this.freqLabel(freq)}</text>`;
+              fill="${isMax ? '#15803D' : '#475569'}">${this.freqLabel(freq)}</text>`;
     }).join('');
 
     // Krzywa progu słyszenia (tylko badane częstotliwości)
@@ -110,9 +110,9 @@ class AudiogramChart {
     const polyline = pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
     const markers = pts.map(p => `
       <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="6.5" fill="#FFFFFF"/>
-      <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.5" fill="#004AAD"/>
+      <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.5" fill="#0E7490"/>
       <text x="${p.x.toFixed(1)}" y="${(p.y - 12).toFixed(1)}" text-anchor="middle"
-            font-size="10" font-weight="700" font-family="Montserrat, sans-serif" fill="#003D91">${p.db != null ? p.db : ''}</text>`
+            font-size="10" font-weight="700" font-family="Montserrat, sans-serif" fill="#155E75">${p.db != null ? p.db : ''}</text>`
     ).join('');
 
     // Znacznik maksymalnej słyszalnej częstotliwości (zielona linia, jak na froncie)
@@ -124,8 +124,8 @@ class AudiogramChart {
       const lx = Math.min(xm + 8, right - labelW);
       maxMarker = `
         <line x1="${xm.toFixed(1)}" y1="${this.padTop}" x2="${xm.toFixed(1)}" y2="${bottom}"
-              stroke="#00A846" stroke-width="2" stroke-dasharray="4,4"/>
-        <rect x="${lx.toFixed(1)}" y="${this.padTop - 1}" width="${labelW.toFixed(0)}" height="17" rx="5" fill="#00A846"/>
+              stroke="#15803D" stroke-width="2" stroke-dasharray="4,4"/>
+        <rect x="${lx.toFixed(1)}" y="${this.padTop - 1}" width="${labelW.toFixed(0)}" height="17" rx="5" fill="#166534"/>
         <text x="${(lx + labelW / 2).toFixed(1)}" y="${this.padTop + 11}" text-anchor="middle"
               font-size="9.5" font-weight="700" font-family="Montserrat, sans-serif" fill="#FFFFFF">${label}</text>`;
     }
@@ -136,7 +136,7 @@ class AudiogramChart {
       ${zoneRects}
       ${hLines.join('')}
       ${vLines}
-      <polyline points="${polyline}" fill="none" stroke="#004AAD" stroke-width="3"
+      <polyline points="${polyline}" fill="none" stroke="#0E7490" stroke-width="3"
                 stroke-linecap="round" stroke-linejoin="round"/>
       ${markers}
       ${maxMarker}

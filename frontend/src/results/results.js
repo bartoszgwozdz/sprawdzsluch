@@ -222,8 +222,9 @@ function injectHeaderAndFooter() {
 
 // Funkcja do wyświetlania wykresu słuchu
 function displayHearingChart() {
-    // Pobierz dane z localStorage
-    const testResults = JSON.parse(localStorage.getItem('hearingTestResults')) || {};
+    // Pobierz dane z sessionStorage (tam zapisuje je przepływ testu), z fallbackiem na localStorage
+    const stored = sessionStorage.getItem('hearingTestResults') || localStorage.getItem('hearingTestResults');
+    const testResults = JSON.parse(stored) || {};
     const maxFrequency = testResults.maxAudibleFrequency || 13000;
     const hearingLevels = testResults.hearingLevels || [];
     
@@ -253,6 +254,8 @@ function displayHearingChart() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+            layout: { padding: { top: 26, left: 8, right: 8 } },
             scales: {
                 x: {
                     type: 'logarithmic',
@@ -290,10 +293,10 @@ function displayHearingChart() {
                             borderDash: [4, 4],
                             label: {
                                 display: true,
-                                content: `Twój maksymalny zakres słyszalny: ${(maxFrequency / 1000).toFixed(1)} kHz`,
+                                content: `Maks. ${(maxFrequency / 1000).toFixed(1)} kHz`,
                                 position: 'start',
-                                yAdjust: -20,
-                                backgroundColor: 'rgba(34,197,94,0.9)',
+                                yAdjust: -14,
+                                backgroundColor: 'rgba(21,128,61,0.92)',
                                 color: '#fff',
                                 font: {
                                     size: 12,
@@ -357,7 +360,26 @@ function setupPaymentForm() {
     
     paymentForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
+
+        // Walidacja zgód RODO
+        const consentChecks = [
+            { id: 'consentHealth',  errorId: 'consentHealthError' },
+            { id: 'consentTerms',   errorId: 'consentTermsError' },
+            { id: 'consentDigital', errorId: 'consentDigitalError' },
+        ];
+        let consentValid = true;
+        consentChecks.forEach(({ id, errorId }) => {
+            const cb = document.getElementById(id);
+            const err = document.getElementById(errorId);
+            if (cb && !cb.checked) {
+                if (err) err.style.display = 'block';
+                consentValid = false;
+            } else if (err) {
+                err.style.display = 'none';
+            }
+        });
+        if (!consentValid) return;
+
         // Walidacja email
         const email = document.getElementById('email').value;
         const emailError = document.getElementById('emailError');
