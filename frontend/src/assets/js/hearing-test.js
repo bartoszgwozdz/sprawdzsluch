@@ -144,7 +144,7 @@ class HearingTest {
   startAdjusting1kHz() {
     this.testPhase = 'adjusting1kHz';
     this.ensureRunning();
-    this.testInstruction.textContent = "Za chwilę usłyszysz cichy dźwięk, który będzie powoli głośniał. Kliknij „Słyszę”, gdy tylko go usłyszysz — bez pośpiechu.";
+    this.testInstruction.textContent = "Usłyszysz cichy dźwięk, który powoli głośnieje. Kliknij „Słyszę”, gdy tylko go usłyszysz.";
     this.currentFrequency = 1000;
     this.currentGain = 0.00001;
     this.playTone(this.currentFrequency, this.currentGain);
@@ -158,7 +158,7 @@ class HearingTest {
   findMaxFrequency() {
     this.testPhase = 'maxFrequency';
     this.ensureRunning();
-    this.testInstruction.textContent = "Świetnie! Teraz sprawdzimy najwyższe dźwięki, jakie słyszysz. Zacznie się od bardzo wysokiego tonu, który będzie stopniowo niższy. Kliknij „Słyszę”, gdy tylko go usłyszysz.";
+    this.testInstruction.textContent = "Usłyszysz wysoki dźwięk, który będzie coraz niższy. Kliknij „Słyszę”, gdy tylko go usłyszysz.";
     this.currentFrequency = 20000;
     this._descentDecrement = 500;
     this._descentGain = this.referenceLevel * 1.414; // ~+3dB

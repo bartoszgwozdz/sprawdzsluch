@@ -1611,6 +1611,94 @@ ul.features li .material-icons {
 
 .muted { color: var(--color-text-muted); }
 
+/* --- Intro: hero + podgląd 3 kroków --- */
+.intro-modal .modal-description { margin-bottom: 1.25rem; }
+.intro-hero {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: var(--teal-50);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+}
+.intro-hero .material-icons { font-size: 40px; color: var(--color-primary); }
+
+.intro-steps {
+    list-style: none;
+    margin: 0 0 1.75rem;
+    padding: 0;
+    width: 100%;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    text-align: left;
+}
+.intro-steps li { display: flex; align-items: center; gap: 0.85rem; }
+.intro-steps__num {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: #fff;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.intro-steps li strong { display: block; color: var(--color-text); font-size: 1rem; line-height: 1.3; }
+.intro-steps li div span { display: block; color: var(--color-text-muted); font-size: 0.875rem; }
+.intro-note {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    margin-top: 1.1rem;
+}
+.intro-note .material-icons { font-size: 1rem; }
+
+/* --- Karty testu: spójny rytm pionowy (oparty na gap) --- */
+.test-modal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.15rem;
+    width: 100%;
+}
+.test-modal > * { margin: 0; }            /* rytm steruje gap, nie indywidualne marginesy */
+.test-modal .modal-description { max-width: 440px; }
+.test-modal .audio-visualizer { margin: 0 auto; }
+
+.test-progress {
+    width: 100%;
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Licznik tonów jako kompaktowy chip (zamiast dużego boksu) */
+.freq-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--teal-50);
+    border: 1px solid var(--teal-100);
+    border-radius: var(--radius-pill);
+    padding: 0.35rem 0.95rem;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-primary);
+}
+.freq-chip:empty { display: none; }
+
 /* --- Grafika prawidłowego założenia słuchawek (krok przygotowania) --- */
 .headphones-graphic {
     width: 100%;
@@ -1653,7 +1741,7 @@ ul.features li .material-icons {
     gap: 0.5rem;
     width: 100%;
     max-width: 320px;
-    margin: 0 auto 0.6rem;
+    margin: 0 auto;
 }
 .step-indicator__seg {
     flex: 1;
@@ -1669,11 +1757,11 @@ ul.features li .material-icons {
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--color-primary);
-    margin-bottom: 1rem;
+    margin: 0;
     letter-spacing: 0.01em;
 }
 
-/* --- Wizualizator audio (AnalyserNode -> canvas) + wskaźnik „Odtwarzanie” --- */
+/* --- Wizualizator audio (equalizer CSS) + wskaźnik „Odtwarzanie” --- */
 .audio-visualizer {
     position: relative;
     width: 100%;
