@@ -1,8 +1,30 @@
-<div class="modal-content-wrapper">
-  <h2 class="modal-title">Losowe częstotliwości</h2>
-  <p id="test-instruction" class="modal-description">Naciśnij „Słyszę", gdy tylko usłyszysz dźwięk.</p>
+<div class="modal-content-wrapper test-modal">
+  <div class="step-indicator" role="img" aria-label="Krok 3 z 3">
+    <span class="step-indicator__seg is-active"></span>
+    <span class="step-indicator__seg is-active"></span>
+    <span class="step-indicator__seg is-active"></span>
+  </div>
+  <p class="step-indicator__label">Krok 3 z 3 — Pełne badanie</p>
+
+  <h2 class="modal-title">Sprawdzamy różne dźwięki</h2>
+  <p id="test-instruction" class="modal-description">Usłyszysz po kolei różne dźwięki. Kliknij „Słyszę”, gdy tylko usłyszysz każdy z nich.</p>
+
   <div id="frequency-counter" class="frequency-display"></div>
-  <div class="modal-button-container">
-    <button id="hear-button" class="btn-primary">Słyszę</button>
+
+  <div class="audio-visualizer" aria-hidden="true">
+    <div class="equalizer" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <span class="audio-visualizer__status"><span class="audio-visualizer__dot"></span>Odtwarzanie…</span>
+  </div>
+
+  <div class="test-actions">
+    <button id="hear-button" class="btn-primary hear-btn">
+      <span class="material-icons" aria-hidden="true">hearing</span>
+      <span>Słyszę</span>
+    </button>
+    <button id="pause-button" class="btn-pause" type="button" aria-label="Wstrzymaj test">
+      <span class="material-icons" aria-hidden="true">pause</span>
+    </button>
   </div>
 </div>

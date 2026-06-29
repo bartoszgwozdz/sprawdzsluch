@@ -1,8 +1,31 @@
 <div class="modal-content-wrapper">
   <h2 class="modal-title">Przygotowanie do testu</h2>
   <p class="modal-description">
-    Aby uzyskać najbardziej dokładne wyniki, znajdź ciche miejsce i używaj słuchawek.
+    Aby uzyskać najdokładniejszy wynik, znajdź ciche miejsce i nałóż słuchawki zgodnie z oznaczeniami <strong>L</strong> (lewe) i <strong>R</strong> (prawe).
   </p>
+
+  <div class="headphones-graphic" role="img" aria-label="Ilustracja prawidłowego założenia słuchawek: lewa na lewym uchu, prawa na prawym">
+    <svg viewBox="0 0 220 170" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <!-- głowa -->
+      <circle cx="110" cy="95" r="46" fill="var(--teal-50)" stroke="var(--teal-200)" stroke-width="2"/>
+      <!-- pałąk -->
+      <path d="M44 96 a66 66 0 0 1 132 0" stroke="var(--color-primary)" stroke-width="6" stroke-linecap="round"/>
+      <!-- lewa muszla -->
+      <rect x="32" y="84" width="26" height="44" rx="11" fill="var(--color-primary)"/>
+      <!-- prawa muszla -->
+      <rect x="162" y="84" width="26" height="44" rx="11" fill="var(--color-primary)"/>
+      <!-- oznaczenia L / R -->
+      <text x="45" y="113" text-anchor="middle" fill="#fff" font-size="16" font-weight="700" font-family="Figtree, sans-serif">L</text>
+      <text x="175" y="113" text-anchor="middle" fill="#fff" font-size="16" font-weight="700" font-family="Figtree, sans-serif">R</text>
+    </svg>
+  </div>
+
+  <ul class="prep-checklist">
+    <li><span class="material-icons" aria-hidden="true">headphones</span> Nałóż słuchawki (L na lewe, R na prawe ucho)</li>
+    <li><span class="material-icons" aria-hidden="true">volume_up</span> Za chwilę ustawimy wygodną głośność</li>
+    <li><span class="material-icons" aria-hidden="true">nights_stay</span> Wybierz ciche, spokojne miejsce</li>
+  </ul>
+
   <div class="checkbox-container">
     <input id="headphones-checkbox" type="checkbox" class="custom-checkbox">
     <label for="headphones-checkbox" class="checkbox-label">
@@ -10,6 +33,6 @@
     </label>
   </div>
   <button id="start-test-button" class="btn-primary" disabled>
-    Rozpocznij test
+    Dalej
   </button>
 </div>

@@ -1603,3 +1603,197 @@ ul.features li .material-icons {
         text-align: center;
     }
 }
+
+/* =========================================================================
+   FAZA 2 — Flow testu: grafika słuchawek, kalibracja, wizualizator,
+   wskaźnik postępu, przyciski Słyszę/pauza
+   ========================================================================= */
+
+.muted { color: var(--color-text-muted); }
+
+/* --- Grafika prawidłowego założenia słuchawek (krok przygotowania) --- */
+.headphones-graphic {
+    width: 100%;
+    max-width: 240px;
+    margin: 0.5rem auto 1.5rem;
+}
+.headphones-graphic svg { width: 100%; height: auto; display: block; }
+
+/* --- Lista kontrolna w przygotowaniu --- */
+.prep-checklist {
+    list-style: none;
+    margin: 0 auto 1.5rem;
+    padding: 0;
+    max-width: 380px;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.prep-checklist li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--color-text);
+    font-size: 1rem;
+}
+.prep-checklist .material-icons {
+    color: var(--color-primary);
+    background: var(--teal-50);
+    border-radius: var(--radius-pill);
+    padding: 0.4rem;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+/* --- Wskaźnik postępu (3 etapy testu) --- */
+.step-indicator {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto 0.6rem;
+}
+.step-indicator__seg {
+    flex: 1;
+    height: 6px;
+    border-radius: var(--radius-pill);
+    background: var(--teal-100);
+    transition: background-color var(--transition);
+}
+.step-indicator__seg.is-active { background: var(--color-primary); }
+.step-indicator__label {
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+    letter-spacing: 0.01em;
+}
+
+/* --- Wizualizator audio (AnalyserNode -> canvas) + wskaźnik „Odtwarzanie” --- */
+.audio-visualizer {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    margin: 0.5rem auto 1.75rem;
+    background: var(--teal-50);
+    border: 1px solid var(--teal-100);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm) inset;
+    overflow: hidden;
+}
+/* Equalizer (lekka animacja CSS sterowana stanem .is-playing) */
+.equalizer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 88px;
+}
+.equalizer span {
+    display: block;
+    width: 6px;
+    height: 14px;
+    border-radius: var(--radius-pill);
+    background: var(--teal-200);
+    transition: height var(--transition), background-color var(--transition);
+}
+.audio-visualizer.is-playing .equalizer span {
+    background: var(--color-primary);
+    animation: eq-bounce 1s ease-in-out infinite;
+}
+/* Zróżnicowane opóźnienia/czasy dla organicznego ruchu 7 słupków */
+.audio-visualizer.is-playing .equalizer span:nth-child(1) { animation-duration: 1.1s; animation-delay: -0.90s; }
+.audio-visualizer.is-playing .equalizer span:nth-child(2) { animation-duration: 0.9s; animation-delay: -0.30s; }
+.audio-visualizer.is-playing .equalizer span:nth-child(3) { animation-duration: 1.3s; animation-delay: -0.60s; }
+.audio-visualizer.is-playing .equalizer span:nth-child(4) { animation-duration: 0.8s; animation-delay: -0.15s; }
+.audio-visualizer.is-playing .equalizer span:nth-child(5) { animation-duration: 1.2s; animation-delay: -0.75s; }
+.audio-visualizer.is-playing .equalizer span:nth-child(6) { animation-duration: 1.0s; animation-delay: -0.45s; }
+.audio-visualizer.is-playing .equalizer span:nth-child(7) { animation-duration: 1.15s; animation-delay: -0.20s; }
+@keyframes eq-bounce {
+    0%, 100% { height: 12px; }
+    50%      { height: 60px; }
+}
+.audio-visualizer__status {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: var(--radius-pill);
+    padding: 0.15rem 0.6rem;
+    opacity: 0;
+    transition: opacity var(--transition);
+}
+.audio-visualizer.is-playing .audio-visualizer__status { opacity: 1; }
+.audio-visualizer__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-primary);
+}
+.audio-visualizer.is-playing .audio-visualizer__dot {
+    animation: av-pulse 1.4s ease-in-out infinite;
+}
+@keyframes av-pulse {
+    0%, 100% { transform: scale(1);   opacity: 1;   }
+    50%      { transform: scale(1.5); opacity: 0.4; }
+}
+
+/* --- Akcje testu: „Słyszę” + pauza --- */
+.test-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+}
+.hear-btn {
+    font-size: 1.15rem;
+    padding: 1rem 2.75rem;
+    min-height: 56px;
+}
+.hear-btn .material-icons { font-size: 1.4rem; }
+
+.btn-pause {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--teal-200);
+    background: var(--color-surface);
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: background-color var(--transition), color var(--transition), border-color var(--transition);
+}
+.btn-pause:hover { background: var(--teal-50); border-color: var(--color-primary); }
+.btn-pause .material-icons { font-size: 1.5rem; }
+
+/* --- Krok kalibracji głośności --- */
+.calib-play {
+    margin: 0 auto 1.25rem;
+    gap: 0.5rem;
+}
+.calib-play.is-playing { background: var(--teal-100); color: var(--color-primary-hover); }
+.calib-hint { font-size: 0.875rem; margin-top: 0.75rem; text-align: center; }
+
+/* --- Dostępność: ograniczenie ruchu --- */
+@media (prefers-reduced-motion: reduce) {
+    .audio-visualizer.is-playing .audio-visualizer__dot { animation: none; }
+    .audio-visualizer.is-playing .equalizer span {
+        animation: none;
+        height: 32px; /* czytelny, statyczny wskaźnik „gra” */
+    }
+    .btn-primary:hover, .btn-submit:hover:not(:disabled) { transform: none; }
+}

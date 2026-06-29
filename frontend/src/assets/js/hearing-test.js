@@ -127,24 +127,24 @@ class HearingTest {
     this.ensureRunning();
 
     // Jeden, długożyjący oscylator: jeśli już istnieje, nie twórz go ponownie.
-    if (this.oscillator) return;
+    if (!this.oscillator) {
+      // Przypisz węzły bezpośrednio do właściwości klasy
+      this.oscillator = this.audioContext.createOscillator();
+      this.oscillator.type = 'sine';
+      this.gainNode = this.audioContext.createGain();
 
-    // Przypisz węzły bezpośrednio do właściwości klasy
-    this.oscillator = this.audioContext.createOscillator();
-    this.oscillator.type = 'sine';
-    this.gainNode = this.audioContext.createGain();
-
-    this.oscillator.connect(this.gainNode);
-    this.gainNode.connect(this.audioContext.destination);
-    this.gainNode.gain.setValueAtTime(0, this.audioContext.currentTime); // Zacznij od zera głośności
-    this.oscillator.start();
+      this.oscillator.connect(this.gainNode);
+      this.gainNode.connect(this.audioContext.destination);
+      this.gainNode.gain.setValueAtTime(0, this.audioContext.currentTime); // Zacznij od zera głośności
+      this.oscillator.start();
+    }
   }
 
   // Metody dla poszczególnych etapów testu
   startAdjusting1kHz() {
     this.testPhase = 'adjusting1kHz';
     this.ensureRunning();
-    this.testInstruction.textContent = "Najpierw musimy ustawić poziom referencyjny 0 dB. Ton o częstotliwości 1kHz zacznie bardzo cicho i będzie stopniowo zwiększał głośność. Kliknij 'Słyszę!' gdy tylko usłyszysz dźwięk.";
+    this.testInstruction.textContent = "Za chwilę usłyszysz cichy dźwięk, który będzie powoli głośniał. Kliknij „Słyszę”, gdy tylko go usłyszysz — bez pośpiechu.";
     this.currentFrequency = 1000;
     this.currentGain = 0.00001;
     this.playTone(this.currentFrequency, this.currentGain);
@@ -152,12 +152,13 @@ class HearingTest {
     this.hearButton.disabled = false;
     this._log("startAdjusting1kHz - currentFrequency:", this.currentFrequency, "currentGain:", this.currentGain);
     this.startIncreasingGain();
+    this._setPlaying(true);
   }
 
   findMaxFrequency() {
     this.testPhase = 'maxFrequency';
     this.ensureRunning();
-    this.testInstruction.textContent = "Świetnie! Teraz znajdziemy Twoją najwyższą słyszalną częstotliwość. Ton rozpocznie się od 20kHz (bardzo wysoki) i będzie stopniowo obniżany. Kliknij 'Słyszę!' w MOMENCIE gdy usłyszysz dźwięk.";
+    this.testInstruction.textContent = "Świetnie! Teraz sprawdzimy najwyższe dźwięki, jakie słyszysz. Zacznie się od bardzo wysokiego tonu, który będzie stopniowo niższy. Kliknij „Słyszę”, gdy tylko go usłyszysz.";
     this.currentFrequency = 20000;
     this._descentDecrement = 500;
     this._descentGain = this.referenceLevel * 1.414; // ~+3dB
@@ -166,6 +167,13 @@ class HearingTest {
     this.hearButton.disabled = false;
     this.testRunning = true;
     this.startFrequencyDescent(this._descentDecrement, this._descentGain);
+    this._setPlaying(true);
+  }
+
+  // Wspólne przełączanie stanu „gra/pauza" — steruje animacją equalizera CSS
+  _setPlaying(isPlaying) {
+    const wrap = document.querySelector('.audio-visualizer');
+    if (wrap) wrap.classList.toggle('is-playing', !!isPlaying);
   }
 
   // Zejście częstotliwości — wyodrębnione, aby resumeAudio mogło je wznowić
@@ -184,7 +192,7 @@ class HearingTest {
         clearInterval(this.frequencyDescentInterval);
         this.testRunning = false;
         this.maxAudibleFrequency = 0;
-        this.testInstruction.textContent = "Nie udało się określić maksymalnej częstotliwości.";
+        this.testInstruction.textContent = "Nie udało się zmierzyć najwyższych dźwięków — przejdźmy dalej.";
         this.testStage = 2;
         // Tutaj zakończyłby się ten etap
         return;
@@ -222,7 +230,7 @@ class HearingTest {
 
       // ZAKTUALIZUJ LICZNIK
       if (counterElement) {
-        counterElement.textContent = `Ton ${this.currentFrequencyIndex + 1} / ${this.frequencyOrder.length}`;
+        counterElement.textContent = `Dźwięk ${this.currentFrequencyIndex + 1} z ${this.frequencyOrder.length}`;
       }
 
       // Ustaw bardzo niską początkową głośność
@@ -239,14 +247,16 @@ class HearingTest {
       // Włącz mechanizm zwiększania głośności
       this.testRunning = true;
       this.startIncreasingGain();
+      this._setPlaying(true);
 
     } else {
       // Test complete
       this.stopTone();
+      this._setPlaying(false);
       
       // Ukryj licznik po zakończeniu testu
       if (counterElement) {
-        counterElement.textContent = "Test zakończony!";
+        counterElement.textContent = "Gotowe! Przygotowujemy Twój wynik…";
       }
 
       this._log("Test complete. Final results:", this.hearingLevels);
@@ -326,6 +336,7 @@ class HearingTest {
     clearInterval(this.frequencyDescentInterval);
     clearInterval(this.increaseGainInterval);
     this.stopTone();
+    this._setPlaying(false);
 
     if (this.testStage === 0) {
       this.referenceLevel = this.currentGain;
@@ -424,6 +435,7 @@ class HearingTest {
       clearInterval(this.increaseGainInterval);
       clearInterval(this.frequencyDescentInterval);
       this.stopTone();
+      this._setPlaying(false);
       this._log('pauseAudio - phase:', this.testPhase, 'freq:', this._savedFrequency, 'gain:', this._savedGain);
   }
 
@@ -449,6 +461,7 @@ class HearingTest {
       } else if (this.testPhase === 'maxFrequency') {
           this.startFrequencyDescent(this._descentDecrement, this._descentGain);
       }
+      this._setPlaying(true);
   }
 
   // Całkowite zatrzymanie testu audio (np. po potwierdzeniu wyjścia)
@@ -461,7 +474,29 @@ class HearingTest {
       this._savedFrequency = null;
       this._savedGain = null;
       this.testPhase = 'idle';
+      this._setPlaying(false);
       this._log('stopAudio - test stopped, intervals cleared');
+  }
+
+  // ---- Krok kalibracji głośności ----
+  // Odtwarza spokojny, ciągły ton 1 kHz na komfortowym poziomie, aby użytkownik
+  // mógł ustawić głośność urządzenia. Nie zmienia stanu testu (testStage/testPhase).
+  playCalibrationTone() {
+      this.ensureRunning();
+      this.currentFrequency = 1000;
+      const calibGain = 0.04; // wyraźnie słyszalny, ale komfortowy
+      this.currentGain = calibGain;
+      this.playTone(1000, calibGain);
+      this.testRunning = true; // utrzymaj animację wizualizatora
+      this._setPlaying(true);
+      this._log('playCalibrationTone');
+  }
+
+  stopCalibrationTone() {
+      this.testRunning = false;
+      this.stopTone();
+      this._setPlaying(false);
+      this._log('stopCalibrationTone');
   }
 
   // Jawny cykl życia: pełne sprzątanie instancji (interwały, węzły, handlery)
