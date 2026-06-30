@@ -67,9 +67,10 @@
               </div>
             </div>
           </div>
-          <p class="badge-price" style="font-size: 1.15rem; margin: 2.5rem 0;">
+          <p class="badge-price" style="font-size: 1.15rem; margin: 2.5rem 0 0.5rem;">
             Jednorazowa opłata: <span class="price-old">49,99 zł</span> <strong>24,99 zł</strong>
           </p>
+          <p class="price-min-note">Najniższa cena z 30 dni przed obniżką: <span class="placeholder">{{CENA_MIN_30DNI}}</span></p>
         </div>
       </div>
     </section>
@@ -124,6 +125,17 @@
             </form>
         </div>
     </section> -->
+
+    <!-- ====== ZAUFANIE: płatności + bezpieczeństwo / RODO / SSL ====== -->
+    <section class="trust-strip" aria-label="Bezpieczeństwo i płatności">
+      <div class="trust-badges">
+        <span class="trust-badge"><span class="material-icons" aria-hidden="true">lock</span> Dane szyfrowane (SSL)</span>
+        <span class="trust-badge"><span class="material-icons" aria-hidden="true">verified_user</span> Zgodność z RODO</span>
+        <span class="trust-badge"><span class="material-icons" aria-hidden="true">health_and_safety</span> Dane medyczne chronione</span>
+      </div>
+      <div class="trust-strip__divider" role="presentation"></div>
+      <div data-payment-methods></div>
+    </section>
 
     <div id="main-footer"></div>
   </div>

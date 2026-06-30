@@ -378,6 +378,16 @@ fetch('/assets/partials/footer.html')
         }
     });
 
+// Wstrzykiwanie metod płatności (Paynow) do każdego kontenera [data-payment-methods]
+const paymentContainers = document.querySelectorAll('[data-payment-methods]');
+if (paymentContainers.length) {
+    fetch('/assets/partials/payment-methods.html')
+        .then(res => res.text())
+        .then(html => {
+            paymentContainers.forEach(el => { el.innerHTML = html; });
+        });
+}
+
 // Dodaj funkcję do dynamicznego ładowania biblioteki Chart.js
 function loadChartJS() {
     return new Promise((resolve, reject) => {

@@ -77,12 +77,26 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
           chmod 600 ~/.kube/config
 
-      # 9️⃣ Create MongoDB Secret
+      # 9️⃣ Create Secrets
       - name: Create MongoDB Secret
         run: |
           kubectl -n $K8S_NAMESPACE create secret generic mongo-secret \
             --from-literal=mongo-root-username=${{ secrets.MONGO_ROOT_USERNAME }} \
             --from-literal=mongo-root-password=${{ secrets.MONGO_ROOT_PASSWORD }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Create Mail Secret
+        run: |
+          kubectl -n $K8S_NAMESPACE create secret generic mail-secret \
+            --from-literal=username=${{ secrets.MAIL_USERNAME }} \
+            --from-literal=password=${{ secrets.MAIL_PASSWORD }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Create PayNow Secret
+        run: |
+          kubectl -n $K8S_NAMESPACE create secret generic paynow-secret \
+            --from-literal=api-key=${{ secrets.PAYNOW_API_KEY }} \
+            --from-literal=signature-key=${{ secrets.PAYNOW_SIGNATURE_KEY }} \
             --dry-run=client -o yaml | kubectl apply -f -
 
       # 🔟 Deploy all manifests

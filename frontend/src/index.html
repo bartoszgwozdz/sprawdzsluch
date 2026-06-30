@@ -48,6 +48,22 @@
                             <li class="trust-item"><span class="material-icons" aria-hidden="true">home</span> Bez wizyty w gabinecie</li>
                             <li class="trust-item"><span class="material-icons" aria-hidden="true">verified</span> Opracowany ze specjalistami</li>
                         </ul>
+                        <div class="hero-pricing" aria-label="Cennik raportu">
+                            <div class="hero-pricing__tier">
+                                <span class="hero-pricing__icon material-icons" aria-hidden="true">visibility</span>
+                                <span class="hero-pricing__text">
+                                    <span class="hero-pricing__label">Poglądowy wynik</span>
+                                    <span class="hero-pricing__value">za darmo</span>
+                                </span>
+                            </div>
+                            <div class="hero-pricing__tier hero-pricing__tier--full">
+                                <span class="hero-pricing__icon material-icons" aria-hidden="true">picture_as_pdf</span>
+                                <span class="hero-pricing__text">
+                                    <span class="hero-pricing__label">Pełny raport PDF</span>
+                                    <span class="hero-pricing__value">24,99 zł</span>
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     <div class="hero-image-container">
                         <img alt="Kobieta w słuchawkach robiąca test słuchu" 
@@ -111,6 +127,122 @@
                     </div>
                 </div>
             </section>
+
+            <!-- ====== OPINIE UŻYTKOWNIKÓW — struktura, treści/nazwiska do uzupełnienia ====== -->
+            <section class="steps-section" aria-labelledby="reviews-heading">
+                <div class="section-header">
+                    <h2 id="reviews-heading">Co mówią użytkownicy</h2>
+                    <p>Opinie osób, które sprawdziły swój słuch online.</p>
+                </div>
+                <!-- Przykładowe opinie (sample copy) — przed publikacją zastąp realnymi
+                     opiniami za zgodą autorów; publikowanie zmyślonych opinii jest
+                     niezgodne z prawem (dyrektywa Omnibus / UOKiK). -->
+                <div class="reviews-grid">
+                    <article class="review-card">
+                        <div class="stars" role="img" aria-label="Ocena: 5 na 5">
+                            <span class="material-icons" aria-hidden="true">star</span>
+                            <span class="material-icons" aria-hidden="true">star</span>
+                            <span class="material-icons" aria-hidden="true">star</span>
+                            <span class="material-icons" aria-hidden="true">star</span>
+                            <span class="material-icons" aria-hidden="true">star</span>
+                        </div>
+                        <p class="review-text">„Od dłuższego czasu miałam wrażenie, że gorzej rozumiem rozmowy w hałasie. Test zajął kilka minut, a raport jasno pokazał, na których częstotliwościach mam słabszy słuch. Z tym wynikiem od razu umówiłam się do laryngologa."</p>
+                        <div class="review-author">
+                            <span class="review-avatar" aria-hidden="true">A</span>
+                            <div>
+                                <div class="review-name">Anna K.</div>
+                                <div class="review-role">Wrocław</div>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="review-card">
+                        <div class="stars" role="img" aria-label="Ocena: 5 na 5">
+                            <span class="material-icons" aria-hidden="true">star</span>
+                            <span class="material-icons" aria-hidden="true">star</span>
+                            <span class="material-icons" aria-hidden="true">star</span>
+                            <span class="material-icons" aria-hidden="true">star</span>
+                            <span class="material-icons" aria-hidden="true">star</span>
+                        </div>
+                        <p class="review-text">„Przez lata pracowałem w głośnym warsztacie, więc zrobiłem test z czystej ciekawości. Jest naprawdę prosty i intuicyjny, a wynik dał mi do myślenia. Wreszcie mam konkretne dane, zamiast się domyślać."</p>
+                        <div class="review-author">
+                            <span class="review-avatar" aria-hidden="true">M</span>
+                            <div>
+                                <div class="review-name">Marek W.</div>
+                                <div class="review-role">Poznań</div>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="review-card">
+                        <div class="stars" role="img" aria-label="Ocena: 5 na 5">
+                            <span class="material-icons" aria-hidden="true">star</span>
+                            <span class="material-icons" aria-hidden="true">star</span>
+                            <span class="material-icons" aria-hidden="true">star</span>
+                            <span class="material-icons" aria-hidden="true">star</span>
+                            <span class="material-icons" aria-hidden="true">star</span>
+                        </div>
+                        <p class="review-text">„Bałam się, że badanie słuchu online będzie skomplikowane. Okazało się banalnie proste — wykonałam je sama w domu, w ciszy. Raport PDF dostałam na maila praktycznie od razu."</p>
+                        <div class="review-author">
+                            <span class="review-avatar" aria-hidden="true">T</span>
+                            <div>
+                                <div class="review-name">Teresa L.</div>
+                                <div class="review-role">Gdańsk</div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- ====== ZAUFANIE: płatności + bezpieczeństwo / RODO / SSL ====== -->
+            <section class="trust-strip" aria-label="Bezpieczeństwo i płatności">
+                <div class="trust-badges">
+                    <span class="trust-badge"><span class="material-icons" aria-hidden="true">lock</span> Dane szyfrowane (SSL)</span>
+                    <span class="trust-badge"><span class="material-icons" aria-hidden="true">verified_user</span> Zgodność z RODO</span>
+                    <span class="trust-badge"><span class="material-icons" aria-hidden="true">health_and_safety</span> Dane medyczne chronione</span>
+                </div>
+                <div class="trust-strip__divider" role="presentation"></div>
+                <div data-payment-methods></div>
+            </section>
+
+            <!-- ====== MINI-FAQ ====== -->
+            <section class="steps-section" aria-labelledby="home-faq-heading">
+                <div class="section-header">
+                    <h2 id="home-faq-heading">Najczęstsze pytania</h2>
+                    <p>Krótkie odpowiedzi na to, co warto wiedzieć przed testem.</p>
+                </div>
+                <div class="home-faq">
+                    <div class="faq-item open">
+                        <button type="button" class="faq-question" aria-expanded="true" aria-controls="home-faq-1">
+                            <span>Jak dokładny jest ten test słuchu?</span>
+                            <span class="faq-icon material-icons" aria-hidden="true">expand_more</span>
+                        </button>
+                        <div id="home-faq-1" class="faq-answer">
+                            To rzetelne badanie przesiewowe — w kilka minut wskaże, czy Twój słuch wymaga uwagi
+                            specjalisty. Nie zastępuje jednak pełnej diagnostyki audiologicznej.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button type="button" class="faq-question" aria-expanded="false" aria-controls="home-faq-2">
+                            <span>Czy moje dane są bezpieczne?</span>
+                            <span class="faq-icon material-icons" aria-hidden="true">expand_more</span>
+                        </button>
+                        <div id="home-faq-2" class="faq-answer">
+                            Tak. Szyfrujemy połączenie (SSL) i działamy zgodnie z RODO. Wyniki — jako dane o zdrowiu —
+                            przetwarzamy wyłącznie za Twoją wyraźną zgodą.
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <button type="button" class="faq-question" aria-expanded="false" aria-controls="home-faq-3">
+                            <span>Czego potrzebuję do wykonania testu?</span>
+                            <span class="faq-icon material-icons" aria-hidden="true">expand_more</span>
+                        </button>
+                        <div id="home-faq-3" class="faq-answer">
+                            Słuchawek, urządzenia z dostępem do internetu i chwili ciszy. Cały test zajmie Ci
+                            około 5 minut.
+                        </div>
+                    </div>
+                </div>
+                <p class="faq-more"><a href="/faq">Zobacz wszystkie pytania →</a></p>
+            </section>
         </main> <!-- Koniec main -->
         
         <!-- Zakładając, że JS wstawia tu <footer>, to jest OK. Jeśli nie, powinien to być tag <footer> -->
@@ -143,6 +275,27 @@
 
    <script src="/assets/js/main.js"></script>
    <script src="/assets/js/cookie-consent.js"></script>
+   <script>
+     // Akordeon mini-FAQ (dostępny z klawiatury, aria-expanded)
+     document.addEventListener('DOMContentLoaded', function () {
+       const faqItems = document.querySelectorAll('.home-faq .faq-item');
+       faqItems.forEach(item => {
+         const question = item.querySelector('.faq-question');
+         question.addEventListener('click', () => {
+           const willOpen = !item.classList.contains('open');
+           faqItems.forEach(other => {
+             other.classList.remove('open');
+             const q = other.querySelector('.faq-question');
+             if (q) q.setAttribute('aria-expanded', 'false');
+           });
+           if (willOpen) {
+             item.classList.add('open');
+             question.setAttribute('aria-expanded', 'true');
+           }
+         });
+       });
+     });
+   </script>
 </body>
 
 </html>
