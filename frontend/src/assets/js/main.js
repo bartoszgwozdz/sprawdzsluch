@@ -1,13 +1,13 @@
 const modalSteps = [
-    "/assets/partials/modal-intro.html",            // Wprowadzenie
-    "/assets/partials/modal-preparation.html",      // Przygotowanie
-    // "/assets/partials/modal-test-1-intro.html",
-    "/assets/partials/modal-test-1.html",           // Test 1kHz
-    // "/assets/partials/modal-test-2-intro.html",
-    "/assets/partials/modal-test-2.html",           // Test maksymalnej częstotliwości
-    // "/assets/partials/modal-test-3-intro.html",
-    "/assets/partials/modal-test-3.html"            // Test losowych częstotliwości (po nim następuje przekierowanie na /results/)
+    "/assets/partials/modal-intro.html",            // 0 Wprowadzenie
+    "/assets/partials/modal-preparation.html",      // 1 Przygotowanie (słuchawki)
+    "/assets/partials/modal-calibration.html",      // 2 Kalibracja głośności
+    "/assets/partials/modal-test-1.html",           // 3 Test 1kHz (referencja)
+    "/assets/partials/modal-test-2.html",           // 4 Test maksymalnej częstotliwości
+    "/assets/partials/modal-test-3.html"            // 5 Test losowych częstotliwości (-> /results/)
 ];
+// Indeksy kroków testowych (z aktywnym dźwiękiem) — używane przez pauzę/wznowienie
+const TEST_STEPS = { CALIBRATION: 2, TEST_1KHZ: 3, MAX_FREQ: 4, RANDOM: 5 };
 let currentStep = 0;
 
 // Elementy
@@ -32,20 +32,50 @@ if (mainTestBtn) {
     mainTestBtn.addEventListener('click', openModal);
 }
 
-// Zamknięcie modalu
-btnClose.onclick = () => {
-    // Jeśli jesteśmy na kroku przygotowania lub dalej, pokaż potwierdzenie wyjścia
+// Wiąże przyciski w modalu potwierdzenia wyjścia. Wywoływane przy KAŻDYM otwarciu
+// potwierdzenia (X, klik poza modalem, Escape), aby pauza/wznowienie było
+// deterministyczne niezależnie od ścieżki wyjścia.
+function wireConfirmExitButtons() {
+    const confirmExitModal = document.getElementById('confirm-exit-modal');
+    const confirmExitYes = document.getElementById('confirm-exit-yes');
+    const confirmExitNo = document.getElementById('confirm-exit-no');
+
+    if (confirmExitYes) {
+        confirmExitYes.onclick = () => {
+            // Potwierdzono wyjście: zatrzymaj test na stałe
+            if (window.hearingTestInstance) {
+                window.hearingTestInstance.stopAudio();
+                console.log('Test audio stopped permanently');
+            }
+            confirmExitModal.classList.remove('show');
+            modal.classList.remove('show');
+        };
+    }
+    if (confirmExitNo) {
+        confirmExitNo.onclick = () => {
+            confirmExitModal.classList.remove('show');
+            // Wznów test po anulowaniu wyjścia
+            toggleTestPause(false);
+        };
+    }
+}
+
+// Otwiera potwierdzenie wyjścia (z pauzą testu) lub zamyka modal na wprowadzeniu.
+function requestExit() {
     if (currentStep >= 1) {
         const confirmExitModal = document.getElementById('confirm-exit-modal');
         confirmExitModal.classList.add('show');
-
         // Zatrzymaj test audio, gdy pokazujemy potwierdzenie
         toggleTestPause(true);
+        wireConfirmExitButtons();
     } else {
         // Jeśli jesteśmy na wprowadzeniu, po prostu zamknij modal
         modal.classList.remove('show');
     }
-};
+}
+
+// Zamknięcie modalu (przycisk X)
+btnClose.onclick = requestExit;
 
 // Dodaj style dla scrollowania modalu - umieść tę funkcję na początku pliku
 function addModalScrollStyles() {
@@ -82,24 +112,33 @@ function addModalScrollStyles() {
 addModalScrollStyles();
 
 // Ładowanie zawartości kroku - NOWA, ZAKTUALIZOWANA WERSJA
+// Wiąże widoczny przycisk pauzy/wznowienia w krokach testowych (zamienia ikonę)
+function wirePauseButton() {
+    const pauseBtn = document.getElementById('pause-button');
+    if (!pauseBtn) return;
+    pauseBtn.onclick = () => {
+        const h = window.hearingTestInstance;
+        if (!h) return;
+        const icon = pauseBtn.querySelector('.material-icons');
+        if (!h._isPaused) {
+            h.pauseAudio();
+            if (icon) icon.textContent = 'play_arrow';
+            pauseBtn.setAttribute('aria-label', 'Wznów test');
+        } else {
+            h.resumeAudio();
+            if (icon) icon.textContent = 'pause';
+            pauseBtn.setAttribute('aria-label', 'Wstrzymaj test');
+        }
+    };
+}
+
 function showModalStep(step) {
     const modalDialog = modal.querySelector('.modal-container'); // Zmiana selektora na właściwy
 
-    // Dynamicznie dostosuj szerokość modala w zależności od kroku
-    if (step === 5) { // Krok z wynikami
-        modalDialog.classList.remove('standard-width');
-        modalDialog.classList.add('wide-width'); // Ustaw większą szerokość dla wyników
-        
-        // Upewnij się, że możliwe jest scrollowanie
-        modalDialog.style.overflowY = 'auto';
-        modalDialog.style.maxHeight = '90vh';
-    } else {
-        modalDialog.classList.remove('wide-width');
-        modalDialog.classList.add('standard-width'); // Przywróć domyślną szerokość dla innych kroków
-        
-        // Dla mniejszych kroków możemy zachować standardową wysokość
-        modalDialog.style.maxHeight = '';
-    }
+    // Wszystkie kroki flow testu mają standardową szerokość
+    modalDialog.classList.remove('wide-width');
+    modalDialog.classList.add('standard-width');
+    modalDialog.style.maxHeight = '';
 
     fetch(modalSteps[step])
         .then(res => res.text())
@@ -107,79 +146,111 @@ function showModalStep(step) {
             const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
             modalContent.innerHTML = bodyMatch ? bodyMatch[1] : html;
 
+            const h = window.hearingTestInstance;
+
             // --- Logika specyficzna dla każdego kroku ---
 
-            if (step === 0) { // Modal 1: Wprowadzenie
+            if (step === 0) { // Wprowadzenie
                 const understandBtn = document.getElementById('understand-button');
                 if (understandBtn) {
-                    understandBtn.onclick = () => {
-                        currentStep++;
-                        showModalStep(currentStep);
-                    };
+                    understandBtn.onclick = () => { currentStep++; showModalStep(currentStep); };
                 }
-            } else if (step === 1) { // Modal 2: Przygotowanie
+            } else if (step === 1) { // Przygotowanie (słuchawki)
                 const checkbox = document.getElementById('headphones-checkbox');
                 const startBtn = document.getElementById('start-test-button');
                 if (checkbox && startBtn) {
                     startBtn.disabled = true; // Domyślnie wyłączony
-                    checkbox.onchange = () => {
-                        startBtn.disabled = !checkbox.checked;
-                    };
+                    checkbox.onchange = () => { startBtn.disabled = !checkbox.checked; };
                     startBtn.onclick = () => {
-                        // *** NOWY KOD: Odblokuj audio w odpowiedzi na kliknięcie ***
-                        if (window.hearingTestInstance) {
-                            window.hearingTestInstance.unlockAudio();
-                        }
-                        // *** KONIEC NOWEGO KODU ***
+                        // Odblokuj audio w odpowiedzi na gest użytkownika
+                        if (h) h.unlockAudio();
                         currentStep++;
                         showModalStep(currentStep);
                     };
                 }
-            } else if (step === 2) { // Test 1kHz
-                window.hearingTestInstance.initialize('hear-button', 'test-instruction', 'sound-wave-canvas');
-                window.hearingTestInstance.startAdjusting1kHz();
-                document.getElementById('hear-button').onclick = () => {
-                    window.hearingTestInstance.recordHearing();
-                    setTimeout(() => { currentStep++; showModalStep(currentStep); }, 500);
-                };
-            } else if (step === 3) { // Test max częstotliwości
-                window.hearingTestInstance.initialize('hear-button', 'test-instruction', 'sound-wave-canvas');
-                window.hearingTestInstance.findMaxFrequency();
-                document.getElementById('hear-button').onclick = () => {
-                    window.hearingTestInstance.recordHearing();
-                    setTimeout(() => { currentStep++; showModalStep(currentStep); }, 500);
-                };
-            } else if (step === 4) { // Test losowych częstotliwości
-                window.hearingTestInstance.initialize('hear-button', 'test-instruction', 'sound-wave-canvas');
-                window.hearingTestInstance.startRandomFrequencyTest();
+            } else if (step === 2) { // Kalibracja głośności
+                // initialize tworzy (raz) oscylator i węzły audio
+                h.initialize('hear-button', 'test-instruction');
 
-                // Nasłuchuj na niestandardowy event, który zasygnalizuje koniec tego etapu
+                const playBtn = document.getElementById('calib-play-button');
+                const contBtn = document.getElementById('calib-continue-button');
+                const hint = document.querySelector('.calib-hint');
+                let playing = false;
+
+                if (playBtn) {
+                    playBtn.onclick = () => {
+                        const icon = playBtn.querySelector('.material-icons');
+                        const label = playBtn.querySelector('.calib-play__label');
+                        playing = !playing;
+                        if (playing) {
+                            h.playCalibrationTone();
+                            playBtn.classList.add('is-playing');
+                            playBtn.setAttribute('aria-pressed', 'true');
+                            if (icon) icon.textContent = 'stop';
+                            if (label) label.textContent = 'Zatrzymaj dźwięk';
+                            if (contBtn) contBtn.disabled = false; // odsłuchano -> można dalej
+                            if (hint) hint.style.display = 'none';
+                        } else {
+                            h.stopCalibrationTone();
+                            playBtn.classList.remove('is-playing');
+                            playBtn.setAttribute('aria-pressed', 'false');
+                            if (icon) icon.textContent = 'play_arrow';
+                            if (label) label.textContent = 'Włącz dźwięk testowy';
+                        }
+                    };
+                }
+                if (contBtn) {
+                    contBtn.onclick = () => {
+                        h.stopCalibrationTone();
+                        currentStep++;
+                        showModalStep(currentStep);
+                    };
+                }
+            } else if (step === 3) { // Test 1kHz (referencja)
+                h.initialize('hear-button', 'test-instruction');
+                h.startAdjusting1kHz();
+                wirePauseButton();
+                document.getElementById('hear-button').onclick = () => {
+                    h.recordHearing();
+                    setTimeout(() => { currentStep++; showModalStep(currentStep); }, 500);
+                };
+            } else if (step === 4) { // Test max częstotliwości
+                h.initialize('hear-button', 'test-instruction');
+                h.findMaxFrequency();
+                wirePauseButton();
+                document.getElementById('hear-button').onclick = () => {
+                    h.recordHearing();
+                    setTimeout(() => { currentStep++; showModalStep(currentStep); }, 500);
+                };
+            } else if (step === 5) { // Test losowych częstotliwości
+                h.initialize('hear-button', 'test-instruction');
+                wirePauseButton();
+
+                // WAŻNE: dodaj listener PRZED startem testu, aby uniknąć wyścigu zakończenia
+                // (event randomTestCompleted może wystąpić natychmiast, np. przy pustej liście).
                 window.addEventListener('randomTestCompleted', () => {
                     console.log('Event "randomTestCompleted" received. Advancing to results page.');
-                    
-                    // Zapisz dane testu do localStorage
+
+                    // Zapisz dane testu do sessionStorage
                     if (window.hearingTestInstance) {
                         const testResults = {
                             hearingLevels: window.hearingTestInstance.hearingLevels || [],
                             maxAudibleFrequency: window.hearingTestInstance.maxAudibleFrequency || 20000,
                             timestamp: new Date().toISOString()
                         };
-                        
                         sessionStorage.setItem('hearingTestResults', JSON.stringify(testResults));
                     }
-                    
-                    // Zamknij modal
-                    if (modal) {
-                        modal.classList.remove('show');
-                    }
-                    
+
+                    if (modal) modal.classList.remove('show');
+
                     // Przekieruj do strony z wynikami
                     window.location.href = '/results/';
-                }, { once: true }); // { once: true } sprawi, że listener usunie się sam po jednym wywołaniu
+                }, { once: true });
 
-                document.getElementById('hear-button').onclick = () => {
-                    window.hearingTestInstance.recordHearing();
-                };
+                // Start testu DOPIERO po zarejestrowaniu listenera zakończenia
+                h.startRandomFrequencyTest();
+
+                document.getElementById('hear-button').onclick = () => { h.recordHearing(); };
             }
         })
         .catch(error => {
@@ -188,62 +259,26 @@ function showModalStep(step) {
         });
 }
 
-// Dodaj nową funkcję do zatrzymania i wznowienia testu
+// Zatrzymanie/wznowienie testu (używane przez modal potwierdzenia wyjścia)
 function toggleTestPause(shouldPause) {
-    // Sprawdź, czy test jest aktywny (kroki 2, 3, 4)
-    if (currentStep >= 2 && currentStep <= 4 && window.hearingTestInstance) {
-        if (shouldPause) {
-            // Zatrzymaj odtwarzanie dźwięku
-            window.hearingTestInstance.pauseAudio();
-            console.log('Test audio paused');
-        } else {
-            // Wznów odtwarzanie dźwięku
-            window.hearingTestInstance.resumeAudio();
-            console.log('Test audio resumed');
-        }
+    const h = window.hearingTestInstance;
+    if (!h) return;
+
+    if (currentStep === TEST_STEPS.CALIBRATION) {
+        // W kroku kalibracji wyciszamy ton próbny (bez stanu pauzy testu)
+        if (shouldPause) h.stopCalibrationTone();
+        return;
+    }
+    if (currentStep >= TEST_STEPS.TEST_1KHZ && currentStep <= TEST_STEPS.RANDOM) {
+        if (shouldPause) { h.pauseAudio(); console.log('Test audio paused'); }
+        else { h.resumeAudio(); console.log('Test audio resumed'); }
     }
 }
 
 // Zamknięcie modalu po kliknięciu poza oknem
 modal.addEventListener('mousedown', e => {
     if (e.target === modal) {
-        // Jeśli jesteśmy na kroku przygotowania lub dalej, pokaż potwierdzenie wyjścia
-        if (currentStep >= 1) {
-            const confirmExitModal = document.getElementById('confirm-exit-modal');
-            confirmExitModal.classList.add('show');
-
-            // Zatrzymaj test audio, gdy pokazujemy potwierdzenie
-            toggleTestPause(true);
-
-            // Dodaj event listenery do przycisków w modalu potwierdzającym
-            const confirmExitYes = document.getElementById('confirm-exit-yes');
-            const confirmExitNo = document.getElementById('confirm-exit-no');
-
-            if (confirmExitYes) {
-                confirmExitYes.onclick = function () {
-                    // Jeśli użytkownik potwierdził wyjście, zatrzymaj test na stałe
-                    if (window.hearingTestInstance) {
-                        window.hearingTestInstance.stopAudio();
-                        console.log('Test audio stopped permanently');
-                    }
-
-                    confirmExitModal.classList.remove('show');
-                    modal.classList.remove('show'); // Zamknij główny modal
-                }
-            }
-
-            if (confirmExitNo) {
-                confirmExitNo.onclick = function () {
-                    confirmExitModal.classList.remove('show'); // Tylko zamknij modal potwierdzający
-
-                    // Wznów test audio po anulowaniu wyjścia
-                    toggleTestPause(false);
-                }
-            }
-        } else {
-            // Jeśli jesteśmy na wprowadzeniu, po prostu zamknij modal
-            modal.classList.remove('show');
-        }
+        requestExit();
     }
 });
 
@@ -268,24 +303,24 @@ document.addEventListener('keydown', e => {
             toggleTestPause(false);
         }
         // W przeciwnym razie, zachowaj się jak przy kliknięciu przycisku zamknięcia
-        else if (currentStep >= 1) {
-            confirmExitModal.classList.add('show');
-            toggleTestPause(true);
-        } else {
-            modal.classList.remove('show');
+        else {
+            requestExit();
         }
     }
 });
 
-// Kod główny na stronie
-fetch('/assets/js/hearing-test.js')
-    .then(response => response.text())
-    .then(code => {
-        // Wykonanie kodu dopiero po pobraniu
-        const script = document.createElement('script');
-        script.textContent = code;
-        document.head.appendChild(script);
-    });
+// Kod główny na stronie — wstrzyknięcie hearing-test.js (idempotentne).
+// Jeśli instancja już istnieje (np. po przywróceniu z bfcache), nie wstrzykuj ponownie.
+if (!window.hearingTestInstance) {
+    fetch('/assets/js/hearing-test.js')
+        .then(response => response.text())
+        .then(code => {
+            // Wykonanie kodu dopiero po pobraniu
+            const script = document.createElement('script');
+            script.textContent = code;
+            document.head.appendChild(script);
+        });
+}
 
 // Wstrzykiwanie headera z pliku header.html
 fetch('/assets/partials/header.html')

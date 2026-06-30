@@ -1,0 +1,23 @@
+<div class="modal-content-wrapper">
+  <h2 class="modal-title">Ustaw wygodną głośność</h2>
+  <p class="modal-description">
+    Włącz dźwięk testowy i ustaw głośność urządzenia tak, aby był <strong>wyraźnie słyszalny, ale komfortowy</strong>. Dzięki temu wynik będzie dokładny.
+  </p>
+
+  <div class="audio-visualizer" aria-hidden="true">
+    <div class="equalizer" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <span class="audio-visualizer__status"><span class="audio-visualizer__dot"></span>Odtwarzanie…</span>
+  </div>
+
+  <button id="calib-play-button" class="btn-secondary calib-play" type="button" aria-pressed="false">
+    <span class="material-icons" aria-hidden="true">play_arrow</span>
+    <span class="calib-play__label">Włącz dźwięk testowy</span>
+  </button>
+
+  <button id="calib-continue-button" class="btn-primary" disabled>
+    Rozpocznij test
+  </button>
+  <p class="calib-hint muted">Najpierw odsłuchaj dźwięk testowy, aby przejść dalej.</p>
+</div>

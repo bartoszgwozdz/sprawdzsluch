@@ -1,7 +1,30 @@
-<div class="modal-content-wrapper">
-  <h2 class="modal-title">Najwyższa słyszalna częstotliwość</h2>
-  <p id="test-instruction" class="modal-description">Naciśnij „Słyszę", gdy tylko usłyszysz wysoki dźwięk.</p>
-  <div class="modal-button-container">
-    <button id="hear-button" class="btn-primary">Słyszę</button>
+<div class="modal-content-wrapper test-modal">
+  <div class="test-progress">
+    <div class="step-indicator" role="img" aria-label="Krok 2 z 3">
+      <span class="step-indicator__seg is-active"></span>
+      <span class="step-indicator__seg is-active"></span>
+      <span class="step-indicator__seg"></span>
+    </div>
+    <p class="step-indicator__label">Krok 2 z 3 — Najwyższe tony</p>
+  </div>
+
+  <h2 class="modal-title">Najwyższe dźwięki</h2>
+  <p id="test-instruction" class="modal-description">Usłyszysz wysoki dźwięk, który będzie coraz niższy. Kliknij „Słyszę”, gdy tylko go usłyszysz.</p>
+
+  <div class="audio-visualizer" aria-hidden="true">
+    <div class="equalizer" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <span class="audio-visualizer__status"><span class="audio-visualizer__dot"></span>Odtwarzanie…</span>
+  </div>
+
+  <div class="test-actions">
+    <button id="hear-button" class="btn-primary hear-btn">
+      <span class="material-icons" aria-hidden="true">hearing</span>
+      <span>Słyszę</span>
+    </button>
+    <button id="pause-button" class="btn-pause" type="button" aria-label="Wstrzymaj test">
+      <span class="material-icons" aria-hidden="true">pause</span>
+    </button>
   </div>
 </div>
