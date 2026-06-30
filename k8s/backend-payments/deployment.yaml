@@ -8,6 +8,7 @@ metadata:
     version: v1
 spec:
   replicas: 1
+  progressDeadlineSeconds: 900
   selector:
     matchLabels:
       app: backend-payments
@@ -43,27 +44,27 @@ spec:
             httpGet:
               path: /actuator/health
               port: 8082
-            initialDelaySeconds: 60
+            initialDelaySeconds: 150
             periodSeconds: 30
             timeoutSeconds: 10
             failureThreshold: 3
-          
+
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
               port: 8082
-            initialDelaySeconds: 30
+            initialDelaySeconds: 150
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
-          
+
           # Resource limits
           resources:
             requests:
-              memory: "512Mi"
+              memory: "768Mi"
               cpu: "250m"
             limits:
-              memory: "1Gi"
+              memory: "1536Mi"
               cpu: "500m"
           
           # Volume mounts for logs
