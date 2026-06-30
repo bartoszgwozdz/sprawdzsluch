@@ -2,6 +2,7 @@
 node_modules/
 backups/
 target/
+examples/
 *.log
 *.jar
 *.class
