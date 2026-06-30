@@ -425,6 +425,50 @@ header {
     font-size: 1.25rem;
 }
 
+/* Hero — strip cenowy: poglądowy (za darmo) + pełny raport (wyróżniony) */
+.hero-pricing {
+    margin-top: 1.5rem;
+    display: inline-flex;
+    align-items: stretch;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+.hero-pricing__tier {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.8rem 1.15rem;
+}
+.hero-pricing__tier + .hero-pricing__tier { border-left: 1px solid var(--color-border); }
+.hero-pricing__tier--full { background: var(--teal-50); }
+.hero-pricing__icon { font-size: 1.5rem; color: var(--color-accent-strong); }
+.hero-pricing__tier--full .hero-pricing__icon { color: var(--color-primary); }
+.hero-pricing__text { display: flex; flex-direction: column; line-height: 1.2; text-align: left; }
+.hero-pricing__label { font-size: 0.78rem; color: var(--color-text-muted); }
+.hero-pricing__value {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--color-accent-strong);
+}
+.hero-pricing__tier--full .hero-pricing__value { color: var(--color-primary); }
+
+@media (max-width: 480px) {
+    .hero-pricing { display: flex; flex-direction: column; width: 100%; }
+    .hero-pricing__tier { justify-content: flex-start; }
+    .hero-pricing__tier + .hero-pricing__tier { border-left: none; border-top: 1px solid var(--color-border); }
+}
+
+/* Najniższa cena z 30 dni przed obniżką (wymóg dyrektywy Omnibus) */
+.price-min-note {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
 .hero-image-container {
     position: relative;
 }
@@ -1884,4 +1928,270 @@ ul.features li .material-icons {
         height: 32px; /* czytelny, statyczny wskaźnik „gra” */
     }
     .btn-primary:hover, .btn-submit:hover:not(:disabled) { transform: none; }
+}
+
+/* =========================================================================
+   ELEMENTY ZAUFANIA / KONWERSJI  (social proof, opinie, płatności, RODO)
+   UWAGA: to temat zdrowotny. Wszystkie liczby/cytaty/odznaki to STRUKTURA
+   z wyraźnymi placeholderami — patrz docs/TRUST_PLACEHOLDERS.md. Nic
+   zmyślonego nie może trafić na produkcję jako fakt.
+   ========================================================================= */
+
+/* --- Placeholder: treść do uzupełnienia (celowo NIE wygląda jak marka) --- */
+.placeholder {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.92em;
+    font-weight: 600;
+    color: #92400E;                 /* amber-800 — kontrast ≥7:1 na amber-100 */
+    background: #FEF3C7;            /* amber-100 */
+    border: 1px dashed #D97706;    /* amber-600 */
+    border-radius: 6px;
+    padding: 0 0.35em;
+    white-space: nowrap;
+}
+
+.placeholder-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    margin-top: 0.85rem;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: #92400E;
+    background: #FFFBEB;           /* amber-50 */
+    border: 1px dashed #FBBF24;    /* amber-400 */
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 0.8rem;
+    text-align: left;
+}
+.placeholder-note .material-icons { font-size: 1.1rem; flex-shrink: 0; }
+
+/* --- Pasek social proof (liczby) --- */
+.stat-band {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin: 1.5rem 0 2.5rem;
+    padding: 2rem 1.75rem;
+    background: linear-gradient(135deg, var(--teal-50), var(--green-50));
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    text-align: center;
+}
+.stat-item { padding: 0.25rem; }
+.stat-num {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: clamp(1.5rem, 4vw, 2.1rem);
+    color: var(--color-primary);
+    line-height: 1.15;
+}
+.stat-label {
+    margin-top: 0.35rem;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+}
+
+/* --- Sekcja opinii użytkowników --- */
+.reviews-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+.review-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    text-align: left;
+    transition: box-shadow var(--transition), transform var(--transition);
+}
+.review-card:hover { box-shadow: var(--shadow-md); transform: translateY(-4px); }
+.stars { display: inline-flex; gap: 0.05rem; color: #F59E0B; }
+.stars .material-icons { font-size: 1.2rem; }
+.review-text { color: var(--color-text); font-size: 1.02rem; }
+.review-author { display: flex; align-items: center; gap: 0.85rem; margin-top: auto; }
+.review-author img {
+    width: 48px; height: 48px;
+    border-radius: var(--radius-pill);
+    object-fit: cover;
+    box-shadow: var(--shadow-sm);
+}
+.review-avatar {
+    width: 48px; height: 48px;
+    flex-shrink: 0;
+    border-radius: var(--radius-pill);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #fff;
+    background: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+}
+.review-card:nth-child(2) .review-avatar { background: var(--color-accent); }
+.review-card:nth-child(3) .review-avatar { background: var(--teal-600); }
+.review-name { font-family: var(--font-heading); font-weight: 700; font-size: 0.95rem; color: var(--color-text); }
+.review-role { font-size: 0.82rem; color: var(--color-text-muted); }
+
+/* --- Kompetencje audiologa (chipy) --- */
+.credential-chips { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.25rem; }
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    padding: 0.45rem 0.95rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+.chip .material-icons { font-size: 1.05rem; color: var(--color-primary); }
+
+/* --- Strip zaufania (płatności + bezpieczeństwo na jednej karcie) --- */
+.trust-strip {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 1.75rem 1.5rem;
+    margin: 2rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    text-align: center;
+}
+.trust-strip h2 { font-size: 1.2rem; font-weight: 700; }
+.trust-strip__divider { width: 100%; max-width: 520px; height: 1px; background: var(--color-border); }
+
+/* --- Rząd ikon płatności (Paynow) --- */
+[data-payment-methods] { width: 100%; }
+.pay-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.pay-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    min-width: 56px;
+    padding: 0 0.7rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+}
+.pay-badge--wide { min-width: 76px; }
+.pay-badge svg { height: 20px; width: auto; display: block; }
+.pay-note {
+    margin-top: 0.85rem;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* --- Rząd odznak bezpieczeństwa / RODO / SSL --- */
+.trust-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+    align-items: center;
+    justify-content: center;
+}
+.trust-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    font-weight: 600;
+}
+.trust-badge .material-icons { color: var(--color-accent-strong); font-size: 1.35rem; }
+
+/* --- Nota gwarancji / satysfakcji --- */
+.guarantee-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    background: var(--green-50);
+    border: 1px solid var(--green-100);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+    margin: 1.25rem 0;
+    text-align: left;
+}
+.guarantee-note .material-icons { color: var(--color-accent-strong); font-size: 1.6rem; flex-shrink: 0; }
+.guarantee-note .guarantee-title { font-family: var(--font-heading); font-weight: 700; color: var(--color-text); }
+.guarantee-note p { font-size: 0.9rem; color: var(--color-text-muted); margin-top: 0.15rem; }
+
+/* --- Mini-FAQ na stronie głównej (współdzieli akordeon globalny) --- */
+.home-faq { max-width: 820px; margin: 0 auto; }
+.faq-more { text-align: center; margin-top: 1.5rem; }
+.faq-more a { font-weight: 600; text-decoration: none; }
+.faq-more a:hover { text-decoration: underline; }
+
+/* =========================================================================
+   Akordeon FAQ — globalny (używany przez /faq oraz mini-FAQ na stronie gł.)
+   ========================================================================= */
+.faq-item {
+    margin-bottom: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: box-shadow var(--transition), border-color var(--transition);
+}
+.faq-item.open { border-color: var(--teal-200); box-shadow: var(--shadow-md); }
+.faq-question {
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    padding: 1.1rem 1.25rem;
+    min-height: 56px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--color-text);
+    background: none;
+    border: none;
+    transition: color var(--transition);
+}
+.faq-question:hover { color: var(--color-primary); }
+.faq-icon { color: var(--color-text-muted); flex-shrink: 0; transition: transform var(--transition); }
+.faq-item.open .faq-icon { transform: rotate(180deg); color: var(--color-primary); }
+.faq-answer {
+    padding: 0 1.25rem 1.4rem;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    text-align: left;
+    display: none;
+}
+.faq-item.open .faq-answer { display: block; }
+
+@media (min-width: 768px) {
+    .stat-band { grid-template-columns: repeat(3, 1fr); }
+    .reviews-grid { grid-template-columns: repeat(3, 1fr); }
 }

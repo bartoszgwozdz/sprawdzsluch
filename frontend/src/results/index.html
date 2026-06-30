@@ -48,6 +48,7 @@
         <div>
           <h2 class="results-subtitle">Pełny raport z badania</h2>
           <p class="results-lead">Za jedyne <span class="price-old">49,99 zł</span> <span class="price-tag">24,99 zł</span> otrzymasz kompletny raport PDF na podany e-mail.</p>
+          <p class="price-min-note">Najniższa cena z 30 dni przed obniżką: <span class="placeholder">{{CENA_MIN_30DNI}}</span></p>
 
           <ul class="features">
             <li><span class="material-icons" aria-hidden="true">check_circle</span> Szczegółowy audiogram dla obu uszu</li>
@@ -133,11 +134,28 @@
             <p style="font-size:0.8rem; color: var(--color-text-muted);">* Pola obowiązkowe</p>
           </div>
 
+          <!-- ====== NOTA GWARANCJI / SATYSFAKCJI — placeholder, do potwierdzenia ====== -->
+          <div class="guarantee-note">
+            <span class="material-icons" aria-hidden="true">verified</span>
+            <div>
+              <span class="guarantee-title"><span class="placeholder">{{GWARANCJA_NAGLOWEK}}</span></span>
+              <p><span class="placeholder">{{GWARANCJA_OPIS}}</span> — wpisz tu wyłącznie realne warunki (np. zwrot środków, gdy raport nie dotrze). Jeśli nie oferujesz gwarancji, usuń tę sekcję.</p>
+            </div>
+          </div>
+
           <div>
             <button id="buyBtn" type="submit" class="btn-submit">
               Kup raport PDF za 24,99 zł
             </button>
             <p class="secure-note"><span class="material-icons" aria-hidden="true">lock</span> Bezpieczna płatność · raport PDF trafi na Twój e-mail</p>
+
+            <!-- ====== ZAUFANIE: ikony płatności (Paynow) + RODO/SSL ====== -->
+            <div class="trust-badges" style="margin-top:1rem;">
+              <span class="trust-badge"><span class="material-icons" aria-hidden="true">lock</span> Szyfrowanie SSL</span>
+              <span class="trust-badge"><span class="material-icons" aria-hidden="true">verified_user</span> RODO</span>
+              <span class="trust-badge"><span class="material-icons" aria-hidden="true">health_and_safety</span> Dane medyczne chronione</span>
+            </div>
+            <div data-payment-methods style="margin-top:0.85rem;"></div>
           </div>
 
           <p id="statusMessage" class="status-message" style="display:none;"></p>
