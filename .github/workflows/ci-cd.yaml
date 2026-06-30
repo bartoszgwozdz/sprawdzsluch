@@ -131,6 +131,12 @@ jobs:
           # Na samym końcu ingress
           kubectl apply -f k8s/ingress.yaml
 
+          # Ustaw konkretny tag obrazu (SHA commita) aby wymusić pobranie nowego obrazu
+          kubectl set image deployment/frontend frontend=${LOCAL_REGISTRY}/frontend:${IMAGE_TAG} -n $K8S_NAMESPACE
+          kubectl set image deployment/backend-core backend-core=${LOCAL_REGISTRY}/backend-core:${IMAGE_TAG} -n $K8S_NAMESPACE
+          kubectl set image deployment/backend-payments backend-payments=${LOCAL_REGISTRY}/backend-payments:${IMAGE_TAG} -n $K8S_NAMESPACE
+          kubectl set image deployment/backend-pdf backend-pdf=${LOCAL_REGISTRY}/backend-pdf:${IMAGE_TAG} -n $K8S_NAMESPACE
+
           kubectl rollout status statefulset/mongodb -n $K8S_NAMESPACE
           kubectl rollout status deployment/frontend -n $K8S_NAMESPACE
           kubectl rollout status deployment/backend-core -n $K8S_NAMESPACE
